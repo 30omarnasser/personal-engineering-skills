@@ -1,0 +1,23 @@
+{
+  "skill_name": "rag-evaluation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I switched the chunk size from 512 to 1024 tokens in our retriever. Are the answers better now?",
+      "expected_output": "Looks for EVAL_CMD and BASELINE; if missing, stops and says so instead of guessing or claiming improvement. If present, runs harness and reports baseline vs current metric table with regressions inspected.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Here are eval results. Baseline: recall@5 0.81, faithfulness 0.88, p95 2.1s, $0.012/q. Current: recall@5 0.86, faithfulness 0.83, p95 3.4s, $0.019/q. Failing IDs: q14, q22, q37 (new). Should I merge?",
+      "expected_output": "Verdict MIXED: retrieval up, faithfulness down, latency and cost up; lists q14/q22/q37 as regressions to inspect; does not recompute or invent numbers; does not update baseline without approval.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Explain the difference between BM25 and dense retrieval.",
+      "expected_output": "SHOULD NOT TRIGGER rag-evaluation. Plain explanation.",
+      "files": []
+    }
+  ]
+}

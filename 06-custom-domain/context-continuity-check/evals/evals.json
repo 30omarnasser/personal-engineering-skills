@@ -1,0 +1,23 @@
+{
+  "skill_name": "context-continuity-check",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm starting fresh from this handoff. What's next?\n\nHANDOFF: Working on quote export. Mostly done. Tests pass. Next: finish the remaining bits. Keep the format the client agreed on.",
+      "expected_output": "Flags the handoff as insufficient: no branch, no file paths, no test command/result, 'agreed format' not specified or sourced, next action vague. Asks for or reconstructs from git log/status rather than guessing.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Before I /compact, check this handoff is complete:\nGoal: add PDF export to /quotes/{id}. Branch: feat/quote-pdf. Decided: WeasyPrint, A4, Arabic RTL support (ADR-007). Done: template + route, commit a1b2c3d, `uv run pytest tests/test_quotes.py` 14 passed. Pending: 1) RTL font embedding 2) add endpoint to docs. Open question: logo source.",
+      "expected_output": "Runs through checklist, finds it largely complete, verifies against git log/status/test command where available, and reports any mismatch. Does not invent missing items.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Rename the variable `qty` to `quantity` in utils.py.",
+      "expected_output": "SHOULD NOT TRIGGER context-continuity-check.",
+      "files": []
+    }
+  ]
+}

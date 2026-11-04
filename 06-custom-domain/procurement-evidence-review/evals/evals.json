@@ -1,0 +1,23 @@
+{
+  "skill_name": "procurement-evidence-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review this tender analysis before I send the offer.\n\nTENDER EXCERPT:\n§4.2 All motors shall be IE3 efficiency class minimum, 400V/50Hz.\n§4.3 Motors installed in Zone 1 areas (see Annex B) shall be ATEX Ex d certified.\n§9.1 Special Conditions: Notwithstanding §4.2, pump motors above 75kW shall be IE4.\n\nAGENT OUTPUT:\n1. Motors must be IE3 — our offer of IE3 for all motors including the 90kW pump complies.\n2. ATEX not required.\n3. Voltage 400V/60Hz.",
+      "expected_output": "Flags finding 1 as CONTRADICTED by §9.1 (90kW pump needs IE4, precedence of special conditions); finding 2 as UNSUPPORTED/CONDITIONAL on Annex B zones; finding 3 as CONTRADICTED (50Hz not 60Hz). Every row cites a clause. Ends with no-go.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Check this RFQ extraction: Requirement 'IP65 enclosure' — source: RFQ p.3 §2.1 'Enclosures shall be IP65 or better.' Applicability: applies to all panels. Our offer: IP66.",
+      "expected_output": "Marks it VERIFIED (IP66 exceeds IP65) with source cited and applicability explicit; notes nothing missing given the limited excerpt, and does not invent extra requirements.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Can you review my FastAPI pagination code for off-by-one bugs?\n\n@app.get('/items')\ndef items(page: int = 1, size: int = 20):\n    return db[page*size:(page+1)*size]",
+      "expected_output": "SHOULD NOT TRIGGER procurement-evidence-review. Ordinary code review: notes page=1 skips the first page.",
+      "files": []
+    }
+  ]
+}
