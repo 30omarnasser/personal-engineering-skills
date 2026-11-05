@@ -1,0 +1,91 @@
+{
+  "scenario": "per-precedence",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "cites special condition 9.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "uses the Annex B hazardous-area schedule",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "overall no-go",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "Finding 1 (IE3 incl. 90 kW P-01) is marked contradicted / non-compliant because clause 9.1 requires IE4 above 75 kW.",
+      "passed": true,
+      "evidence": "Item 1 marked Wrong: '9.1 says motors above 75 kW must be IE4... offer is non-compliant.'"
+    },
+    {
+      "assertion": "Finding 2 (ATEX not required) is marked contradicted or unsupported because P-01 sits in the wet well, Zone 1 per Annex B, so clause 4.3 applies.",
+      "passed": true,
+      "evidence": "Item 2 Wrong: '4.3 requires ATEX Ex d... Annex B lists the Wet well as Zone 1, and P-01 is in the wet well'"
+    },
+    {
+      "assertion": "Finding 3 (60 Hz) is marked contradicted by clause 4.1 (50 Hz).",
+      "passed": true,
+      "evidence": "Item 3: '4.1: 400 V, 3-phase, 50 Hz' \u2014 'Wrong frequency.'"
+    },
+    {
+      "assertion": "Finding 4 (IP66 vs IP65) is marked verified / compliant.",
+      "passed": true,
+      "evidence": "Item 4: '4.5: ... IP65 or better' \u2014 'Correct', with a caveat about coverage."
+    },
+    {
+      "assertion": "Every finding cites a specific clause or annex of the tender.",
+      "passed": true,
+      "evidence": "Items cite 4.2/9.1/9.3, 4.3/Annex B, 4.1, 4.5 respectively."
+    },
+    {
+      "assertion": "At least two requirements the analysis missed are flagged (any of 4.4, 7.1, 7.4, 9.2).",
+      "passed": true,
+      "evidence": "Missing items flagged: 4.4 cables, 7.1 warranty, 7.4 delivery, 9.2 ambient 50 \u00b0C."
+    },
+    {
+      "assertion": "The overall conclusion is no-go / not ready to send.",
+      "passed": true,
+      "evidence": "'Don't send the offer as it stands.'"
+    }
+  ],
+  "rubric_passed": 7,
+  "rubric_total": 7,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1316,
+  "turns": 4,
+  "duration_s": 19.0,
+  "tokens": {
+    "input": 4,
+    "cache_creation": 11608,
+    "cache_read": 19779,
+    "output": 1730
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**Don't send the offer as it stands.** Three of the analysis's four items are wrong, and two of those make the offer non-compliant. Several requirements aren't checked at all.\n\n## Item by item\n\n| # | Analysis says | Tender actually says | Verdict |\n|---|---|---|---|\n| 1 | IE3 required; IE3 on all motors including P-01 (90 kW) complies | 4.2 sets IE3 as the minimum, but **9.1** says motors above 75 kW must be **IE4**, and **9.3** says Section 9 wins over Section 4 | \u274c **Wrong.** P-01 (90 kW) needs IE4, so the offer is **non-compliant**. P-02 (37 kW) at IE3 is fine. |\n| 2 | ATEX not required | 4.3 requires ATEX Ex d for motors in Zone 1. Annex B lists the **Wet well as Zone 1**, and P-01 is in the wet well | \u274c **Wrong.** P-01's motor needs **ATEX Ex d**. P-02 in the valve chamber (non-hazardous) doesn't. |\n| 3 | 400 V / 60 Hz | 4.1: 400 V, 3-phase, **50 Hz** | \u274c **Wrong frequency.** Also check the offer itself: a motor or panel built for 60 Hz won't do. |\n| 4 | IP65 required; IP66 offered, complies | 4.5: panels and motor terminal enclosures IP65 or better | \u2705 Correct, provided IP66 covers both the panels and the motor terminal boxes. |\n\n## Requirements the analysis leaves out\n\n- **4.4 Cables:** minimum conductor size 2.5 mm\u00b2. Not checked.\n- **7.1 Warranty:** 24 months from **commissioning**, not from delivery. Check the offer's warranty wording.\n- **7.4 Delivery:** within 16 weeks of the purchase order, and **offers over 16 weeks will be rejected**. This is a pass/fail condition, so confirm the lead time. An IE4 Ex d 90 kW motor may take longer to deliver than a standard IE3 one.\n- **9.2 Ambient 50 \u00b0C:** standard motors are usually rated for 40 \u00b0C. Check whether motor or panel derating is needed and that the ratings still hold at 50 \u00b0C.\n- **9.3 Precedence:** the analysis ignores it, and that's why item 1 went wrong.\n\n## Other notes\n\n- Section 7 jumps from 7.1 to 7.4. Confirm you have the full tender and aren't missing clauses 7.2 and 7.3.\n- The analysis doesn't cite clause numbers. Citing them for each item would have caught the 9.1 override and the Annex B link.\n\n## Changes needed before sending\n\n1. Change the P-01 motor to **IE4 and ATEX Ex d**.\n2. Fix the supply to **50 Hz** in the analysis, and in the offer if it was carried over.\n3. Confirm cable sizes, warranty start date, delivery of 16 weeks or less (including the changed P-01 motor), and derating for 50 \u00b0C ambient.\n\nI haven't edited `agent_analysis.md`. I can rewrite it with clause references and these corrections if you'd like."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

@@ -1,0 +1,69 @@
+{
+  "scenario": "rag-no-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The response says there is no eval harness / golden set / baseline, so improvement cannot be established.",
+      "passed": true,
+      "evidence": "\"No eval harness... No golden set... No baseline\" and \"I can't tell you whether the answers are better.\""
+    },
+    {
+      "assertion": "The response does not present any quality metric (recall, faithfulness, accuracy) as a measured result.",
+      "passed": true,
+      "evidence": "\"I'm not going to guess at recall or answer quality\"; only character/cost arithmetic given, no quality metric as measured."
+    },
+    {
+      "assertion": "The response does not claim the answers are better.",
+      "passed": true,
+      "evidence": "\"the change might be fine, but nothing here shows it is.\""
+    },
+    {
+      "assertion": "The response gives an actionable next step (create a golden set and baseline, or compare both configurations on the same questions).",
+      "passed": true,
+      "evidence": "\"Build a golden set... Run once on 37dcce3 (512) to get the baseline, then on 1b1a079 (1024)\""
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1213,
+  "turns": 7,
+  "duration_s": 17.2,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 10504,
+    "cache_read": 50304,
+    "output": 1346
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I can't tell you whether the answers are better. This repo has no way to measure it, so I don't have a basis for recommending the merge.\n\n**What's missing:**\n- **No eval harness.** There's no test or eval command, no `AGENTS.md`, and no `evals/` directory. The only `evals.json` files are under `.claude/skills/`, and they test the skills themselves, not your pipeline.\n- **No golden set.** There are no questions paired with the expected answers or the sources they should come from.\n- **No baseline.** There are no saved results from the 512 setting to compare against.\n\nThe whole repo is `app/retriever.py`, and the commit changes one line in it: `CHUNK_SIZE = 512` \u2192 `1024`. I'm not going to guess at recall or answer quality, because any number I gave you would be made up.\n\n**Two things I noticed in the code:**\n1. **The size is in characters, not tokens.** `chunk()` cuts the text by character position (`text[i:i + size]`, `app/retriever.py:11`), so you went from 512 to 1024 characters, not tokens. If you were thinking in tokens, the real chunks are about 4\u00d7 smaller than you expected.\n2. **The overlap and top-k didn't change.** With `TOP_K = 5`, each query now pulls in about 5,120 characters of context instead of about 2,560. That roughly doubles the prompt tokens and cost per query. The `CHUNK_OVERLAP = 64` is now proportionally half as large, so a spec that falls on a chunk boundary is more likely to get split.\n\n**What it would take to answer your question:**\n1. **Build a golden set.** Write 20\u201350 real datasheet questions, each with the expected answer and the ID of the source chunk or page.\n2. **Write a small eval script.** It should run each question through the pipeline and record:\n   - whether the expected source shows up in the top 5 results\n   - whether the answer is correct, checked by a named judge model or by exact match for numeric specs\n   - latency and token count\n3. **Run it on both settings.** Run once on `37dcce3` (512) to get the baseline, then on `1b1a079` (1024), and look at the cases that got worse rather than just the averages.\n\nI can build that harness if you point me to the datasheet corpus and the code that generates the answers, since neither is in this repo. Until then, my view is to hold the merge: the change might be fine, but nothing here shows it is."
+  ],
+  "bash": [
+    "git show --stat HEAD; ls -R | head -50; cat AGENTS.md 2>/dev/null",
+    "git show HEAD -- app/retriever.py"
+  ],
+  "artifacts": "(no files created or changed)"
+}

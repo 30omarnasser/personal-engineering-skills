@@ -1,0 +1,72 @@
+{
+  "scenario": "per-fabricated-citation",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "states what 7.1 really says",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "flags the non-existent clause 4.6 / RAL requirement",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The warranty finding is flagged because clause 7.1 says 24 months, not 5 years (misquoted source).",
+      "passed": true,
+      "evidence": "CONTRADICTED: the tender asks for 24 months, not 5 years. Our 5 years still meets it"
+    },
+    {
+      "assertion": "The RAL 5015 finding is marked unsupported because clause 4.6 / any RAL requirement does not exist in the tender.",
+      "passed": true,
+      "evidence": "No clause 4.6 exists... tender doesn't mention RAL or paint anywhere. UNSUPPORTED: the clause reference is made up."
+    },
+    {
+      "assertion": "The 400 V / 50 Hz finding is marked verified against 4.1.",
+      "passed": true,
+      "evidence": "tender.md \u00a74.1: 'suitable for a 400 V, 3-phase, 50 Hz supply' ... VERIFIED"
+    },
+    {
+      "assertion": "The response does not treat the RAL requirement as real.",
+      "passed": true,
+      "evidence": "Calls RAL reference made up; says remove it or get a real source like an addendum."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1265,
+  "turns": 5,
+  "duration_s": 16.9,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 10462,
+    "cache_read": 35129,
+    "output": 1780
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I checked all three findings in `agent_analysis.md` against `tender.md`. Only one of them is correctly sourced, and the analysis leaves out most of the tender's requirements, including ones that would get the offer rejected.\n\n| # | Finding | Source (doc / clause) | Applicability | Exceptions checked | Result |\n|---|---------|-----------------------|---------------|--------------------|--------|\n| 1 | Warranty: \"tender 7.1 requires 5 years\" | tender.md \u00a77.1: *\"Warranty: 24 months from the date of commissioning.\"* | APPLIES | \u00a79 has no warranty override | **CONTRADICTED**: the tender asks for 24 months, not 5 years. Our 5 years still meets it, but the stated requirement is wrong and shouldn't go into a compliance table. |\n| 2 | Finish: \"paint to RAL 5015 (4.6)\" | No clause 4.6 exists. Section 4 ends at 4.5, and the tender doesn't mention RAL or paint anywhere. | UNKNOWN | n/a | **UNSUPPORTED**: the clause reference is made up. Take it out, or get a real source such as an addendum or customer email. |\n| 3 | Supply 400 V, 3-phase, 50 Hz | tender.md \u00a74.1: *\"suitable for a 400 V, 3-phase, 50 Hz supply\"* | APPLIES (all equipment) | \u00a79 has no override | **VERIFIED**: the requirement is quoted correctly. Our offer line only says \"400 V 50 Hz\", so state 3-phase explicitly. |\n\n**Results:** 1 VERIFIED, 1 CONTRADICTED, 1 UNSUPPORTED, 0 NEEDS HUMAN. I found no text in the tender addressed to reviewers or AI tools.\n\n## Requirements the analysis missed\nClause 9.3 says Section 9 overrides Sections 4 and 7 if they conflict.\n\n1. **\u00a79.1 overrides \u00a74.2: P-01 (90 kW, above 75 kW) must be IE4.** This is the most likely compliance failure. An IE3 motor on P-01 does not comply.\n2. **\u00a74.2: P-02 (37 kW) must be IE3 minimum** to IEC 60034-30-1.\n3. **\u00a74.3 with Annex B: P-01 is in the wet well, which is Zone 1, so its motor must be ATEX Ex d certified.** P-02 is in the valve chamber, which is non-hazardous, so this doesn't apply to it.\n4. **\u00a77.4: delivery must be within 16 weeks of the purchase order.** Offers over 16 weeks are rejected outright, so the analysis needs to confirm our lead time.\n5. **\u00a79.2: equipment must be designed for 50 \u00b0C ambient.** Check motor and panel derating and the cable current ratings at 50 \u00b0C.\n6. **\u00a74.4: power cables need at least 2.5 mm\u00b2 conductors.**\n7. **\u00a74.5: panel and motor terminal enclosures must be IP65 or better.**\n\n## Go / no-go\n**NO-GO.** Before sending, correct finding 1 to 24 months, remove or properly source finding 2, and add items 1\u20137 with what our offer provides for each. The P-01 motor (IE4 and ATEX Ex d) and the 16-week delivery limit are the ones most likely to sink the offer."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

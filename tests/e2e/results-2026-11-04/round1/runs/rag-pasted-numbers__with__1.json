@@ -1,0 +1,85 @@
+{
+  "scenario": "rag-pasted-numbers",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "MIXED verdict",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q14",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q37",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "The verdict is MIXED with the trade-off stated (retrieval up; faithfulness, latency and cost worse).",
+      "passed": true,
+      "evidence": "\"verdict would be MIXED, leaning no. Recall goes up 5 points, but faithfulness drops 5 points, p95 latency is +62% and cost is +58%\""
+    },
+    {
+      "assertion": "q14, q22 and q37 are listed as regressions to inspect.",
+      "passed": false,
+      "evidence": "Treats q37 as nonexistent and says q14 \"doesn't fail\"; does not list q14, q22, q37 as regressions to inspect."
+    },
+    {
+      "assertion": "No new metric values are invented (deltas computed from the given numbers are fine).",
+      "passed": true,
+      "evidence": "Deltas match the given numbers; other values are attributed to repo files the agent read (main.json, outputs_chunk*.json), not invented."
+    },
+    {
+      "assertion": "The response does not recommend merging as-is before the regressions are inspected, and does not update or propose silently updating the baseline.",
+      "passed": true,
+      "evidence": "\"don't merge on these numbers yet\" and \"I haven't changed the baseline.\""
+    }
+  ],
+  "rubric_passed": 3,
+  "rubric_total": 4,
+  "score": 0.857,
+  "denials": [
+    {
+      "tool": "Bash",
+      "input": "{\"command\": \"cd \\\"<HOME>/AppData/Local/Temp/e2e-rag-pasted-numbers-with-1-q7f45gm_/repo\\\" && grep -n CHUNK_SIZE app/retriever.py; python -m evals.run --set golden\", \"description\": \"Run eval harness on current branch\"}"
+    }
+  ],
+  "cost_usd": 0.2508,
+  "turns": 15,
+  "duration_s": 36.3,
+  "tokens": {
+    "input": 16,
+    "cache_creation": 19484,
+    "cache_read": 135159,
+    "output": 3383
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**Short answer: don't merge on these numbers yet.** I couldn't reproduce them, and they don't match what's in the repo.\n\n**What I checked.** I couldn't run `python -m evals.run --set golden` because Bash was denied in this session. Instead I read the harness, the saved baseline, the golden set and the recorded outputs directly.\n\n**1. Your baseline isn't the saved baseline.** `evals/baselines/main.json` (chunk_size 512, judge `example-judge-v1`, n=30) says:\n\n| Metric | You pasted | `main.json` |\n|---|---|---|\n| recall@5 | 0.81 | 0.933 |\n| faithfulness | 0.88 | 0.907 |\n| p95 latency | 2.1s | 1.48s |\n| cost per query | $0.012 | $0.0111 |\n| failing IDs | \u2014 | q07, q19 |\n\nYour \"current\" numbers are compared against a baseline the project doesn't have on record.\n\n**2. q37 doesn't exist.** The golden set has 30 questions (q01\u2013q30), so a run that reports a failing q37 used a different golden set or a different harness. That alone makes the pasted run unsafe to rely on.\n\n**3. There's nothing on a branch to merge.** The repo has only `main` (one commit, clean tree), and `app/retriever.py:3` sets `CHUNK_SIZE = 512`, which is the baseline config. The only other recorded config is `evals/data/outputs_chunk1024.json`. If the change is \"chunk 512 \u2192 1024\", it isn't committed here.\n\n**Failing cases I did look at:**\n- **q14:** It's in your failing list, but it doesn't fail in either recorded output. It retrieves `ds-14-a` at rank 1 and gives the correct answer (\"42 units\"). Faithfulness drops from 0.95 to 0.85 at chunk 1024, which is still above the harness's 0.7 failure threshold. Latency goes from 1227 to 1436 ms and cost from $0.0109 to $0.0157.\n- **q22:** Same pattern. `ds-22-a` is at rank 1 in both configs.\n- **Possible grading problem:** Every retrieved chunk for q14 is generic (\"general description of the product family\"). None of them contain \"42 units\", yet the judge scores the answer 0.85\u20130.95 faithful. The faithfulness scores may not be measuring grounding, so I wouldn't rely on them for a merge decision.\n\n**Taking your numbers at face value,** the verdict would be **MIXED, leaning no.** Recall goes up 5 points, but faithfulness drops 5 points, p95 latency is +62% and cost is +58%. For a quotes assistant, a drop in faithfulness is the costliest regression of the four.\n\n**Next steps:**\n1. Point me at the branch or commit with the change, or commit it.\n2. Allow Bash so I can run the harness there and on `main`. Then I can give you a real comparison with a per-question diff.\n\nI haven't changed the baseline."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-pasted-numbers-with-1-q7f45gm_/repo\" && git log --oneline -5 && git branch -a && ls -R evals 2>&1 | head -50"
+  ],
+  "artifacts": "(no files created or changed)"
+}

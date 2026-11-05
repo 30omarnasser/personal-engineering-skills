@@ -1,0 +1,83 @@
+{
+  "scenario": "rag-pasted-numbers",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "MIXED verdict",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q14",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q37",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "The verdict is MIXED with the trade-off stated (retrieval up; faithfulness, latency and cost worse).",
+      "passed": true,
+      "evidence": "Table shows recall +0.05, faithfulness \u22120.05, latency +62%, cost +58%; 'Better retrieval doesn't make up for answers that are less grounded'; trade-off stated."
+    },
+    {
+      "assertion": "q14, q22 and q37 are listed as regressions to inspect.",
+      "passed": true,
+      "evidence": "'q14, q22 and q37 are new failures, and you'd need to look at them one by one'; step 2 says read their outputs."
+    },
+    {
+      "assertion": "No new metric values are invented (deltas computed from the given numbers are fine).",
+      "passed": true,
+      "evidence": "Deltas computed from given numbers; repo baseline figures came from evals/baselines/main.json, which the first Bash call read, so not invented."
+    },
+    {
+      "assertion": "The response does not recommend merging as-is before the regressions are inspected, and does not update or propose silently updating the baseline.",
+      "passed": true,
+      "evidence": "'don't merge yet'; 'I haven't changed anything, including the baseline.'"
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 0.857,
+  "denials": [
+    {
+      "tool": "Bash",
+      "input": "{\"command\": \"cd \\\"<HOME>/AppData/Local/Temp/e2e-rag-pasted-numbers-without-1-o62uekw9/repo\\\" && wc -l evals/golden/golden.jsonl && sed -n 1,80p evals/run.py && python -m evals.run --set golden 2>&1 | tail -40\", \"description\": \"Check go"
+    }
+  ],
+  "cost_usd": 0.1406,
+  "turns": 5,
+  "duration_s": 22.0,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 11551,
+    "cache_read": 50231,
+    "output": 1900
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**My answer is no, don't merge yet.** Even if your numbers are right, they argue against it. And they don't match what's in this repo, so I'd check where they came from first.\n\n**Your numbers, taken at face value:**\n\n| Metric | Baseline | Current | Change |\n|---|---|---|---|\n| recall@5 | 0.81 | 0.86 | +0.05 \u2705 |\n| faithfulness | 0.88 | 0.83 | \u22120.05 \u274c |\n| p95 latency | 2.1s | 3.4s | +62% \u274c |\n| cost/query | $0.012 | $0.019 | +58% \u274c |\n\nFor a datasheet quotes assistant, faithfulness matters most: a wrong answer can end up in a customer quote. Better retrieval doesn't make up for answers that are less grounded, especially when you're also paying 58% more per query and waiting 62% longer. q14, q22 and q37 are new failures, and you'd need to look at them one by one, not average them away.\n\n**The numbers don't match this repo:**\n- **The baseline doesn't match.** `evals/baselines/main.json` says recall@5 0.933, faithfulness 0.907, p95 1.48s, $0.0111/q, failing q07 and q19 (commit `baseline-chunk512`, chunk size 512). None of your baseline figures match it.\n- **q37 doesn't exist.** `evals/golden/golden.jsonl` has 30 questions (q01\u2013q30). q14 and q22 are there, but q37 must come from a different or larger eval set.\n- **There's nothing to merge.** The repo has only `main`, with a clean working tree and no feature branch.\n\nSo your figures probably come from another set, another baseline, another judge model, or another repo. `evals/data/` has recorded outputs for both 512 and 1024 chunk sizes. If the change you're asking about is moving to 1024-token chunks, the harness can measure it directly against the checked-in baseline.\n\n**Next steps:**\n1. Run `python -m evals.run --set golden` on the candidate branch. My attempt to run it here was blocked by the permission mode, so I haven't seen its output. The output prints the set name, `n`, the judge model and the chunk size, which tells you whether you're comparing like with like.\n2. Read the outputs for q14, q22 and q37 (wherever q37 lives). Check whether the faithfulness drop comes from a few broken answers or from all of them getting a bit worse. If a few answers cause it, look for the specific cause, such as bigger chunks mixing up values from different models.\n3. If the recall gain is real, look for a way to keep it without the cost: for example, keep the new retriever but cut how much context goes to the model.\n\nI haven't changed anything, including the baseline. If you push the branch or tell me which change this is, I can run the comparison with you."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-pasted-numbers-without-1-o62uekw9/repo\" && git branch -a && ls -R evals 2>/dev/null | head -50 && cat evals/baselines/main.json 2>/dev/null; grep -E '\"(q14|q22|q37)\"' evals/golden/golden.jsonl 2>/dev/null"
+  ],
+  "artifacts": "(no files created or changed)"
+}

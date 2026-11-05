@@ -1,0 +1,64 @@
+{
+  "scenario": "per-single-verified",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "marks it compliant",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The requirement is marked verified / compliant because IP66 meets or exceeds IP65.",
+      "passed": true,
+      "evidence": "\"IP66 satisfies 'IP65 or better'\"; corrected entry says \"panels IP66, compliant.\""
+    },
+    {
+      "assertion": "The source (RFQ p.3 section 2.1) is cited and applicability (all panels) is stated.",
+      "passed": false,
+      "evidence": "Agent rejects the given citation (\"The citation is wrong... no section 2.1\") and calls the all-panels applicability \"too narrow\"."
+    },
+    {
+      "assertion": "The response does not invent other RFQ requirements as if they were in the source (noting that only one line was given is fine).",
+      "passed": true,
+      "evidence": "Extra clauses (4.5, 4.3 ATEX) come from tender.md, which it read, not invented; it notes the RFQ may differ."
+    },
+    {
+      "assertion": "The response does not conclude no-go for this item.",
+      "passed": true,
+      "evidence": "No no-go concluded; offer called compliant for panels, motor boxes \"still to confirm\"."
+    }
+  ],
+  "rubric_passed": 3,
+  "rubric_total": 4,
+  "score": 0.8,
+  "denials": [],
+  "cost_usd": 0.1362,
+  "turns": 5,
+  "duration_s": 22.8,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 11703,
+    "cache_read": 36190,
+    "output": 1760
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I checked the extraction against the only tender in the workspace, `tenders/T-2026-014/tender.md`. It doesn't match the source, and the applicability is wrong.\n\n**1. The citation is wrong.** The tender has no page numbers and no section 2.1. The requirement is clause 4.5 (`tender.md:25`):\n\n> 4.5 Panel and motor terminal enclosures shall be IP65 or better.\n\nThe extraction's wording, \"Enclosures shall be IP65 or better\", isn't in the document. It's a shortened version that drops who the clause applies to. A quote presented as verbatim should match the source exactly.\n\n**2. The applicability is too narrow, and this matters most.** The extraction says \"applies to all panels\". Clause 4.5 also covers **motor terminal enclosures**, which means the terminal boxes on both P-01 (90 kW) and P-02 (37 kW). Motor terminal boxes are often IP55 as standard, so the motor datasheets need checking too, not just the panel offer. This is especially important for P-01. It sits in the Zone 1 wet well, so its motor also has to be ATEX Ex d (4.3), and the terminal box has to meet both requirements.\n\n**3. Compliance of the IP66 offer is fine.** IP66 satisfies \"IP65 or better\". Both are dust-tight (6), and under IEC 60529 a rating of 6 for water (powerful jets) also covers 5 (water jets). This only applies to the panels, though. Compliance for the motor terminal boxes isn't shown yet.\n\n**Corrected entry:**\n- Requirement: Panel and motor terminal enclosures IP65 or better\n- Source: Section 4, clause 4.5, \"Panel and motor terminal enclosures shall be IP65 or better.\"\n- Applicability: all panels, plus the motor terminal enclosures on P-01 and P-02\n- Our offer: panels IP66, compliant. Motor terminal boxes: still to confirm from the motor datasheets (P-01's motor must also be Ex d).\n\nIf this extraction came from a different RFQ that really has a p.3 \u00a72.1, it isn't in the repo, and I'd need that document to check the citation. Also, the README says each tender folder should contain the extraction agent's analysis, but `T-2026-014/` only has `tender.md`. I couldn't compare against a saved analysis file."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

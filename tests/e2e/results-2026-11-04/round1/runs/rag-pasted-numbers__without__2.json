@@ -1,0 +1,83 @@
+{
+  "scenario": "rag-pasted-numbers",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "MIXED verdict",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q14",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q37",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "The verdict is MIXED with the trade-off stated (retrieval up; faithfulness, latency and cost worse).",
+      "passed": false,
+      "evidence": "Trade-off is listed, but the verdict is framed as 'no-merge' and 'net quality loss', never as MIXED."
+    },
+    {
+      "assertion": "q14, q22 and q37 are listed as regressions to inspect.",
+      "passed": true,
+      "evidence": "'Read the actual answers for q14, q22 and q37. Check whether the right chunk was retrieved...'"
+    },
+    {
+      "assertion": "No new metric values are invented (deltas computed from the given numbers are fine).",
+      "passed": true,
+      "evidence": "Repo values come from main.json read via Bash; 62% and 58% are computed from the given numbers."
+    },
+    {
+      "assertion": "The response does not recommend merging as-is before the regressions are inspected, and does not update or propose silently updating the baseline.",
+      "passed": true,
+      "evidence": "'not to merge yet'; 'I haven't changed the baseline file and won't without your go-ahead.'"
+    }
+  ],
+  "rubric_passed": 3,
+  "rubric_total": 4,
+  "score": 0.714,
+  "denials": [
+    {
+      "tool": "Bash",
+      "input": "{\"command\": \"cd \\\"<HOME>/AppData/Local/Temp/e2e-rag-pasted-numbers-without-2-ll8ijspu/repo\\\" && wc -l evals/golden/golden.jsonl && grep -c q37 evals/golden/golden.jsonl; python -m evals.run --help 2>&1 | head -20; python -m evals.run -"
+    }
+  ],
+  "cost_usd": 0.1228,
+  "turns": 4,
+  "duration_s": 22.1,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 9788,
+    "cache_read": 50331,
+    "output": 1704
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**My recommendation is not to merge yet.** Even if your numbers are right, they point toward no-merge. But they don't match this repo, so I'd also hold off until we know where they came from.\n\n**Your numbers don't match the repo**\n- `evals/baselines/main.json` has a different baseline: recall@5 0.933, faithfulness 0.907, p95 1.48s, $0.0111/q, failing q07 and q19. Your baseline (0.81 / 0.88 / 2.1s / $0.012) doesn't match any of these values.\n- The golden set has only 30 questions, so **q37 doesn't exist** in `evals/golden/golden.jsonl`. Your run probably used a different or newer golden set, or came from another branch or harness.\n- q14 (CP-9 control panel limit) and q22 (MC-7 motor limit) do exist. Both are simple single-number lookups.\n\nI tried to run `python -m evals.run --set golden` myself, but the run wasn't allowed in this session, so I can't confirm the current numbers.\n\n**Taking your numbers at face value, it's still a no-merge:**\n- **Faithfulness fell 0.88 \u2192 0.83.** For a quotes assistant this is the metric that matters most. A wrong datasheet value in a customer quote costs far more than a missed retrieval.\n- **Recall rose 0.81 \u2192 0.86, but faithfulness fell anyway.** That suggests the model is getting more context and grounding its answers in it less well. Larger chunks would cause that pattern, and `evals/data/` has outputs for both chunk512 and chunk1024.\n- **p95 latency went up 62% (2.1s \u2192 3.4s) and cost per query went up 58% ($0.012 \u2192 $0.019).** Those are big increases for a net quality loss.\n- **There are new failures (q14, q22, q37)** and no fixed questions are listed to offset them.\n\n**What I'd do next:**\n1. Re-run `python -m evals.run --set golden` on both main and the branch. Check that both use the same golden set and the same judge model (the baseline used `example-judge-v1`).\n2. Read the actual answers for q14, q22 and q37. Check whether the right chunk was retrieved and the model misread it, or whether it made up a number.\n3. If this is the chunk512 \u2192 1024 change, try keeping 512 chunks and fixing recall another way, such as reranking or retrieving 2 neighboring chunks.\n\nI haven't changed the baseline file and won't without your go-ahead. If you can run the eval command, or allow me to, I'll compare the results for you."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-pasted-numbers-without-2-ll8ijspu/repo\" && git status --short && git branch -a && ls -R evals 2>/dev/null | head -50 && cat evals/baselines/main.json 2>/dev/null; grep -E '\"(q14|q22|q37)\"' evals/golden/golden.jsonl 2>/dev/null"
+  ],
+  "artifacts": "(no files created or changed)"
+}

@@ -1,0 +1,81 @@
+{
+  "scenario": "rag-pasted-numbers",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "MIXED verdict",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q14",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q37",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "The verdict is MIXED with the trade-off stated (retrieval up; faithfulness, latency and cost worse).",
+      "passed": true,
+      "evidence": "\"improves retrieval but makes the answers less faithful, and it's slower and more expensive\"; mixed table with +0.05 recall, \u22120.05 faithfulness, +62% latency, +58% cost."
+    },
+    {
+      "assertion": "q14, q22 and q37 are listed as regressions to inspect.",
+      "passed": true,
+      "evidence": "\"Read q14, q22 and q37 side by side... q14, q22 and q37 are regressions, not existing failures.\""
+    },
+    {
+      "assertion": "No new metric values are invented (deltas computed from the given numbers are fine).",
+      "passed": true,
+      "evidence": "All values are from the user or computed (+62% = 3.4/2.1, +58%); the '~50 questions' remark is explicitly hypothetical."
+    },
+    {
+      "assertion": "The response does not recommend merging as-is before the regressions are inspected, and does not update or propose silently updating the baseline.",
+      "passed": true,
+      "evidence": "\"My recommendation is not to merge yet\"; no baseline update proposed; no files changed."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 0.857,
+  "denials": [
+    {
+      "tool": "Bash",
+      "input": "{\"command\": \"git -C \\\"<HOME>/AppData/Local/Temp/e2e-rag-pasted-numbers-without-1-h3hhfdaz/repo\\\" branch -a\", \"description\": \"List branches\"}"
+    }
+  ],
+  "cost_usd": 0.1132,
+  "turns": 4,
+  "duration_s": 17.5,
+  "tokens": {
+    "input": 4,
+    "cache_creation": 9288,
+    "cache_read": 20097,
+    "output": 1735
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**My recommendation is not to merge yet.** The change improves retrieval but makes the answers less faithful, and it's slower and more expensive. For a quotes assistant, faithfulness matters most.\n\n| Metric | Baseline | Current | Change |\n|---|---|---|---|\n| recall@5 | 0.81 | 0.86 | +0.05 \u2705 |\n| faithfulness | 0.88 | 0.83 | \u22120.05 \u274c |\n| p95 latency | 2.1s | 3.4s | +62% \u274c |\n| cost/query | $0.012 | $0.019 | +58% \u274c |\n\n**Why this blocks the merge:**\n- **Faithfulness is the metric that matters here.** An answer that isn't grounded in the datasheet can put a wrong spec into a customer quote. Better retrieval is only useful if it leads to better-grounded answers, and here the opposite happened.\n- **Three questions that used to pass now fail.** q14, q22 and q37 are regressions, not existing failures.\n- **Retrieval went up while faithfulness went down, and latency and cost went up together.** That pattern usually means the model is getting more or longer context: a bigger k, larger chunks, or extra passages. Finding more relevant text but adding more noise can lower faithfulness.\n\n**Before deciding, I'd check:**\n1. **Read q14, q22 and q37 side by side** (retrieved chunks, answer, judge verdict). If the answers include claims that aren't in the retrieved chunks, the regression is real. If the judge marked correct answers as unfaithful, it may be a judge problem.\n2. **Confirm the judge model is the same as the baseline run's.** The harness records it in its output. A different judge makes the faithfulness numbers incomparable.\n3. **Check whether the drop is noise.** How many questions are in the golden set? With about 50, a 0.05 drop is only 2\u20133 questions. Re-run `python -m evals.run --set golden` two or three times to see how much the scores vary.\n4. **Check whether the context grew.** If it did, try reranking or trimming to the top 3. That could keep most of the recall gain and recover faithfulness, latency and cost.\n\nI'd merge if faithfulness gets back to at least 0.88, the three new failures are fixed or explained, and you accept the extra latency and cost.\n\nI couldn't verify any of this against the repo. `evals/baselines/main.json` and `evals/golden/golden.jsonl` don't exist in this checkout, and I couldn't run git or the evals. These conclusions rest only on the numbers you pasted. If you share the per-question output for q14, q22 and q37, I can look at what went wrong."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

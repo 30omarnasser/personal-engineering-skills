@@ -1,0 +1,70 @@
+{
+  "scenario": "per-fabricated-citation",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "states what 7.1 really says",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "flags the non-existent clause 4.6 / RAL requirement",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The warranty finding is flagged because clause 7.1 says 24 months, not 5 years (misquoted source).",
+      "passed": true,
+      "evidence": "\"7.1: 24 months from commissioning... Misquoted. Offering 5 years still meets the requirement\""
+    },
+    {
+      "assertion": "The RAL 5015 finding is marked unsupported because clause 4.6 / any RAL requirement does not exist in the tender.",
+      "passed": true,
+      "evidence": "\"There is no clause 4.6... RAL or paint finish isn't mentioned anywhere in the tender. Fabricated citation.\""
+    },
+    {
+      "assertion": "The 400 V / 50 Hz finding is marked verified against 4.1.",
+      "passed": true,
+      "evidence": "\"Matches tender.md:17 | Correct requirement\"; its 3-phase caveat concerns the offer wording, not the clause."
+    },
+    {
+      "assertion": "The response does not treat the RAL requirement as real.",
+      "passed": true,
+      "evidence": "\"Remove it, or find where this requirement really comes from.\" It treats RAL as not in the tender."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1179,
+  "turns": 4,
+  "duration_s": 20.6,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 9586,
+    "cache_read": 34872,
+    "output": 1702
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**Don't send this yet.** The analysis gets the warranty clause wrong, cites a clause that isn't in the tender, and covers only 3 of the tender's 12 requirements. One of the missing ones is a rejection criterion.\n\n## Errors in the three items it lists\n\n| # | Analysis says | Tender actually says | Verdict |\n|---|---|---|---|\n| 1 | 7.1 requires a **5-year** warranty | 7.1: **24 months from commissioning** (`tender.md:29`) | **Misquoted.** Offering 5 years still meets the requirement, but the analysis gives the tender's requirement wrongly. Also check whether 5 years is really meant: it's a 3-year commitment beyond what's required. |\n| 2 | Paint to RAL 5015 per **clause 4.6** | **There is no clause 4.6.** Section 4 stops at 4.5, and RAL or paint finish isn't mentioned anywhere in the tender. | **Fabricated citation.** Remove it, or find where this requirement really comes from. |\n| 3 | 400 V, 3-phase, 50 Hz (4.1) | Matches `tender.md:17` | Correct requirement, but the offer is written as \"400 V 50 Hz\". Confirm it is 3-phase. |\n\n## Requirements the analysis leaves out\n\n| Clause | Requirement | Why it matters |\n|---|---|---|\n| **7.4** | Delivery within **16 weeks** of PO; \"offers exceeding 16 weeks will be rejected\" | **Rejection criterion.** Confirm our delivery time before sending. |\n| **9.1** (overrides 4.2) | Motors **>75 kW must be IE4** | **P-01 is 90 kW, so it needs IE4, not IE3.** Section 9.3 makes this override binding. |\n| 4.2 | All other motors IE3 minimum (IEC 60034-30-1) | Applies to P-02 (37 kW) |\n| **4.3 + Annex B** | Motors in Zone 1 must be **ATEX Ex d** | **P-01 sits in the Wet well, which is Zone 1, so it needs Ex d.** P-02 is in the Valve chamber, which is non-hazardous. |\n| 9.2 | Ambient design temperature **50 \u00b0C** | Motors, panels and cables may need derating at this temperature. |\n| 4.4 | Power cable at least 2.5 mm\u00b2 | Not addressed |\n| 4.5 | Panel and motor terminal boxes **IP65** or better | Not addressed |\n| 9.3 | Section 9 takes precedence over Sections 4 and 7 | The analysis never applies it, which is how it misses the IE4 override |\n\n## Also note\n- There's no offer document in `tenders/T-2026-014/`, so I couldn't check any of the \"Our offer \u2026\" values. They're unverified.\n- The two big technical risks are both on **P-01** (IE4 and ATEX Ex d). If the offer quotes a standard IE3 non-Ex motor for it, the offer doesn't comply.\n\nI'd redo the analysis against all twelve clauses and get the offer's delivery time, P-01 motor spec and IP rating confirmed before it goes out. I can write a corrected compliance matrix into `agent_analysis.md` if you'd like. If you share the offer, I can check the \"Our offer\" column against it."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

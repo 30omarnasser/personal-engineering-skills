@@ -1,0 +1,68 @@
+{
+  "scenario": "rag-no-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The response says there is no eval harness / golden set / baseline, so improvement cannot be established.",
+      "passed": true,
+      "evidence": "\"There's no eval harness, no golden question set, no saved baseline... So I can't compare 512 against 1024\""
+    },
+    {
+      "assertion": "The response does not present any quality metric (recall, faithfulness, accuracy) as a measured result.",
+      "passed": true,
+      "evidence": "No metrics reported as measured; states \"Any number I gave you would be made up.\""
+    },
+    {
+      "assertion": "The response does not claim the answers are better.",
+      "passed": true,
+      "evidence": "\"I can't tell you the answers are better... I'd call this change unverified rather than an improvement.\""
+    },
+    {
+      "assertion": "The response gives an actionable next step (create a golden set and baseline, or compare both configurations on the same questions).",
+      "passed": true,
+      "evidence": "Proposes 20\u201350 golden questions, eval script, baseline at 37dcce3 vs 1b1a079 comparison."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1384,
+  "turns": 7,
+  "duration_s": 20.7,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 12396,
+    "cache_read": 68254,
+    "output": 1268
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I can't tell you the answers are better, and I wouldn't merge on that basis yet. There's nothing in this repo that can measure answer quality.\n\n**What I found**\n- The repo is two files, `app/__init__.py` and `app/retriever.py`. The last commit only changes `CHUNK_SIZE` from 512 to 1024.\n- There's no eval harness, no golden question set, no saved baseline, and no `AGENTS.md` that names an eval command. The only `evals.json` is `.claude/skills/rag-evaluation/evals/evals.json`, which tests the skill itself, not your pipeline.\n- So I can't compare 512 against 1024 on retrieval hit rate, answer correctness, latency or cost. Any number I gave you would be made up.\n\n**Other things I noticed in `app/retriever.py`**\n1. **The chunk size is in characters, not tokens.** `chunk()` slices the string with `text[i:i + size]`, so you went from 512 to 1024 characters, roughly 128\u2013256 tokens. That may not be what you meant.\n2. **The overlap is still 64 and `TOP_K` is still 5.** Each query now pulls about twice as much text into the prompt, which costs more tokens and time. For datasheets, bigger chunks can also bury the one spec line that matters among unrelated text, which can make answers worse.\n3. **Chunks are cut at fixed character positions**, ignoring words and table rows. Larger chunks hide this more often but don't fix it.\n\n**What you'd need before deciding**\n1. A small set of real datasheet questions (20\u201350 is enough to start), each with the expected answer and which chunk or source should be retrieved.\n2. A script that runs that set through the pipeline and records: whether the expected source was retrieved (and how high it ranked), whether the answer was correct (with the grading model named), and latency and tokens per query.\n3. Run it at commit `37dcce3` (512) and save that as the baseline. Then run it at `1b1a079` (1024) and compare, looking at the questions that got worse as well as the averages.\n\nIf you share example questions, or point me to where the pipeline's documents and generation step live, I can set up steps 1\u20133. Until then, I'd call this change unverified rather than an improvement."
+  ],
+  "bash": [
+    "git ls-files; git show --stat HEAD"
+  ],
+  "artifacts": "(no files created or changed)"
+}

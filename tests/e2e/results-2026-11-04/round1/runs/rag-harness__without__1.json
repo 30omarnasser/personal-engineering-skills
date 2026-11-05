@@ -1,0 +1,112 @@
+{
+  "scenario": "rag-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the eval harness",
+      "passed": true,
+      "detail": "cd \"<HOME>/AppData/Local/Temp/e2e-rag-harness-without-1-0vo49bsi/repo\" && git show HEAD -- app/retriever.py | tail -8 && cat evals/run.py && python -m eval"
+    },
+    {
+      "type": "file_unchanged",
+      "desc": "baseline untouched",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "reports the measured faithfulness",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q12",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q30",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 6,
+  "checks_total": 6,
+  "rubric": [
+    {
+      "assertion": "Metrics reported for the current run match the harness output (recall@5 0.967, faithfulness 0.838, p95 3.4 s, cost 0.0167) and are compared with the baseline values.",
+      "passed": true,
+      "evidence": "Table shows recall@5 0.967, faithfulness 0.838, p95 3.40 s, cost $0.0167 alongside baseline 0.933, 0.907, 1.48 s, $0.0111."
+    },
+    {
+      "assertion": "The verdict is MIXED or REGRESSED, not IMPROVED, and the trade-off is stated.",
+      "passed": true,
+      "evidence": "\"No, the answers are not better\"; trade-off stated as gaining one question on retrieval, losing three on answers, higher cost and latency."
+    },
+    {
+      "assertion": "The new failing cases q12, q21 and q30 are named.",
+      "passed": true,
+      "evidence": "\"Broke (3): q12, q21 and q30.\""
+    },
+    {
+      "assertion": "At least one failing case's raw output (retrieved chunks or answer) was inspected and a cause is given.",
+      "passed": true,
+      "evidence": "Quoted q12 answers at 512 and 1024. Cause: same chunks retrieved, but generator paraphrases unsupported values with longer context."
+    },
+    {
+      "assertion": "The baseline is not updated and the response does not claim it was; any update is left to the user.",
+      "passed": true,
+      "evidence": "\"I haven't changed the baseline, and I won't without asking you\"; only latest.json was written."
+    },
+    {
+      "assertion": "No number in the response is invented (all trace to the harness output or the baseline file).",
+      "passed": true,
+      "evidence": "Percentages are correctly derived (1.77/1.16\u2248+53%, 3.4/1.48\u22482.3\u00d7). The q12 answer values were read from output files."
+    }
+  ],
+  "rubric_passed": 6,
+  "rubric_total": 6,
+  "score": 1.0,
+  "denials": [
+    {
+      "tool": "Bash",
+      "input": "{\"command\": \"cd \\\"<HOME>/AppData/Local/Temp/e2e-rag-harness-without-1-0vo49bsi/repo\\\" && python -I - <<'EOF'\\nimport json\\ng={}\\nfor l in open(\\\"evals/golden/golden.jsonl\\\",encoding=\\\"utf-8\\\"):\\n    if l.strip(): d=json.loads(l); g[d[\\"
+    }
+  ],
+  "cost_usd": 0.2326,
+  "turns": 8,
+  "duration_s": 29.9,
+  "tokens": {
+    "input": 12,
+    "cache_creation": 20047,
+    "cache_read": 91538,
+    "output": 2687
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**No, the answers are not better.** I don't recommend merging as it stands. I ran `python -m evals.run --set golden` at `3ae9d6e` and compared it to `evals/baselines/main.json` (chunk 512). Both runs used the same judge (`example-judge-v1`) and the same 30 questions.\n\n| Metric | 512 (baseline) | 1024 (this commit) | Change |\n|---|---|---|---|\n| recall@5 | 0.933 | 0.967 | +0.033 (1 question) |\n| MRR | 0.933 | 0.933 | \u2014 |\n| **faithfulness** | **0.907** | **0.838** | **\u22120.069** |\n| latency p50 | 1.16 s | 1.77 s | +53% |\n| **latency p95** | **1.48 s** | **3.40 s** | **+130%** |\n| **cost/query** | **$0.0111** | **$0.0167** | **+50%** |\n| failing questions | q07, q19 | q07, q12, q21, q30 | 2 \u2192 4 |\n\n**What changed, question by question:**\n- **Fixed (1):** q19. At 512, none of the top 5 chunks came from its expected sources. At 1024, `ds-19-a` is ranked first. This is the only reason recall went up.\n- **Broke (3):** q12, q21 and q30. They retrieve exactly the same chunks as before, but the answers got worse:\n  - 512 answer for q12: \"Datasheet value 36 units for the MC-7 motor.\" (faithfulness 0.93)\n  - 1024 answer for q12: \"The q12 limit is roughly double the datasheet value.\" (faithfulness 0.55)\n  \n  q21 and q30 changed the same way. The new answers don't give the actual value and aren't backed by the retrieved text. For a quotes assistant, a vague \"roughly double\" for a rated limit is the worst kind of error.\n- **Still failing:** q07. Its expected sources aren't in the top 5 at either chunk size.\n\nSo you gain one question on retrieval and lose three on answer quality, and every query costs 50% more and takes up to 2.3\u00d7 longer.\n\n**Caveats:**\n- 30 questions is a small sample, so the recall gain rests on a single question.\n- The eval reads pre-recorded outputs (`evals/data/outputs_chunk1024.json`), so these numbers are only as current as those recordings.\n\n**Next steps:**\n- I'd keep 512 for now. If q19's retrieval miss matters, it's worth trying a fix that leaves answers alone, such as more chunk overlap, a higher `TOP_K` at 512, or a reranker.\n- q12, q21 and q30 all fail with the same phrasing, so it's worth finding out why longer context makes the generator paraphrase instead of quoting the value.\n- I haven't changed the baseline, and I won't without asking you, per `AGENTS.md`. The run did write `evals/results/latest.json`."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-harness-without-1-0vo49bsi/repo\" && git show --stat HEAD && ls evals evals/baselines && cat evals/baselines/main.json",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-harness-without-1-0vo49bsi/repo\" && git show HEAD -- app/retriever.py | tail -8 && cat evals/run.py && python -m evals.run --set golden"
+  ],
+  "artifacts": "--- new file: evals/results/latest.json\n{\n  \"commit\": \"3ae9d6e\",\n  \"chunk_size\": 1024,\n  \"judge_model\": \"example-judge-v1\",\n  \"n\": 30,\n  \"recall_at_5\": 0.967,\n  \"mrr\": 0.933,\n  \"faithfulness\": 0.838,\n  \"latency_p50_s\": 1.77,\n  \"latency_p95_s\": 3.4,\n  \"cost_per_query_usd\": 0.0167,\n  \"failing_ids\": [\n    \"q07\",\n    \"q12\",\n    \"q21\",\n    \"q30\"\n  ]\n}\n"
+}

@@ -1,0 +1,93 @@
+{
+  "scenario": "per-precedence",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "cites special condition 9.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "uses the Annex B hazardous-area schedule",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "overall no-go",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "Finding 1 (IE3 incl. 90 kW P-01) is marked contradicted / non-compliant because clause 9.1 requires IE4 above 75 kW.",
+      "passed": true,
+      "evidence": "CONTRADICTED. P-01 must be IE4, so IE3 does not comply. Cites \u00a79.1 'above 75 kW shall be IE4' and \u00a79.3 precedence."
+    },
+    {
+      "assertion": "Finding 2 (ATEX not required) is marked contradicted or unsupported because P-01 sits in the wet well, Zone 1 per Annex B, so clause 4.3 applies.",
+      "passed": true,
+      "evidence": "CONTRADICTED. P-01 sits in the wet well (Zone 1) per Annex B; \u00a74.3 requires ATEX Ex d."
+    },
+    {
+      "assertion": "Finding 3 (60 Hz) is marked contradicted by clause 4.1 (50 Hz).",
+      "passed": true,
+      "evidence": "tender.md \u00a74.1 '400 V, 3-phase, 50 Hz' ... CONTRADICTED. The tender says 50 Hz, not 60 Hz."
+    },
+    {
+      "assertion": "Finding 4 (IP66 vs IP65) is marked verified / compliant.",
+      "passed": true,
+      "evidence": "\u00a74.5 'IP65 or better' ... VERIFIED. IP66 meets 'IP65 or better'."
+    },
+    {
+      "assertion": "Every finding cites a specific clause or annex of the tender.",
+      "passed": true,
+      "evidence": "Findings cite \u00a74.2/\u00a79.1/\u00a79.3, \u00a74.3/Annex B, \u00a74.1, \u00a74.5 respectively."
+    },
+    {
+      "assertion": "At least two requirements the analysis missed are flagged (any of 4.4, 7.1, 7.4, 9.2).",
+      "passed": true,
+      "evidence": "Missed requirements listed: \u00a74.4 cable 2.5 mm\u00b2, \u00a77.1 warranty, \u00a77.4 16-week delivery, \u00a79.2 50 \u00b0C ambient."
+    },
+    {
+      "assertion": "The overall conclusion is no-go / not ready to send.",
+      "passed": true,
+      "evidence": "'Don't send this offer.' ... 'Decision: NO-GO.'"
+    }
+  ],
+  "rubric_passed": 7,
+  "rubric_total": 7,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1238,
+  "turns": 6,
+  "duration_s": 17.5,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 10679,
+    "cache_read": 35235,
+    "output": 1558
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**Don't send this offer.** Three of the four findings in the analysis are contradicted by the tender, and five requirements are missing from it.\n\n| # | Finding | Source (doc / clause) | Applicability | Exceptions checked | Result |\n|---|---------|-----------------------|---------------|--------------------|--------|\n| 1 | IE3 on all motors, including 90 kW P-01, \"complies\" | tender.md \u00a74.2 \"IE3 efficiency class minimum\" + equipment schedule (P-01 = 90 kW) | APPLIES to P-02 (37 kW). For P-01, \u00a79.1 replaces it | **\u00a79.1:** \"pump motors rated above 75 kW shall be IE4\". **\u00a79.3:** Section 9 takes precedence over Section 4 | **CONTRADICTED.** P-01 must be IE4, so IE3 does not comply. P-02 at IE3 is fine. |\n| 2 | ATEX not required | tender.md \u00a74.3 \"Zone 1 (see Annex B) shall be ATEX Ex d certified\" + Annex B (Wet well = Zone 1) | APPLIES to P-01, which sits in the wet well (Zone 1). Does not apply to P-02 in the valve chamber (non-hazardous) | No later clause overrides \u00a74.3 | **CONTRADICTED.** The P-01 motor needs ATEX Ex d. |\n| 3 | Supply 400 V / 60 Hz | tender.md \u00a74.1 \"400 V, 3-phase, 50 Hz\" | APPLIES | No override found | **CONTRADICTED.** The tender says 50 Hz, not 60 Hz, and the analysis also leaves out 3-phase. Check that the offered motors and drives are rated for 50 Hz. |\n| 4 | IP65 required; offer is IP66, \"complies\" | tender.md \u00a74.5 \"IP65 or better\" (panels and motor terminal enclosures) | APPLIES | No override found | **VERIFIED.** IP66 meets \"IP65 or better\". |\n\n**Results:** 1 verified, 3 contradicted, 0 unsupported, 0 needing human review.\n\n**Requirements the analysis missed (all from tender.md):**\n- **\u00a74.4:** power cables must be at least 2.5 mm\u00b2. Cabling is in scope, but the analysis doesn't mention it.\n- **\u00a77.1:** 24-month warranty from commissioning.\n- **\u00a77.4:** delivery within 16 weeks of the purchase order. **Offers that exceed this are rejected**, so confirm your lead time, especially for an IE4 Ex d motor.\n- **\u00a79.2:** 50 \u00b0C ambient design temperature. Motors and panels may need derating or a higher temperature rating; check the datasheets.\n- **\u00a79.3:** Section 9 takes precedence over Sections 4 and 7. The analysis ignored this, which is why it got finding 1 wrong.\n\n**Fixes needed before sending:**\n1. Change P-01 to a 90 kW motor that is **IE4** and **ATEX Ex d**.\n2. Correct the supply to 400 V, 3-phase, 50 Hz.\n3. Add the cable, warranty, delivery and 50 \u00b0C requirements to the analysis, and confirm the offer meets each one.\n\n**Decision: NO-GO.** The offer as analysed fails clauses 9.1, 4.3 and 4.1, and five requirements haven't been checked."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

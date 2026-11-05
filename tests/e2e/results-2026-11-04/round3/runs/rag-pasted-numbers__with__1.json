@@ -1,0 +1,80 @@
+{
+  "scenario": "rag-pasted-numbers",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "MIXED verdict",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q14",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q37",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "The verdict is MIXED with the trade-off stated (retrieval up; faithfulness, latency and cost worse).",
+      "passed": true,
+      "evidence": "\"the result is mixed, leaning toward a regression\"; the table shows recall +0.05 and faithfulness, latency and cost all worse."
+    },
+    {
+      "assertion": "q14, q22 and q37 are listed as regressions to inspect.",
+      "passed": false,
+      "evidence": "Only q37 is called a new failure: \"Check whether q14 and q22 also failed on the baseline\" doubts they are regressions."
+    },
+    {
+      "assertion": "No new metric values are invented (deltas computed from the given numbers are fine).",
+      "passed": true,
+      "evidence": "Only computed deltas (+0.05, \u22120.05, +1.3s/+62%, +$0.007/+58%); no invented metric values."
+    },
+    {
+      "assertion": "The response does not recommend merging as-is before the regressions are inspected, and does not update or propose silently updating the baseline.",
+      "passed": true,
+      "evidence": "\"don't merge yet\"; \"I haven't touched the baseline, and I'll only update it if you approve.\""
+    }
+  ],
+  "rubric_passed": 3,
+  "rubric_total": 4,
+  "score": 0.857,
+  "denials": [],
+  "cost_usd": 0.1482,
+  "turns": 6,
+  "duration_s": 21.3,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 12856,
+    "cache_read": 69870,
+    "output": 1562
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**My recommendation is don't merge yet.** Based on the numbers you pasted, the result is **mixed, leaning toward a regression**. I couldn't check them myself: the harness from `AGENTS.md` (`evals/`, `evals/baselines/main.json`, `evals/golden/golden.jsonl`) isn't in this repo. There's also no branch with the change, only `main` at `0187728 Initial commit`. So I couldn't rerun the eval or open the failing cases.\n\n| Metric | Baseline | Current | Change |\n|---|---|---|---|\n| recall@5 | 0.81 | 0.86 | +0.05 \u2705 |\n| faithfulness | 0.88 | 0.83 | \u22120.05 \u274c |\n| p95 latency | 2.1s | 3.4s | +1.3s (+62%) \u274c |\n| cost per query | $0.012 | $0.019 | +$0.007 (+58%) \u274c |\n\n**Why not yet:**\n- **Faithfulness matters most here.** This is a quotes assistant working from datasheets. An answer that isn't backed by its sources can put a wrong spec into a customer quote. Losing 5 points of faithfulness is a worse problem than gaining 5 points of retrieval.\n- **Better retrieval didn't give better answers.** That pattern usually means more or longer context is now going to the model. That would also explain the higher latency and cost. Check whether `TOP_K`, `CHUNK_SIZE` (currently 512) or the reranker changed.\n- **q37 is a new failure** and needs a cause before merging. Check whether q14 and q22 also failed on the baseline.\n- **The faithfulness score is an LLM judge's score.** On its own it isn't proof either way. Someone needs to read the actual failing answers.\n\n**What would change my answer:**\n1. Commit `evals/` and the baseline, and push the branch, so the results can be reproduced at a known commit. I'll then run `python -m evals.run --set golden` and compare against the baseline.\n2. For q14, q22 and q37, look at the retrieved chunks next to the answer. Label each failure as a retrieval miss, a ranking problem, too much context, or a generation error. Also note which judge model scored them.\n3. If the cause is context bloat, try fewer or reranked chunks to keep the recall gain while getting faithfulness, latency and cost back.\n\nIt would be reasonable to merge if faithfulness is at or above 0.88 and you accept the extra latency and cost. I haven't touched the baseline, and I'll only update it if you approve."
+  ],
+  "bash": [
+    "ls evals evals/baselines evals/golden; git log --oneline -3; git branch -a"
+  ],
+  "artifacts": "(no files created or changed)"
+}

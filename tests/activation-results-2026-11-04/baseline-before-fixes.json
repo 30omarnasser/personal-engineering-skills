@@ -1,0 +1,1050 @@
+[
+  {
+    "id": "eval-ccc-1",
+    "kind": "positive",
+    "expect": "context-continuity-check",
+    "prompt": "I'm starting fresh from this handoff. What's next?\n\nHANDOFF: Working on quote export. Mostly done. Tests pass. Next: finish the remaining bits. Keep the format the client agreed on.",
+    "skills_called": [],
+    "tools": [],
+    "text_head": "",
+    "usage": {},
+    "secs": 53.3,
+    "pass": false
+  },
+  {
+    "id": "eval-ccc-2",
+    "kind": "positive",
+    "expect": "context-continuity-check",
+    "prompt": "Before I /compact, check this handoff is complete:\nGoal: add PDF export to /quotes/{id}. Branch: feat/quote-pdf. Decided: WeasyPrint, A4, Arabic RTL support (ADR-007). Done: template + route, commit a1b2c3d, `uv run pytest tests/test_quotes.py` 14 passed. Pending: 1) RTL font embedding 2) add endpoint to docs. Open question: logo source.",
+    "skills_called": [],
+    "tools": [],
+    "text_head": "",
+    "usage": {},
+    "secs": 37.6,
+    "pass": false
+  },
+  {
+    "id": "eval-ccc-3",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Rename the variable `qty` to `quantity` in utils.py.",
+    "skills_called": [],
+    "tools": [
+      "Read"
+    ],
+    "text_head": "I'll read utils.py and rename `qty` to `quantity` throughout.",
+    "usage": {
+      "cost_usd": 0.3062516,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 9.2,
+    "pass": true
+  },
+  {
+    "id": "eval-per-1",
+    "kind": "positive",
+    "expect": "procurement-evidence-review",
+    "prompt": "Review this tender analysis before I send the offer.\n\nTENDER EXCERPT:\n4.2 All motors shall be IE3 efficiency class minimum, 400V/50Hz.\n4.3 Motors installed in Zone 1 areas (see Annex B) shall be ATEX Ex d certified.\n9.1 Special Conditions: Notwithstanding 4.2, pump motors above 75kW shall be IE4.\n\nAGENT OUTPUT:\n1. Motors must be IE3 - our offer of IE3 for all motors including the 90kW pump complies.\n2. ATEX not required.\n3. Voltage 400V/60Hz.",
+    "skills_called": [],
+    "tools": [],
+    "text_head": "",
+    "usage": {},
+    "secs": 35.8,
+    "pass": false
+  },
+  {
+    "id": "eval-per-2",
+    "kind": "positive",
+    "expect": "procurement-evidence-review",
+    "prompt": "Check this RFQ extraction: Requirement 'IP65 enclosure' - source: RFQ p.3 section 2.1 'Enclosures shall be IP65 or better.' Applicability: applies to all panels. Our offer: IP66.",
+    "skills_called": [
+      "procurement-evidence-review"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll load the procurement evidence review checklist and check this extraction against it.",
+    "usage": {
+      "cost_usd": 0.30668799999999996,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 8.2,
+    "pass": true
+  },
+  {
+    "id": "eval-per-3",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Can you review my FastAPI pagination code for off-by-one bugs?\n\n@app.get('/items')\ndef items(page: int = 1, size: int = 20):\n    return db[page*size:(page+1)*size]",
+    "expect_not": "procurement-evidence-review",
+    "skills_called": [],
+    "tools": [],
+    "text_head": "",
+    "usage": {},
+    "secs": 21.2,
+    "pass": true
+  },
+  {
+    "id": "eval-rag-2",
+    "kind": "positive",
+    "expect": "rag-evaluation",
+    "prompt": "Here are eval results. Baseline: recall@5 0.81, faithfulness 0.88, p95 2.1s, $0.012/q. Current: recall@5 0.86, faithfulness 0.83, p95 3.4s, $0.019/q. Failing IDs: q14, q22, q37 (new). Should I merge?",
+    "skills_called": [],
+    "tools": [],
+    "text_head": "Not as-is. The recall gain is real, but it is paid for with a faithfulness regression, three new failures, and a big latency and cost increase. Faithfulness and new failures are blockers on their own.\n\n| Metric | Baseline | Current | Change |\n|---|---|---|---|\n| recall@5 | 0.81 | 0.86 | +0.05 |\n| fa",
+    "usage": {
+      "cost_usd": 0.34457920000000003,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 18.0,
+    "pass": false
+  },
+  {
+    "id": "eval-rag-3",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Explain the difference between BM25 and dense retrieval.",
+    "skills_called": [],
+    "tools": [],
+    "text_head": "BM25 and dense retrieval are two ways to rank documents against a query. They differ in how they represent text and what kind of matching they can do.\n\n**BM25 (sparse, lexical retrieval)**\n\n- Represents each document as a bag of terms. Scoring is based on term frequency, inverse document frequency, ",
+    "usage": {
+      "cost_usd": 0.33649029999999996,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 18.7,
+    "pass": true
+  },
+  {
+    "id": "manual-ask-matt",
+    "kind": "observe",
+    "prompt": "/ask-matt I have a flaky integration test, what flow fits?",
+    "skills_called": [],
+    "tools": [
+      "Glob"
+    ],
+    "text_head": "I'll check the diagnosing-bugs skill file before recommending it, since that's the flow the map points to for intermittent flakes.",
+    "usage": {
+      "cost_usd": 0.3992115,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 12.5,
+    "pass": null
+  },
+  {
+    "id": "manual-grill-with-docs",
+    "kind": "observe",
+    "prompt": "/grill-with-docs add PDF export to the quotes endpoint",
+    "skills_called": [
+      "grilling",
+      "domain-modeling"
+    ],
+    "tools": [
+      "Skill",
+      "Skill"
+    ],
+    "text_head": "I'll load the two skills this command depends on, then start grilling the request.",
+    "usage": {
+      "cost_usd": 0.31920149999999997,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 10.3,
+    "pass": null
+  },
+  {
+    "id": "manual-handoff",
+    "kind": "observe",
+    "prompt": "/handoff next session will implement RTL font embedding",
+    "skills_called": [],
+    "tools": [
+      "Bash"
+    ],
+    "text_head": "I'll survey the project state first, since this session has no prior conversation to summarize, then write the handoff to `%TEMP%`.",
+    "usage": {
+      "cost_usd": 0.32365150000000004,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 12.0,
+    "pass": null
+  },
+  {
+    "id": "neg-askmatt-manual",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Which of the installed skills should I use to plan a new feature?",
+    "expect_not": "ask-matt",
+    "skills_called": [],
+    "tools": [],
+    "text_head": "None of the installed skills is a dedicated feature-planning skill. The closest fit depends on what kind of planning you mean:\n\n- **For an implementation plan**, use the `Plan` agent rather than a skill. It is a software-architect subagent that reads the codebase and returns a step-by-step plan with",
+    "usage": {
+      "cost_usd": 0.3247378,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 14.2,
+    "pass": true
+  },
+  {
+    "id": "neg-branch",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Create a git branch feat/rtl from main and switch to it.",
+    "expect_not": "using-git-worktrees",
+    "skills_called": [],
+    "tools": [
+      "PowerShell"
+    ],
+    "text_head": "I'll check which branches exist, then create `feat/rtl` from `main`.",
+    "usage": {
+      "cost_usd": 0.3068589,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 9.1,
+    "pass": true
+  },
+  {
+    "id": "neg-dockerfile",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Write a Dockerfile for this FastAPI app using Python 3.12.",
+    "skills_called": [],
+    "tools": [
+      "Glob"
+    ],
+    "text_head": "I'll look at the app's layout and dependencies first, then write the Dockerfile.",
+    "usage": {
+      "cost_usd": 0.3030139,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 10.1,
+    "pass": true
+  },
+  {
+    "id": "neg-example-tests",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Write a few example-based unit tests for the existing discount_total() function in app/pricing.py.",
+    "expect_not": "property-based-testing",
+    "skills_called": [],
+    "tools": [
+      "Read",
+      "Glob"
+    ],
+    "text_head": "I'll read the function first, then check how the project runs tests, and write the tests.",
+    "usage": {
+      "cost_usd": 0.3089099,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 11.1,
+    "pass": true
+  },
+  {
+    "id": "neg-grill-manual",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Help me think through whether to add a caching layer in front of the retriever.",
+    "expect_not": "grill-with-docs",
+    "skills_called": [],
+    "tools": [
+      "Bash"
+    ],
+    "text_head": "I'll look at the project first so the advice is grounded in what your retriever actually does.",
+    "usage": {
+      "cost_usd": 0.3133491,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 11.7,
+    "pass": true
+  },
+  {
+    "id": "neg-handoff-manual",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Write a short summary of what we did in this session so I remember tomorrow.",
+    "expect_not": "handoff",
+    "skills_called": [],
+    "tools": [
+      "Bash",
+      "Glob"
+    ],
+    "text_head": "I'll check the workspace and my memory index first, since this conversation has no earlier messages for me to summarize from.",
+    "usage": {
+      "cost_usd": 0.3245677,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 16.6,
+    "pass": true
+  },
+  {
+    "id": "neg-hf-choose",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Which open-weight model is best at Arabic OCR right now?",
+    "expect_not": "huggingface-local-models",
+    "skills_called": [],
+    "tools": [
+      "ToolSearch"
+    ],
+    "text_head": "I'll search for current benchmarks on Arabic OCR with open-weight models, since this changes fast.",
+    "usage": {
+      "cost_usd": 0.3082604,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 9.4,
+    "pass": true
+  },
+  {
+    "id": "neg-ie3",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "What does 'IE3 efficiency class' mean for an electric motor, roughly?",
+    "skills_called": [],
+    "tools": [],
+    "text_head": "IE3 is the \"Premium Efficiency\" class for three-phase induction motors under IEC 60034-30-1, the international standard that grades motor energy efficiency.\n\nThe classes run from IE1 (standard) up through IE2 (high), IE3 (premium), IE4 (super premium) and IE5 (ultra premium). Each step up cuts losse",
+    "usage": {
+      "cost_usd": 0.33010209999999995,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 16.0,
+    "pass": true
+  },
+  {
+    "id": "neg-pytest-speed",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Our pytest suite takes 9 minutes. What are the usual ways to run it in parallel?",
+    "expect_not": "systematic-debugging",
+    "skills_called": [],
+    "tools": [
+      "mcp__context7__resolve-library-id"
+    ],
+    "text_head": "I'll check the current pytest-xdist docs quickly to make sure the flags I cite are up to date.",
+    "usage": {
+      "cost_usd": 0.3134305,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 10.9,
+    "pass": true
+  },
+  {
+    "id": "neg-summarize",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Summarize what this repo does in two sentences.",
+    "skills_called": [],
+    "tools": [
+      "Glob"
+    ],
+    "text_head": "I'll look at the repo's top-level files and README to summarize it.",
+    "usage": {
+      "cost_usd": 0.3024074,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 10.1,
+    "pass": true
+  },
+  {
+    "id": "neg-threat-deck",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "Write a threat model for our SaaS as a short slide outline for the board meeting.",
+    "expect_not": "security-model",
+    "skills_called": [],
+    "tools": [
+      "Bash"
+    ],
+    "text_head": "I'll check the repo first so the threat model reflects your actual stack rather than a generic SaaS.",
+    "usage": {
+      "cost_usd": 0.32643,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 14.9,
+    "pass": true
+  },
+  {
+    "id": "neg-trivia",
+    "kind": "negative",
+    "expect": null,
+    "prompt": "What's the capital of Australia?",
+    "skills_called": [],
+    "tools": [],
+    "text_head": "Canberra. It became the capital in 1913 as a purpose-built compromise between Sydney and Melbourne, and it sits in the Australian Capital Territory.",
+    "usage": {
+      "cost_usd": 0.30150689999999997,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 7.7,
+    "pass": true
+  },
+  {
+    "id": "obs-add-auth",
+    "kind": "observe",
+    "prompt": "Add JWT authentication to the FastAPI app.",
+    "skills_called": [],
+    "tools": [
+      "Bash"
+    ],
+    "text_head": "I'll start by looking at the project to see the existing FastAPI app structure.",
+    "usage": {
+      "cost_usd": 0.31090059999999997,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 10.2,
+    "pass": null
+  },
+  {
+    "id": "obs-ci-hurry",
+    "kind": "observe",
+    "prompt": "The CI deploy failed on the code-signing step; we're in a hurry, just make it pass.",
+    "skills_called": [],
+    "tools": [
+      "Bash"
+    ],
+    "text_head": "I'll look at the CI config and the signing step to see why it failed before changing anything.",
+    "usage": {
+      "cost_usd": 0.31101090000000003,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 10.4,
+    "pass": null
+  },
+  {
+    "id": "obs-compact-ready",
+    "kind": "observe",
+    "prompt": "I'm about to /compact. Is everything the next session needs written down?",
+    "skills_called": [
+      "context-continuity-check"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll run the continuity check skill, which is built for exactly this pre-compact question.",
+    "usage": {
+      "cost_usd": 0.3057285,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 8.7,
+    "pass": null
+  },
+  {
+    "id": "obs-dep-bump",
+    "kind": "observe",
+    "prompt": "Bump fastapi to 0.120 in pyproject.toml and sync.",
+    "skills_called": [],
+    "tools": [
+      "Read",
+      "Bash"
+    ],
+    "text_head": "I'll look at the pyproject file and lock state first, then bump the version and sync.",
+    "usage": {
+      "cost_usd": 0.3143114000000001,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 10.5,
+    "pass": null
+  },
+  {
+    "id": "obs-readme-vs-code",
+    "kind": "observe",
+    "prompt": "Check whether the guarantees stated in README.md match what app/main.py actually does.",
+    "skills_called": [],
+    "tools": [
+      "Read",
+      "Read"
+    ],
+    "text_head": "I'll read both files and compare each stated guarantee against the code.",
+    "usage": {
+      "cost_usd": 0.311882,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 9.1,
+    "pass": null
+  },
+  {
+    "id": "obs-review-generic",
+    "kind": "observe",
+    "prompt": "Review my branch before I open the PR.",
+    "skills_called": [
+      "code-review"
+    ],
+    "tools": [
+      "Skill",
+      "Bash",
+      "Bash",
+      "PowerShell",
+      "Read",
+      "Glob",
+      "Glob",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Grep",
+      "Grep",
+      "Grep",
+      "Grep",
+      "Grep",
+      "Read",
+      "Grep",
+      "PowerShell",
+      "Grep",
+      "Grep",
+      "Grep",
+      "Grep",
+      "Grep",
+      "Read",
+      "Read",
+      "PowerShell",
+      "Grep",
+      "Grep",
+      "Read",
+      "Read",
+      "Read",
+      "Read",
+      "Glob",
+      "PowerShell",
+      "PowerShell",
+      "PowerShell"
+    ],
+    "text_head": "I'll run the code-review skill against the current branch.",
+    "usage": {
+      "cost_usd": 2.78494985,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 336.2,
+    "pass": null
+  },
+  {
+    "id": "obs-skill-trigger",
+    "kind": "observe",
+    "prompt": "Make the rag-evaluation skill in .claude/skills trigger more reliably.",
+    "skills_called": [
+      "skill-creator"
+    ],
+    "tools": [
+      "Glob",
+      "Skill"
+    ],
+    "text_head": "I'll look at the current skill, then load the skill-creator guidance for description optimization.",
+    "usage": {
+      "cost_usd": 0.31215109999999996,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 11.1,
+    "pass": null
+  },
+  {
+    "id": "pos-domain-modeling",
+    "kind": "positive",
+    "expect": "domain-modeling",
+    "prompt": "In our quotes service the words 'order', 'quote' and 'offer' get used interchangeably in code and tickets. Help me pin down the canonical terms and update GLOSSARY.md.",
+    "skills_called": [
+      "domain-modeling"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll load the domain-modeling skill first, since this is a glossary and terminology task, then survey how the codebase actually uses the three words.",
+    "usage": {
+      "cost_usd": 0.30770149999999996,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 8.6,
+    "pass": true
+  },
+  {
+    "id": "pos-domain-modeling-adr",
+    "kind": "positive",
+    "expect": "domain-modeling",
+    "prompt": "We decided to store quote revisions as an append-only table in Postgres instead of versioned JSON documents. Record this as an ADR.",
+    "skills_called": [
+      "domain-modeling"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll load the project's domain-modeling skill, since it covers recording ADRs, then look at the repo for existing ADR conventions.",
+    "usage": {
+      "cost_usd": 0.3095016,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 8.8,
+    "pass": true
+  },
+  {
+    "id": "pos-find-bugs",
+    "kind": "positive",
+    "expect": "find-bugs",
+    "prompt": "Do a security sweep of the changes on this branch before merge: injection, auth checks, IDOR, anything in the upload handler.",
+    "skills_called": [
+      "security-review"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll run the security review skill against this branch's changes.",
+    "usage": {
+      "cost_usd": 0.3058815,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 9.3,
+    "pass": false
+  },
+  {
+    "id": "pos-hf-local",
+    "kind": "positive",
+    "expect": "huggingface-local-models",
+    "prompt": "I have a 16GB M2 MacBook Air. Which GGUF quant of Qwen3 8B should I run with llama.cpp for a local coding assistant, and how do I serve it with an OpenAI-compatible endpoint?",
+    "skills_called": [
+      "huggingface-local-models"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll load the local-models skill first, since it covers exactly this: quant selection and OpenAI-compatible serving with llama.cpp.",
+    "usage": {
+      "cost_usd": 0.3088405,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 8.8,
+    "pass": true
+  },
+  {
+    "id": "pos-modern-python",
+    "kind": "positive",
+    "expect": "modern-python",
+    "prompt": "Set up a new Python project for a document-ingestion CLI: uv, ruff, src layout, pytest with coverage, Python 3.12.",
+    "skills_called": [
+      "modern-python"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll load the modern-python skill first, then scaffold the project.",
+    "usage": {
+      "cost_usd": 0.2875215,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 9.0,
+    "pass": true
+  },
+  {
+    "id": "pos-pbt",
+    "kind": "positive",
+    "expect": "property-based-testing",
+    "prompt": "app/parsers.py has parse_rfq_reference() for strings like 'RFQ-2026-0042/A' and format_rfq_reference() that prints them back. Write tests that prove they round-trip for every valid reference, not just a few examples.",
+    "skills_called": [
+      "property-based-testing"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll load the property-based-testing skill, then read the parser to learn the exact grammar before writing Hypothesis tests.",
+    "usage": {
+      "cost_usd": 0.3071988,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 8.9,
+    "pass": true
+  },
+  {
+    "id": "pos-requesting-code-review",
+    "kind": "positive",
+    "expect": "requesting-code-review",
+    "prompt": "I've finished the quote PDF export feature on branch feat/quote-pdf (3 commits since main). Review the work against the plan in docs/plan.md before I merge.",
+    "skills_called": [
+      "requesting-code-review"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll start by loading the code-review skill, then look at the plan and the branch diff.",
+    "usage": {
+      "cost_usd": 0.32049180000000005,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 13.0,
+    "pass": true
+  },
+  {
+    "id": "pos-research",
+    "kind": "positive",
+    "expect": "research",
+    "prompt": "Research how FastAPI BackgroundTasks differ from Starlette's and from Celery for our ingestion jobs, and write the findings with sources as a markdown note under docs/.",
+    "skills_called": [
+      "research"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll invoke the research skill, which is built for exactly this: investigate against primary sources and write a markdown note into the repo.",
+    "usage": {
+      "cost_usd": 0.31238020000000005,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 9.2,
+    "pass": true
+  },
+  {
+    "id": "pos-security-model",
+    "kind": "positive",
+    "expect": "security-model",
+    "prompt": "Write a SECURITY_MODEL.md for this FastAPI service so the security scanner knows the scope: tenant isolation is the key invariant, uploaded PDFs are untrusted, admin routes are internal only.",
+    "skills_called": [
+      "security-model"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll load the security-model skill first, then survey the codebase to ground the document in the actual routes and code.",
+    "usage": {
+      "cost_usd": 0.306489,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 8.5,
+    "pass": true
+  },
+  {
+    "id": "pos-skill-creator",
+    "kind": "positive",
+    "expect": "skill-creator",
+    "prompt": "Create a new skill for this repo that reviews Alembic migrations for destructive operations, and set up a couple of test prompts so we can check it works.",
+    "skills_called": [
+      "skill-creator"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll load the skill-creator skill first, then look at the repo to see where skills live.",
+    "usage": {
+      "cost_usd": 0.306484,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 8.5,
+    "pass": true
+  },
+  {
+    "id": "pos-spec-compliance",
+    "kind": "positive",
+    "expect": "spec-to-code-compliance",
+    "prompt": "Compare the implementation in app/ against the protocol described in docs/SPEC.md and tell me which requirements the code contradicts, which are missing, and what the code does that the spec never mentions.",
+    "skills_called": [
+      "spec-to-code-compliance"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll load the spec-to-code compliance skill first, then read the spec and the implementation.",
+    "usage": {
+      "cost_usd": 0.306814,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 8.3,
+    "pass": true
+  },
+  {
+    "id": "pos-supply-chain",
+    "kind": "positive",
+    "expect": "supply-chain-risk-auditor",
+    "prompt": "Audit this project's dependencies (pyproject.toml and uv.lock) for supply-chain risk - abandoned packages, known advisories, install scripts - before we hand it to the customer.",
+    "skills_called": [
+      "supply-chain-risk-auditor"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll load the supply-chain audit skill first, then work through pyproject.toml and uv.lock.",
+    "usage": {
+      "cost_usd": 0.30723399999999995,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 8.1,
+    "pass": true
+  },
+  {
+    "id": "pos-systematic-debugging",
+    "kind": "positive",
+    "expect": "systematic-debugging",
+    "prompt": "pytest tests/test_quotes.py started failing this morning with KeyError: 'customer_id' inside build_quote() in app/quotes.py line 88. It passed yesterday. Traceback ends in _merge_customer(). Fix it.",
+    "skills_called": [],
+    "tools": [
+      "Read",
+      "Read",
+      "PowerShell"
+    ],
+    "text_head": "I'll reproduce the failure first, then read the code around `_merge_customer` and `build_quote`.",
+    "usage": {
+      "cost_usd": 0.3212968,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 12.5,
+    "pass": false
+  },
+  {
+    "id": "pos-tdd",
+    "kind": "positive",
+    "expect": "test-driven-development",
+    "prompt": "Add a discount_total(items, pct) helper to app/pricing.py that applies a percentage discount to the line totals and never returns a negative number.",
+    "skills_called": [],
+    "tools": [
+      "Read"
+    ],
+    "text_head": "I'll look at the existing pricing module first, then add the helper.",
+    "usage": {
+      "cost_usd": 0.30650150000000004,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 9.2,
+    "pass": false
+  },
+  {
+    "id": "pos-verification",
+    "kind": "positive",
+    "expect": "verification-before-completion",
+    "prompt": "I just fixed the pagination off-by-one in app/routes/items.py. It's done - commit it and open the PR.",
+    "skills_called": [],
+    "tools": [
+      "PowerShell"
+    ],
+    "text_head": "I'll check the working tree and the diff before committing.",
+    "usage": {
+      "cost_usd": 0.3088715,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 10.1,
+    "pass": false
+  },
+  {
+    "id": "pos-worktrees",
+    "kind": "positive",
+    "expect": "using-git-worktrees",
+    "prompt": "I want to start the Arabic RTL rendering work in parallel with what's on my current branch without disturbing this checkout. Set up an isolated workspace for it and make sure tests pass there first.",
+    "skills_called": [
+      "using-git-worktrees"
+    ],
+    "tools": [
+      "Skill"
+    ],
+    "text_head": "I'll set up an isolated worktree for the Arabic RTL work, then run the test suite there. Loading the worktree skill first.",
+    "usage": {
+      "cost_usd": 0.3097835,
+      "input": 2,
+      "cache_read": 20526,
+      "model": [
+        "claude-haiku-5-5",
+        "claude-fable-5-1"
+      ]
+    },
+    "secs": 8.6,
+    "pass": true
+  }
+]

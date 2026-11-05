@@ -1,0 +1,112 @@
+{
+  "scenario": "rag-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the eval harness",
+      "passed": true,
+      "detail": "python -m evals.run --set golden"
+    },
+    {
+      "type": "file_unchanged",
+      "desc": "baseline untouched",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "reports the measured faithfulness",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q12",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q30",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 6,
+  "checks_total": 6,
+  "rubric": [
+    {
+      "assertion": "Metrics reported for the current run match the harness output (recall@5 0.967, faithfulness 0.838, p95 3.4 s, cost 0.0167) and are compared with the baseline values.",
+      "passed": true,
+      "evidence": "Table: recall@5 0.967, faithfulness 0.838, p95 3.40 s, cost $0.0167, each shown beside the baseline values 0.933/0.907/1.48/0.0111."
+    },
+    {
+      "assertion": "The verdict is MIXED or REGRESSED, not IMPROVED, and the trade-off is stated.",
+      "passed": true,
+      "evidence": "'Verdict: REGRESSED. Retrieval improved by one question, but three answers now contain made-up content, p95 latency more than doubled'"
+    },
+    {
+      "assertion": "The new failing cases q12, q21 and q30 are named.",
+      "passed": true,
+      "evidence": "'q12, q21, q30 \u2013 the model made up its answer.' All three are named explicitly."
+    },
+    {
+      "assertion": "At least one failing case's raw output (retrieved chunks or answer) was inspected and a cause is given.",
+      "passed": true,
+      "evidence": "Read outputs_chunk1024.json and grepped chunk512 outputs. Cause given: same retrieved chunks, so the answer step fails; larger chunks likely crowd the context."
+    },
+    {
+      "assertion": "The baseline is not updated and the response does not claim it was; any update is left to the user.",
+      "passed": true,
+      "evidence": "'I haven't changed the baseline.' Only evals/results/latest.json was written; baselines/main.json is untouched."
+    },
+    {
+      "assertion": "No number in the response is invented (all trace to the harness output or the baseline file).",
+      "passed": true,
+      "evidence": "Deltas compute correctly (+53%, +130%, +50%). 0.55, 36/63/90 and q06 0.97\u21920.88 come from output files the agent read."
+    }
+  ],
+  "rubric_passed": 6,
+  "rubric_total": 6,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.2169,
+  "turns": 12,
+  "duration_s": 32.2,
+  "tokens": {
+    "input": 18,
+    "cache_creation": 16837,
+    "cache_read": 140552,
+    "output": 2690
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**No, the answers are worse with 1024-token chunks, and I recommend not merging.** Retrieval improved a little, but answer quality and cost both regressed.\n\nI ran `python -m evals.run --set golden` on commit `098d134` (30 questions, judge model `example-judge-v1`) and compared it to `evals/baselines/main.json`, which holds the 512-token run.\n\n| Metric | Baseline (512) | Current (1024) | \u0394 |\n|---|---|---|---|\n| recall@5 | 0.933 | 0.967 | **+0.034** |\n| MRR | 0.933 | 0.933 | 0 |\n| faithfulness | 0.907 | 0.838 | **\u22120.069** |\n| latency p50 | 1.16 s | 1.77 s | +53% |\n| latency p95 | 1.48 s | 3.40 s | **+130%** |\n| cost/query | $0.0111 | $0.0167 | +50% |\n| failing | q07, q19 | q07, q12, q21, q30 | 1 fixed, 3 new |\n\n**New failures (I compared both runs' outputs for each):**\n- **q12, q21, q30 \u2013 the model made up its answer.** All three questions got the same retrieved chunks in both runs (only the `-a` source, never `-b`). With 512-token chunks the answers were correct (36, 63 and 90 units). With 1024 all three come back as the same vague, invented line: *\"The q\u2026 limit is roughly double the datasheet value.\"* Faithfulness dropped to 0.55 on each. Retrieval didn't change, so the problem is in the answer step. My best guess is that the larger chunks crowd the context and the model stops pulling out the specific number. I can't confirm that, because the stored chunk texts are only placeholder excerpts.\n- Faithfulness on correct answers also dropped by a few points across most questions. For example, q06 went from 0.97 to 0.88.\n\n**Fixed:** q19 now passes. It was the only failure the 512 run had that this one doesn't.\n\n**Still failing:**\n- **q07 \u2013 retrieval miss.** In both runs none of the expected sources (`ds-07-a/b`) are retrieved, only unrelated `ds-38\u202642-x` chunks. The answer text happens to be correct, but nothing retrieved supports it, so it can't be trusted.\n\n**Verdict: REGRESSED.** Retrieval improved by one question, but three answers now contain made-up content, p95 latency more than doubled, and cost per query is up 50%. For a quotes assistant, wrong spec values are the worst outcome.\n\nIf you want to keep chunk-size tuning going, I'd try:\n- a middle size like 768;\n- 512 with more overlap, or fetching the `-b` neighbour chunk, which would target the missing `-b` sources.\n\nI haven't changed the baseline. Results are in `evals/results/latest.json`."
+  ],
+  "bash": [
+    "ls evals evals/baselines evals/golden; git show --stat HEAD",
+    "python -m evals.run --set golden",
+    "grep -E '\"(q07|q12|q21|q30|q19)\"' evals/golden/golden.jsonl; ls evals/data",
+    "grep -n -A8 -E '\"(q07|q12|q19|q21|q30)\": \\{' evals/data/outputs_chunk512.json",
+    "grep -n -E '\"answer\"|\"faithfulness\"' evals/data/outputs_chunk512.json"
+  ],
+  "artifacts": "--- new file: evals/results/latest.json\n{\n  \"commit\": \"098d134\",\n  \"chunk_size\": 1024,\n  \"judge_model\": \"example-judge-v1\",\n  \"n\": 30,\n  \"recall_at_5\": 0.967,\n  \"mrr\": 0.933,\n  \"faithfulness\": 0.838,\n  \"latency_p50_s\": 1.77,\n  \"latency_p95_s\": 3.4,\n  \"cost_per_query_usd\": 0.0167,\n  \"failing_ids\": [\n    \"q07\",\n    \"q12\",\n    \"q21\",\n    \"q30\"\n  ]\n}\n"
+}

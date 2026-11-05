@@ -1,0 +1,86 @@
+{
+  "scenario": "per-units",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "converts 14 AWG to about 2.08 mm2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "cites delivery clause 7.4",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "overall no-go",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "The 14 AWG cable finding is marked contradicted / non-compliant, with the conversion to about 2.08 mm2 against the 2.5 mm2 minimum.",
+      "passed": true,
+      "evidence": "\"Doesn't comply. 14 AWG is about 2.08 mm\u00b2, which is below 2.5 mm\u00b2.\""
+    },
+    {
+      "assertion": "The 122 F ambient finding is marked verified (122 F = 50 C).",
+      "passed": true,
+      "evidence": "\"\u2705 Correct. 122 \u00b0F is exactly 50 \u00b0C.\""
+    },
+    {
+      "assertion": "The 18-week delivery finding is marked contradicted by clause 7.4 (16 weeks maximum, longer offers rejected).",
+      "passed": true,
+      "evidence": "\"7.4: 16 weeks or less, and longer offers will be rejected ... Doesn't comply, and the offer would be rejected.\""
+    },
+    {
+      "assertion": "The 2-year warranty finding is marked verified against 24 months in 7.1.",
+      "passed": true,
+      "evidence": "\"7.1: 24 months from commissioning | \u2705 Correct.\""
+    },
+    {
+      "assertion": "No unit conversion in the response is wrong.",
+      "passed": true,
+      "evidence": "Conversions given (14 AWG\u22482.08 mm\u00b2, 12 AWG\u22483.31 mm\u00b2, 122 \u00b0F=50 \u00b0C) are all correct."
+    },
+    {
+      "assertion": "The overall conclusion is no-go.",
+      "passed": true,
+      "evidence": "\"Don't send this offer yet... one of them gets the whole offer rejected.\""
+    }
+  ],
+  "rubric_passed": 6,
+  "rubric_total": 6,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1044,
+  "turns": 3,
+  "duration_s": 13.6,
+  "tokens": {
+    "input": 4,
+    "cache_creation": 8992,
+    "cache_read": 19625,
+    "output": 1418
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**Don't send this offer yet.** Two of the four items marked \"Complies\" fail the tender, and one of them gets the whole offer rejected. The analysis also skips most of the electrical requirements.\n\n## Checking each line\n\n| # | Analysis says | Tender requirement | Verdict |\n|---|---|---|---|\n| 1 | 14 AWG cables, \"complies with 4.4\" | 4.4: at least 2.5 mm\u00b2 | \u274c **Doesn't comply.** 14 AWG is about 2.08 mm\u00b2, which is below 2.5 mm\u00b2. You need 12 AWG (about 3.31 mm\u00b2) or a metric 2.5 mm\u00b2 cable. |\n| 2 | Motors rated for 122 \u00b0F ambient, \"complies with 9.2\" | 9.2: 50 \u00b0C | \u2705 Correct. 122 \u00b0F is exactly 50 \u00b0C. Quote it in \u00b0C to match the tender. |\n| 3 | Delivery in 18 weeks, \"complies\" | 7.4: 16 weeks or less, and longer offers **will be rejected** | \u274c **Doesn't comply, and the offer would be rejected.** This is the most serious problem. Delivery needs to come down to 16 weeks or less before this goes out. |\n| 4 | 2-year warranty, \"complies with 7.1\" | 7.1: 24 months from commissioning | \u2705 Correct. |\n\n## Requirements the analysis leaves out\n\n- **4.1, supply of 400 V, 3-phase, 50 Hz:** not covered.\n- **4.2 and 9.1, motor efficiency:** not covered, and the rule isn't the same for both pumps. P-01 is 90 kW, which is above 75 kW, so it must be **IE4**. Clause 9.1 overrides 4.2 here (see 9.3). P-02 is 37 kW, so IE3 is enough.\n- **4.3 and Annex B, hazardous area:** not covered. P-01 sits in the wet well, which is Zone 1, so its motor must be **ATEX Ex d certified**. P-02 is in the valve chamber, which isn't a hazardous area, so it doesn't need this.\n- **4.5, enclosures:** panels and motor terminal boxes must be IP65 or better. Not covered.\n\n## What to do before sending\n\n1. Bring delivery down to 16 weeks or less. If you can't, the offer will be rejected however good the rest is.\n2. Change the power cables to 2.5 mm\u00b2 or larger (12 AWG works).\n3. Get the vendor to confirm P-01's motor is **IE4 and ATEX Ex d**, P-02's motor is IE3 or better, everything runs on 400 V / 3-phase / 50 Hz, and enclosures are IP65 or better.\n4. Write the offer in the tender's metric units (mm\u00b2, \u00b0C) so the evaluator doesn't have to convert anything.\n\nThe analysis gets the unit conversions wrong and never cross-checks the special conditions in Section 9 or Annex B against the equipment schedule. Don't use output from this extraction step without someone checking it."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

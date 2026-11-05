@@ -1,0 +1,107 @@
+{
+  "scenario": "rag-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the eval harness",
+      "passed": true,
+      "detail": "python -m evals.run --set golden"
+    },
+    {
+      "type": "file_unchanged",
+      "desc": "baseline untouched",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "reports the measured faithfulness",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q12",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q30",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 6,
+  "checks_total": 6,
+  "rubric": [
+    {
+      "assertion": "Metrics reported for the current run match the harness output (recall@5 0.967, faithfulness 0.838, p95 3.4 s, cost 0.0167) and are compared with the baseline values.",
+      "passed": true,
+      "evidence": "Table shows 1024: recall@5 0.967, faithfulness 0.838, p95 3.40 s, cost $0.0167, each beside the 512 baseline value."
+    },
+    {
+      "assertion": "The verdict is MIXED or REGRESSED, not IMPROVED, and the trade-off is stated.",
+      "passed": true,
+      "evidence": "\"No, the answers are worse... Retrieval got a little better, but answer quality, latency and cost all got worse.\" Effectively REGRESSED, trade-off stated."
+    },
+    {
+      "assertion": "The new failing cases q12, q21 and q30 are named.",
+      "passed": true,
+      "evidence": "\"q12, q21 and q30 now fail.\""
+    },
+    {
+      "assertion": "At least one failing case's raw output (retrieved chunks or answer) was inspected and a cause is given.",
+      "passed": true,
+      "evidence": "Read outputs_chunk1024/512.json; quotes the q12 answers; cause: retrieval unchanged, answers degraded to a vague, unfaithful value."
+    },
+    {
+      "assertion": "The baseline is not updated and the response does not claim it was; any update is left to the user.",
+      "passed": true,
+      "evidence": "\"I haven't changed the baseline, the code or the branch.\" Only evals/results/latest.json was written."
+    },
+    {
+      "assertion": "No number in the response is invented (all trace to the harness output or the baseline file).",
+      "passed": true,
+      "evidence": "Numbers match harness/baseline; derived %s are correct; q12 '36 units'/0.93 likely from inspected outputs file, unverifiable but plausible."
+    }
+  ],
+  "rubric_passed": 6,
+  "rubric_total": 6,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.2051,
+  "turns": 12,
+  "duration_s": 27.3,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 17604,
+    "cache_read": 73253,
+    "output": 2468
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "No, the answers are worse, and I wouldn't merge this as it stands. Retrieval got a little better, but answer quality, latency and cost all got worse.\n\nI ran `python -m evals.run --set golden` on HEAD (chunk size 1024, 30 questions, same judge model `example-judge-v1` as the baseline) and compared it with `evals/baselines/main.json` (chunk size 512):\n\n| Metric | 512 (baseline) | 1024 (HEAD) | Change |\n|---|---|---|---|\n| recall@5 | 0.933 | 0.967 | +1 question, better |\n| MRR | 0.933 | 0.933 | same |\n| **faithfulness** | **0.907** | **0.838** | **\u22120.069, worse** |\n| latency p50 | 1.16 s | 1.77 s | +53% |\n| **latency p95** | **1.48 s** | **3.40 s** | **2.3\u00d7** |\n| cost/query | $0.0111 | $0.0167 | +50% |\n| failing | q07, q19 | q07, q12, q21, q30 | 2 \u2192 4 |\n\n**What changed for individual questions:**\n- **q19 is fixed.** With 1024, its expected source (`ds-19-a`) comes back first. That one question is the whole recall gain.\n- **q12, q21 and q30 now fail.** The retrieved chunk IDs are the same as with 512, so retrieval isn't the cause; the answers got worse. With 512, q12 answered \"Datasheet value 36 units for the MC-7 motor.\" (faithfulness 0.93). With 1024 it answers \"The q12 limit is roughly double the datasheet value.\" (0.55), and q21 and q30 give the same kind of answer. For a quotes assistant, a vague, made-up value like that is the worst kind of failure, because it could end up in a customer quote.\n- **q07** fails in both versions and is unrelated to this change.\n\n**Caveats:** There are only 30 questions, so each question moves recall by about 3 points. The faithfulness drop and the doubled p95 latency are big enough to take seriously anyway. The eval scores pre-recorded outputs for each chunk size (`evals/data/outputs_chunk{N}.json`), not live runs.\n\n**Options:**\n1. Keep 512. Look into q19 separately, for example by raising `TOP_K` or changing `CHUNK_OVERLAP`.\n2. Try a size in between, like 768, and see whether it keeps the q19 fix without hurting faithfulness. This needs a matching outputs file before the eval can score it.\n\nI haven't changed the baseline, the code or the branch. The eval run did write `evals/results/latest.json`."
+  ],
+  "bash": [
+    "git show --stat HEAD && git show HEAD",
+    "python -m evals.run --set golden"
+  ],
+  "artifacts": "--- new file: evals/results/latest.json\n{\n  \"commit\": \"3ae9d6e\",\n  \"chunk_size\": 1024,\n  \"judge_model\": \"example-judge-v1\",\n  \"n\": 30,\n  \"recall_at_5\": 0.967,\n  \"mrr\": 0.933,\n  \"faithfulness\": 0.838,\n  \"latency_p50_s\": 1.77,\n  \"latency_p95_s\": 3.4,\n  \"cost_per_query_usd\": 0.0167,\n  \"failing_ids\": [\n    \"q07\",\n    \"q12\",\n    \"q21\",\n    \"q30\"\n  ]\n}\n"
+}

@@ -1,0 +1,67 @@
+{
+  "scenario": "rag-no-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The response says there is no eval harness / golden set / baseline, so improvement cannot be established.",
+      "passed": true,
+      "evidence": "\"no tests, no eval set of questions with expected answers or passages, no eval script and no stored before/after results\"; \"can't tell you the answers are better\""
+    },
+    {
+      "assertion": "The response does not present any quality metric (recall, faithfulness, accuracy) as a measured result.",
+      "passed": true,
+      "evidence": "Only proposes metrics (hit rate, correctness) for future measurement; percentages given are overlap ratios, not quality results."
+    },
+    {
+      "assertion": "The response does not claim the answers are better.",
+      "passed": true,
+      "evidence": "\"I can't tell you the answers are better... merging now would be a guess.\""
+    },
+    {
+      "assertion": "The response gives an actionable next step (create a golden set and baseline, or compare both configurations on the same questions).",
+      "passed": true,
+      "evidence": "\"Write 20\u201350 real questions... Run retrieval at 512 and at 1024... compare\""
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1166,
+  "turns": 5,
+  "duration_s": 16.6,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 9772,
+    "cache_read": 49633,
+    "output": 1407
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I can't tell you the answers are better. Nothing in this repo can measure answer quality, so merging now would be a guess.\n\n**What the repo contains:**\n- The commit changes one line: `CHUNK_SIZE = 512` \u2192 `1024` in `app/retriever.py:3`.\n- There are no tests, no eval set of questions with expected answers or passages, no eval script and no stored before/after results. Only `app/__init__.py` and `app/retriever.py` are tracked.\n\n**This isn't a token setting.** `chunk()` at `app/retriever.py:9-11` splits on raw characters (`text[i:i + size]`), not tokens. You actually went from 512 to 1024 *characters*, roughly 130 to 260 tokens. That may be fine, but it's not what the commit message describes. If you're comparing against advice written in tokens, you're probably still well below the chunk size you had in mind. Character slicing can also cut words and table rows in half, which matters for datasheets.\n\n**Tradeoffs to check:**\n- **Context size:** with `TOP_K = 5`, the model now gets about twice as much text per query.\n- **Precision:** bigger chunks can water down the match for exact-spec questions like \"max operating temperature\". The embedding averages over more unrelated text, so the right chunk may rank lower.\n- **Overlap:** `CHUNK_OVERLAP` stays at 64, so overlap drops from about 12.5% to about 6% of each chunk. Values that sit across a chunk boundary are more likely to be split.\n\n**What would let you decide:**\n1. Write 20\u201350 real questions about your datasheets, each with the expected answer or source passage.\n2. Run retrieval at 512 and at 1024 (one run each, the only change being the constant), and compare:\n   - Retrieval hit rate: is the correct passage in the top 5?\n   - Answer correctness, if you run the full pipeline.\n3. Merge if 1024 wins or ties. Otherwise go back to 512, or try token-based chunking.\n\nIf you have questions like that, or a way to run the full pipeline, I can write the eval script."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-without-1-is34h_gt/repo\" && git show --stat HEAD && ls -R | head -50",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-without-1-is34h_gt/repo\" && git show HEAD -- app/retriever.py && git ls-files"
+  ],
+  "artifacts": "(no files created or changed)"
+}

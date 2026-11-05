@@ -1,0 +1,66 @@
+{
+  "scenario": "per-single-verified",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "marks it compliant",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The requirement is marked verified / compliant because IP66 meets or exceeds IP65.",
+      "passed": false,
+      "evidence": "Only row 3 is 'VERIFIED' conditionally; overall the requirement is marked CONTRADICTED and 'No-go as written.'"
+    },
+    {
+      "assertion": "The source (RFQ p.3 section 2.1) is cited and applicability (all panels) is stated.",
+      "passed": false,
+      "evidence": "Rejects the p.3 \u00a72.1 citation ('No such clause exists') and marks the 'all panels' applicability CONTRADICTED."
+    },
+    {
+      "assertion": "The response does not invent other RFQ requirements as if they were in the source (noting that only one line was given is fine).",
+      "passed": false,
+      "evidence": "Treats an unrelated repo tender as the source and adds \u00a74.5 motor terminals, \u00a74.3 Ex d, and \u00a79.2 50 \u00b0C requirements."
+    },
+    {
+      "assertion": "The response does not conclude no-go for this item.",
+      "passed": false,
+      "evidence": "Explicitly states 'No-go as written.'"
+    }
+  ],
+  "rubric_passed": 0,
+  "rubric_total": 4,
+  "score": 0.2,
+  "denials": [],
+  "cost_usd": 0.1411,
+  "turns": 5,
+  "duration_s": 23.5,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 11463,
+    "cache_read": 51489,
+    "output": 1947
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I checked this against the only tender in the repo, `tenders/T-2026-014/tender.md`. **The IP66 offer meets the requirement, but the extraction has the wrong citation and leaves out part of the scope.**\n\n| # | Finding | Source (doc / clause) | Applicability | Exceptions checked | Result |\n|---|---------|-----------------------|---------------|--------------------|--------|\n| 1 | IP65 or better is required | Extraction says \"RFQ p.3 \u00a72.1, 'Enclosures shall be IP65 or better.'\" No such clause exists in T-2026-014. The real clause is **\u00a74.5** (`tender.md:25`): *\"Panel and motor terminal enclosures shall be IP65 or better.\"* | APPLIES | \u00a79 (Special conditions, which override \u00a74 and \u00a77 under \u00a79.3) has no IP override. | **CONTRADICTED** (wrong citation and wording) |\n| 2 | Applies to all panels | \u00a74.5 | APPLIES, but to **panels and motor terminal enclosures**, not only panels | Same as #1 | **CONTRADICTED** (scope too narrow) |\n| 3 | IP66 meets IP65 | IEC 60529. For the second digit up to 6, a rating also covers the lower levels, so IPX6 covers IPX5. The first digit is 6 in both. | APPLIES | None | **VERIFIED**, provided IP66 is offered for motor terminal boxes too |\n\n**Points to check:**\n- **Is this the right document?** \"p.3 \u00a72.1\" doesn't match anything in T-2026-014. If you meant a different RFQ, send it and I'll check against that. Otherwise the citation needs correcting to \u00a74.5.\n- **Motor terminal boxes are missing.** The offer has to show IP65 or better for the terminal boxes on P-01 and P-02, not just the panels.\n- **The P-01 terminal box has a second requirement.** P-01 sits in the wet well, which is Zone 1 (Annex B). Under \u00a74.3 its motor must be ATEX Ex d certified, so that terminal box needs both Ex d and IP65 or better. Check that the datasheet shows both ratings.\n- **50 \u00b0C ambient (\u00a79.2).** This doesn't change the IP rating. But the IP66 rating and any internal heat calculations for the panels should hold at 50 \u00b0C. Worth checking against the datasheet.\n\n**Counts:** 1 verified, 2 contradicted, 0 unsupported, 0 needing a person's judgement. Missing from the extraction: motor terminal enclosures (\u00a74.5) and the Ex d requirement for the P-01 terminal box (\u00a74.3).\n\n**No-go as written.** Fix the citation to \u00a74.5, extend the scope to motor terminal enclosures, and confirm IP66 on the motor terminal boxes and Ex d on the P-01 box. After that the IP66 offer is compliant."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

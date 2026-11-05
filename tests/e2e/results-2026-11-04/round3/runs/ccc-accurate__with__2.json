@@ -1,0 +1,71 @@
+{
+  "scenario": "ccc-accurate",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "context-continuity-check"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "verified against the repository",
+      "passed": true,
+      "detail": "git log -5 --stat"
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The branch and commit are checked against the repository, and the test command is actually run (not inferred by counting tests in files) and its result compared with the handoff.",
+      "passed": true,
+      "evidence": "Ran git log, git status, and python -m pytest -q; reported '9 passed' and HEAD cda58ff on feat/quote-pdf."
+    },
+    {
+      "assertion": "The handoff is judged complete / accurate; no mismatch is reported that does not exist (minor suggestions are fine).",
+      "passed": true,
+      "evidence": "\"the handoff is accurate. Every claim matches\"; gaps listed are minor suggestions, not false mismatches."
+    },
+    {
+      "assertion": "The next step given is embedding the Arabic font (pending item 1), with the ADR-0007 constraint.",
+      "passed": true,
+      "evidence": "Next step: embed Arabic font in app/fonts/ via @font-face, bundled not system font, per ADR-0007."
+    },
+    {
+      "assertion": "The logo question is kept open, not answered by invention.",
+      "passed": true,
+      "evidence": "\"Where the customer logo comes from is still undecided\"; not answered, flagged as needing an answer later."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1784,
+  "turns": 14,
+  "duration_s": 24.4,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 15223,
+    "cache_read": 72895,
+    "output": 2092
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I checked the handoff against the repo and it's accurate. Every claim matches what's actually there, and you can resume from it.\n\n## What I checked\n\n| Item | Status | Evidence |\n|---|---|---|\n| Goal | present | `app/pdf.py:18` has the `GET /quotes/{id}/pdf` route |\n| Branch / HEAD | present | `git status` shows `feat/quote-pdf` with a clean tree; `git log` shows HEAD is `cda58ff` |\n| Decisions and where they were made | present | `docs/adr/0007-pdf-rendering-weasyprint.md` (accepted) says WeasyPrint, A4, `dir=\"rtl\"` for Arabic, and embedded fonts in `app/fonts/` |\n| Done, with evidence | present | Commit `cda58ff` adds `app/pdf.py` and `tests/test_pdf.py`. I ran `python -m pytest -q` and got **9 passed** (4 PDF tests and 5 quote tests) |\n| Pending work, in order | present | `app/fonts/` doesn't exist yet and no test mentions a font, so step 1 hasn't been started. There's also no README yet |\n| Known failures | present | None; the tests pass |\n| Open question | present | Where the customer logo comes from is still undecided, and the code doesn't touch logos yet |\n\n## Small gaps\n\n1. **No README in the repo.** Pending step 2 (\"document the endpoint in the README\") actually means creating one, not editing one. Worth stating that.\n2. **The font isn't named.** The handoff says \"embed the Arabic font\" but doesn't say which font or what licence. ADR-0007 doesn't say either. If that was decided in a previous chat, it should go in the handoff or the ADR.\n3. **The logo question has no owner and isn't blocking yet.** It doesn't affect step 1, but it will need an answer and probably an ADR before the template gets a logo.\n4. `HANDOFF.md` is git-ignored through `.git/info/exclude`, so it only exists on this machine. That's fine if that was intended.\n\n## Next step\n\n**Embed the Arabic font:** add the font file to `app/fonts/`, have the RTL template in `render_html` (`app/pdf.py:9`) reference it with an `@font-face` rule pointing at a bundled file, not a system font. Add a test in `tests/test_pdf.py` that checks the Arabic quote's HTML (quote 2) references the embedded font.\n\nBefore writing that, I need one answer from you: **which Arabic font should I use, and is its licence OK for embedding?** (Noto Naskh Arabic and Amiri are both under the OFL licence.) I'll write the test first and then the code."
+  ],
+  "bash": [
+    "git log -5 --stat",
+    "git status",
+    "python -m pytest -q",
+    "git status --ignored --short"
+  ],
+  "artifacts": "(no files created or changed)"
+}

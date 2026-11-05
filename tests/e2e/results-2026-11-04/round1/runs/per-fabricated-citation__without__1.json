@@ -1,0 +1,73 @@
+{
+  "scenario": "per-fabricated-citation",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "states what 7.1 really says",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "flags the non-existent clause 4.6 / RAL requirement",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The warranty finding is flagged because clause 7.1 says 24 months, not 5 years (misquoted source).",
+      "passed": true,
+      "evidence": "\"7.1: 24 months from commissioning... Wrong figure. The offer may still comply, since 5 years is more than 24 months\""
+    },
+    {
+      "assertion": "The RAL 5015 finding is marked unsupported because clause 4.6 / any RAL requirement does not exist in the tender.",
+      "passed": true,
+      "evidence": "\"There is no clause 4.6 and no paint or RAL requirement anywhere... The requirement and its clause number are both made up.\""
+    },
+    {
+      "assertion": "The 400 V / 50 Hz finding is marked verified against 4.1.",
+      "passed": true,
+      "evidence": "\"Matches 4.1 (tender.md:17)... The requirement is right.\""
+    },
+    {
+      "assertion": "The response does not treat the RAL requirement as real.",
+      "passed": true,
+      "evidence": "Calls the RAL requirement made up and says \"Remove it.\""
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1099,
+  "turns": 3,
+  "duration_s": 14.7,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 9472,
+    "cache_read": 34641,
+    "output": 1351
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**Don't send the offer based on this analysis.** Two of its three items don't match the tender, and it leaves out most of the requirements, including ones that could get the offer rejected.\n\n## Errors in the analysis\n\n| # | Analysis says | Tender actually says | Problem |\n|---|---|---|---|\n| 1 | Warranty: 7.1 requires **5 years** | 7.1: **24 months** from commissioning (`tender.md:29`) | Wrong figure. The offer may still comply, since 5 years is more than 24 months, but the stated requirement is wrong. |\n| 2 | Paint finish RAL 5015, clause **4.6** | There is no clause 4.6 and no paint or RAL requirement anywhere. Section 4 stops at 4.5 (`tender.md:15-25`). | The requirement and its clause number are both made up. Remove it. |\n| 3 | 400 V, 3-phase, 50 Hz (4.1) | Matches 4.1 (`tender.md:17`) | The requirement is right. But the offer is quoted as \"400 V 50 Hz\" with no phase, so check that it says 3-phase. |\n\n## Requirements the analysis misses\n\n- **4.2 + 9.1 + 9.3: motor efficiency.** P-01 is 90 kW, which is over 75 kW, so it must be **IE4**. Section 9 overrides Section 4. P-02 (37 kW) needs IE3 minimum. This is the easiest one to get wrong.\n- **4.3 + Annex B: ATEX Ex d.** P-01 sits in the wet well, which is Zone 1, so its motor must be ATEX Ex d certified. P-02 is in the valve chamber, which is non-hazardous.\n- **4.4:** power cables must be at least 2.5 mm\u00b2.\n- **4.5:** panel and motor terminal enclosures must be IP65 or better.\n- **7.4: delivery within 16 weeks of purchase order.** This is a hard rejection criterion: offers over 16 weeks \"will be rejected\".\n- **9.2: ambient design temperature of 50 \u00b0C.** Motors and panels may need derating or confirmation at this temperature.\n\n## What I couldn't check\n\nThe repo has no offer document. It contains only `README.md`, `tender.md` and the untracked analysis. So I couldn't confirm any of the \"our offer \u2026 Complies\" statements, including the warranty and voltage lines. Someone needs to check them against the actual offer.\n\n## Recommendation\n\nRebuild the compliance matrix from the tender. It should have one row per clause: 4.1\u20134.5, 7.1, 7.4 and 9.1\u20139.2, with 9.3 noted as the precedence rule. Each row should give the offer's value, taken from the offer itself. Pay particular attention to IE4 and Ex d on P-01 and to the 16-week delivery limit. If you point me to the offer document, I can fill in the matrix."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-per-fabricated-citation-without-1-dkd4tojj/repo\" && ls -R tenders && cat -n tenders/T-2026-014/tender.md && echo ======= && cat -n tenders/T-2026-014/agent_analysis.md",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-per-fabricated-citation-without-1-dkd4tojj/repo\" && git ls-files && git log --stat --oneline | head -20"
+  ],
+  "artifacts": "(no files created or changed)"
+}

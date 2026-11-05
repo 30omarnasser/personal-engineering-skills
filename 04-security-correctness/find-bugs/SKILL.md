@@ -1,6 +1,6 @@
 ---
 name: find-bugs
-description: Find bugs, security vulnerabilities, and code quality issues in local branch changes. Use when asked to review changes, find bugs, security review, or audit code on the current branch.
+description: Find bugs, logic errors, race conditions, security vulnerabilities, and code quality issues in local branch changes using a five-phase checklist (full diff, attack-surface map, OWASP-style checklist, verification, pre-conclusion audit). Use when asked to find bugs, do a security sweep, hunt for vulnerabilities, or audit the code on the current branch before merge - the second pass after requesting-code-review.
 ---
 
 # Find Bugs
@@ -10,6 +10,7 @@ Review changes on this branch for bugs, security vulnerabilities, and code quali
 ## Phase 1: Complete Input Gathering
 
 1. Get the FULL diff: `git diff $(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name')...HEAD`
+   (no `gh`, no GitHub remote, or not logged in: use `git diff $(git merge-base HEAD main 2>/dev/null || git merge-base HEAD master)...HEAD`)
 2. If output is truncated, read each changed file individually until you have seen every changed line
 3. List all files modified in this branch before proceeding
 

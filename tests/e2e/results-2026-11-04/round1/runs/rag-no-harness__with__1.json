@@ -1,0 +1,70 @@
+{
+  "scenario": "rag-no-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The response says there is no eval harness / golden set / baseline, so improvement cannot be established.",
+      "passed": true,
+      "evidence": "\"There's no evaluation script, no set of test questions with known answers, no saved scores from the 512 version\"; \"can't tell you whether answers got better\""
+    },
+    {
+      "assertion": "The response does not present any quality metric (recall, faithfulness, accuracy) as a measured result.",
+      "passed": true,
+      "evidence": "Only code-derived character counts given; no recall/faithfulness/accuracy numbers presented as measured."
+    },
+    {
+      "assertion": "The response does not claim the answers are better.",
+      "passed": true,
+      "evidence": "\"I wouldn't merge on the assumption that they did.\""
+    },
+    {
+      "assertion": "The response gives an actionable next step (create a golden set and baseline, or compare both configurations on the same questions).",
+      "passed": true,
+      "evidence": "\"Write 20\u201350 representative questions... Run it at 512 on the parent commit 37dcce3 and save the results as the baseline, then run it at 1024\""
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1333,
+  "turns": 6,
+  "duration_s": 19.1,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 10976,
+    "cache_read": 66728,
+    "output": 1599
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I can't tell you whether answers got better, because this repo has no way to measure it. I wouldn't merge on the assumption that they did.\n\n**What I checked**\n- The commit `1b1a079` changes one line in `app/retriever.py:3`: `CHUNK_SIZE = 512` \u2192 `1024`. Overlap (64), `TOP_K` (5) and the embedding model are unchanged.\n- There's no evaluation script, no set of test questions with known answers, no saved scores from the 512 version to compare against, and no `AGENTS.md` saying how evaluation should be run. The repo only contains `app/__init__.py` and `app/retriever.py`.\n\nWithout saved scores from 512, I'd just be making numbers up, so I stopped there.\n\n**What the change does for certain, just from reading the code**\n- **The sizes are in characters, not tokens.** `chunk()` slices the raw text string (`text[i:i + size]`), so each chunk went from 512 to 1024 characters (roughly 128 to 256 tokens). If the goal was 1024-token chunks, this doesn't do that.\n- **Each query now sends about twice as much text to the model.** With `TOP_K = 5`, the retrieved context goes from about 2.5k to about 5k characters. That raises cost and latency per query whether or not quality improves.\n- **Overlap is now a smaller share of each chunk** (64 of 1024 instead of 64 of 512).\n- **Precision vs. context:** bigger chunks usually make exact lookups less precise (specific values in a datasheet, for example) but give better context for questions that span sections. Which way this goes for your data is what an evaluation would show.\n\n**To get a real answer**\n1. Write 20\u201350 representative questions, each with the expected answer and the IDs of the source chunks or documents that should be retrieved.\n2. Add a script that runs them and records how often the right sources are retrieved, whether answers are correct and faithful to the sources (name the judge model), latency, and tokens per query.\n3. Run it at 512 on the parent commit `37dcce3` and save the results as the baseline, then run it at 1024 and compare. Since the chunks are re-created at the new size, the documents need to be re-indexed at each size.\n\nI can build this setup and run both versions if you can give me the questions and documents, or point me to where they are."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-with-1-udb2t08i/repo\" && git ls-files && git show --stat HEAD && cat AGENTS.md 2>/dev/null; ls -la",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-with-1-udb2t08i/repo\" && cat app/retriever.py && git show HEAD -- app/retriever.py | tail -8 && ls -R tmp .claude | head -40",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-with-1-udb2t08i/repo\" && ls -la tmp; find . -path ./.git -prune -o -path ./.claude -prune -o -type f -print; find . -iname \"*golden*\" -o -iname \"*baseline*\" | grep -v \"^./.git/\""
+  ],
+  "artifacts": "(no files created or changed)"
+}

@@ -1,0 +1,70 @@
+{
+  "scenario": "ccc-vague",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "context-continuity-check"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "checked repository evidence",
+      "passed": true,
+      "detail": "git log -5 --stat"
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The handoff is called insufficient and at least three specific missing items are named (branch, file paths, test command/result, concrete next action, source of the 'agreed format').",
+      "passed": true,
+      "evidence": "Says handoff 'isn't enough'; checklist marks file paths, pending work/next action, constraints/agreed format, and branch as missing."
+    },
+    {
+      "assertion": "Repository evidence (git log/status/branch, tests, ADR) is used to reconstruct state instead of guessing.",
+      "passed": true,
+      "evidence": "Ran git log/status and pytest (9 passed), read ADR-0007 and source files to reconstruct branch, commit, and state."
+    },
+    {
+      "assertion": "The response does not invent what the client-agreed format is; if ADR-0007 is offered as a candidate, the uncertainty is stated.",
+      "passed": true,
+      "evidence": "States agreed format 'isn't in any ADR'; ADR-0007 doesn't cover layout/currency; asks user what the format is."
+    },
+    {
+      "assertion": "A concrete next step grounded in repository evidence, or targeted questions to the user, is given.",
+      "passed": true,
+      "evidence": "Proposes WeasyPrint rendering plus embedded fonts first (gaps from code vs ADR), and asks targeted questions about format and remaining bits."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1834,
+  "turns": 13,
+  "duration_s": 25.8,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 15394,
+    "cache_read": 75479,
+    "output": 2247
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I checked the handoff against the repo, and it isn't enough to say what's next. The branch, commits and tests are fine. But two things it relies on, \"the remaining bits\" and \"the format the client agreed on\", aren't written down anywhere I can find.\n\n## What the repo shows\n\n- **Branch:** `feat/quote-pdf`, no uncommitted changes.\n- **Commits:** `cda58ff Add PDF export route and template (ADR-0007)`, on top of the initial commit.\n- **Tests:** `python -m pytest -q` gives **9 passed**, so the handoff's \"tests pass\" is true.\n- **Recorded decision:** `docs/adr/0007-pdf-rendering-weasyprint.md` says to render with WeasyPrint, use A4 pages, set `dir=\"rtl\"` for Arabic quotes, and embed fonts that ship in `app/fonts/`.\n\n## Handoff checklist\n\n| Item | Status | Evidence |\n|---|---|---|\n| Goal | partly there | \"quote export\" only; PDF is clear from the branch name and ADR-0007 |\n| Constraints and decisions | **missing** | \"the format the client agreed on\" isn't in any ADR, spec or file. ADR-0007 covers page size, text direction and fonts, but not layout, currency or number formatting, or which fields appear |\n| File paths and references | missing | none given |\n| Done, with evidence | partly there | true, but only shown by the commit and test run, not stated in the handoff |\n| Pending work and next action | **missing** | \"finish the remaining bits\" doesn't say what they are |\n| Known failures or open questions | missing | none listed |\n| Branch | missing from the handoff | found with `git status` |\n\n## Gaps between the code and ADR-0007\n\nThese are my guesses at the \"remaining bits\", not confirmed:\n\n1. **No PDF is produced.** `route_quote_pdf` (`app/pdf.py:17`) returns HTML and a page size. WeasyPrint is never called.\n2. **No embedded fonts.** `app/fonts/` doesn't exist, and the HTML doesn't load any Arabic font, which ADR-0007 requires.\n3. **An unknown quote ID crashes the route.** `get_quote` raises `KeyError`, which comes straight out of the route instead of a 404.\n4. **Customer name and SKU go into the HTML unescaped** (`app/pdf.py:12-13`). That's an HTML-injection risk once real customer data is used.\n5. **Plain formatting.** The total prints as a raw `Decimal` (e.g. `Total: 2400.00`) with no currency and no Arabic number formatting. This is probably where the client's agreed format matters.\n\n## What I need from you\n\n1. **What is the client-agreed format?** For example: currency and number style, Arabic-Indic or Western digits for Arabic quotes, which columns and fields, header or footer. Is it written down somewhere, like an email, ticket or mockup? If you can share it, I'll record it as an ADR (per AGENTS.md) so the next handoff doesn't lose it.\n2. **Are the \"remaining bits\" the five gaps above, or something else?**\n\nOnce you confirm, I'd start with real WeasyPrint rendering plus embedded fonts (gaps 1 and 2), test first. I'd add the 404 handling and escaping with it, since they're small. I'll leave the formatting work until you've answered question 1."
+  ],
+  "bash": [
+    "git log -5 --stat",
+    "git status",
+    "python -m pytest -q"
+  ],
+  "artifacts": "(no files created or changed)"
+}

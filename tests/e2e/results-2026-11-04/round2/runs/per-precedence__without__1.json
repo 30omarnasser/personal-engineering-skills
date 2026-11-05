@@ -1,0 +1,91 @@
+{
+  "scenario": "per-precedence",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "cites special condition 9.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "uses the Annex B hazardous-area schedule",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "overall no-go",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "Finding 1 (IE3 incl. 90 kW P-01) is marked contradicted / non-compliant because clause 9.1 requires IE4 above 75 kW.",
+      "passed": true,
+      "evidence": "Clause 9.1: pump motors above 75 kW must be IE4... P-01 does not comply."
+    },
+    {
+      "assertion": "Finding 2 (ATEX not required) is marked contradicted or unsupported because P-01 sits in the wet well, Zone 1 per Annex B, so clause 4.3 applies.",
+      "passed": true,
+      "evidence": "Annex B classifies the wet well as Zone 1... P-01 needs an Ex d certified motor."
+    },
+    {
+      "assertion": "Finding 3 (60 Hz) is marked contradicted by clause 4.1 (50 Hz).",
+      "passed": true,
+      "evidence": "Clause 4.1: 400 V, 3-phase, 50 Hz. Wrong frequency."
+    },
+    {
+      "assertion": "Finding 4 (IP66 vs IP65) is marked verified / compliant.",
+      "passed": true,
+      "evidence": "Clause 4.5: IP65 or better. Correct."
+    },
+    {
+      "assertion": "Every finding cites a specific clause or annex of the tender.",
+      "passed": true,
+      "evidence": "Findings cite 9.1/9.3, 4.3/Annex B, 4.1, 4.5 respectively."
+    },
+    {
+      "assertion": "At least two requirements the analysis missed are flagged (any of 4.4, 7.1, 7.4, 9.2).",
+      "passed": true,
+      "evidence": "Flags 4.4, 7.1, 7.4, 9.2 as clauses not covered."
+    },
+    {
+      "assertion": "The overall conclusion is no-go / not ready to send.",
+      "passed": true,
+      "evidence": "Don't send the offer yet."
+    }
+  ],
+  "rubric_passed": 7,
+  "rubric_total": 7,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1293,
+  "turns": 4,
+  "duration_s": 17.7,
+  "tokens": {
+    "input": 4,
+    "cache_creation": 11615,
+    "cache_read": 19781,
+    "output": 1615
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**Don't send the offer yet.** The analysis has three errors, and each one would make the offer non-compliant or misdescribe it. It also leaves out five clauses, one of which is a rejection criterion.\n\n## Errors in the analysis\n\n| # | Analysis says | Tender actually says | Impact |\n|---|---|---|---|\n| 1 | IE3 on all motors, including the 90 kW P-01. \"Complies.\" | Clause 9.1: pump motors **above 75 kW must be IE4**. Clause 9.3 says Section 9 overrides Section 4, so 9.1 replaces the IE3 minimum in 4.2. | **P-01 does not comply.** It needs an IE4 motor. P-02 (37 kW) at IE3 is fine. |\n| 2 | \"ATEX not required.\" | Clause 4.3: motors in Zone 1 areas must be **ATEX Ex d**. Annex B classifies the **wet well as Zone 1**, and the equipment schedule puts P-01 in the wet well. | **P-01 needs an Ex d certified motor.** P-02 in the valve chamber (non-hazardous) does not. The analysis seems to have read 4.3 without checking Annex B. |\n| 3 | Supply 400 V / **60 Hz** | Clause 4.1: 400 V, 3-phase, **50 Hz** | Wrong frequency. If this went into the offer or the motor selection, it changes speed and pump duty. |\n| 4 | IP65 required, IP66 offered, complies | Clause 4.5: IP65 or better | \u2705 Correct. |\n\nTogether, items 1 and 2 mean P-01 needs a **90 kW IE4 Ex d motor**. That's a more specialised and more expensive unit, so check that one exists, what it costs and how long it takes to deliver (see clause 7.4 below).\n\n## Clauses the analysis doesn't cover\n\n- **4.4: power cables of at least 2.5 mm\u00b2.** Not checked against the cabling in the offer.\n- **7.1: 24-month warranty from commissioning.** Make sure the offer says \"from commissioning\", not \"from delivery\".\n- **7.4: delivery within 16 weeks of the purchase order. Offers over 16 weeks will be rejected.** This is a hard rejection rule, and the IE4 Ex d motor for P-01 may have a long lead time.\n- **9.2: ambient design temperature of 50 \u00b0C.** Motors are usually rated at 40 \u00b0C, so the motors and panels may need derating or a larger frame size. Not addressed.\n- **9.3: Section 9 takes precedence.** The analysis ignored this rule, which is how error 1 happened.\n\n## What to do before sending\n1. Change P-01 to a 90 kW **IE4, ATEX Ex d** motor, and check it still meets the IP65 requirement and the 50 \u00b0C ambient.\n2. Change the supply to **50 Hz** everywhere it appears.\n3. Confirm delivery of everything, especially the P-01 motor, is **16 weeks or less**.\n4. Confirm cable sizes, warranty wording and 50 \u00b0C derating in the offer.\n\nI only compared the analysis with the tender. There's no offer document in the repo, so I couldn't check the offer itself. I haven't edited `agent_analysis.md`. I can rewrite it with these corrections if you want."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

@@ -1,0 +1,70 @@
+{
+  "scenario": "ccc-vague",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "context-continuity-check"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "checked repository evidence",
+      "passed": true,
+      "detail": "git log -5 --stat"
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The handoff is called insufficient and at least three specific missing items are named (branch, file paths, test command/result, concrete next action, source of the 'agreed format').",
+      "passed": false,
+      "evidence": "Only names missing next action ('which remaining bits') and the agreed format and its source; branch, paths and test command not flagged as missing."
+    },
+    {
+      "assertion": "Repository evidence (git log/status/branch, tests, ADR) is used to reconstruct state instead of guessing.",
+      "passed": true,
+      "evidence": "Ran git log/status and pytest (9 passed), read app/pdf.py, tests and ADR-0007, and reported branch feat/quote-pdf and the commit."
+    },
+    {
+      "assertion": "The response does not invent what the client-agreed format is; if ADR-0007 is offered as a candidate, the uncertainty is stated.",
+      "passed": true,
+      "evidence": "'Nothing in the repo describes it... ADR-0007... covers how the PDF is rendered, not how the document should look.'"
+    },
+    {
+      "assertion": "A concrete next step grounded in repository evidence, or targeted questions to the user, is given.",
+      "passed": true,
+      "evidence": "Asks three targeted questions and proposes WeasyPrint rendering, embedded font and HTML escaping, test-first, grounded in the ADR gaps."
+    }
+  ],
+  "rubric_passed": 3,
+  "rubric_total": 4,
+  "score": 0.8,
+  "denials": [],
+  "cost_usd": 0.1787,
+  "turns": 13,
+  "duration_s": 25.2,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 15231,
+    "cache_read": 74621,
+    "output": 2089
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "The handoff doesn't say what to do next, so I haven't started anything yet. The repo shows what's built and the gaps against the design decision, but \"the remaining bits\" and \"the format the client agreed on\" can't be pinned down from what's here.\n\n## What the repo shows\n\n- **Branch:** `feat/quote-pdf`, working tree clean, one feature commit (`cda58ff` \"Add PDF export route and template (ADR-0007)\").\n- **Tests:** `python -m pytest -q` gives 9 passed, so \"tests pass\" is accurate.\n- **Built so far:** `app/pdf.py` has a route at `/quotes/{id}/pdf` that returns HTML plus `page_size: \"A4\"`, and sets `dir=\"rtl\"` on Arabic quotes. Tests cover the 200 response, A4, and right-to-left vs left-to-right.\n- **The agreed design is ADR-0007** (`docs/adr/0007-pdf-rendering-weasyprint.md`): render with WeasyPrint, A4 pages, right-to-left for Arabic, fonts embedded and never taken from the system, font files in `app/fonts/`.\n\n## What ADR-0007 asks for that isn't built\n\n1. **No PDF is produced.** The route returns HTML and never calls WeasyPrint; the file's own docstring says rendering is stubbed.\n2. **No fonts.** `app/fonts/` doesn't exist, and nothing sets or embeds an Arabic font.\n3. **Values go into the HTML unescaped.** The customer name, SKU and other fields are inserted as raw text (`app/pdf.py:12-14`). That's a bug if any of them can contain `<` or `&`.\n4. **Plain-looking output.** The page has no styling, currency or number formatting. Totals print as raw `Decimal` values like `2400.00` with no currency.\n\n## What the handoff should have answered\n\n- **Which \"remaining bits\"?** Probably items 1 and 2, but I'm guessing.\n- **What is \"the format the client agreed on\"?** Nothing in the repo describes it: no spec, mockup or sample PDF. The only written decision is ADR-0007, which covers how the PDF is rendered, not how the document should look (layout, currency, dates, Arabic numerals, logo, terms).\n- **Where was it agreed?** It isn't recorded in an ADR, spec or ticket.\n\n## Questions for you\n\n1. Is the client-agreed format written down somewhere (email, mockup, sample PDF)? If so, can you share it or point me to it? Once I have it I'd record it in the repo so the next handoff doesn't depend on chat history.\n2. Which Arabic font should go in `app/fonts/` (for example Noto Naskh Arabic or Amiri), and is its license cleared for embedding?\n3. Should the route return actual PDF bytes now? That means WeasyPrint has to be installed in the container image.\n\nMy suggestion: if you confirm items 1\u20133, I'll add real WeasyPrint rendering with the embedded font, plus HTML escaping, test-first. I'd leave layout and styling until the agreed format is pinned down, so I don't invent one."
+  ],
+  "bash": [
+    "git log -5 --stat",
+    "git status",
+    "python -m pytest -q"
+  ],
+  "artifacts": "(no files created or changed)"
+}

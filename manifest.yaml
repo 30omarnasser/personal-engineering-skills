@@ -1,8 +1,10 @@
 # Personal Engineering Skill Library — manifest
 # activation: auto = model loads it when relevant; manual = only when you invoke it (disable-model-invocation: true)
 # scope: global = ~/.claude/skills ; project = <repo>/.claude/skills ; optional = not installed by default
-# tools/update.py refreshes commit fields; fill last_evaluated yourself after running skill-creator evals
+# tools/update.py refreshes commit fields and warns before overwriting skills with local_patches.
+# last_evaluated = date of the last tools/check_library.py + tools/activation_eval.py pass (see EVALUATION_REPORT.md).
 pulled: 2026-11-04
+audited: 2026-11-05 (see EVALUATION_REPORT.md)
 skills:
   - name: handoff
     category: 01-core-engineering
@@ -11,8 +13,9 @@ skills:
     license: MIT
     scope: global
     activation: manual
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-05
+    local_patches: "unique handoff file name (date-time) after a concurrent-session overwrite in e2e tests 2026-11-04"
     notes: "Session boundaries only. Distinct from /compact."
   - name: modern-python
     category: 01-core-engineering
@@ -21,8 +24,8 @@ skills:
     license: CC-BY-SA-4.0
     scope: global
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
     notes: "uv + ruff + ty setup and migration. Templates for pre-commit and dependabot included."
   - name: research
     category: 01-core-engineering
@@ -31,8 +34,8 @@ skills:
     license: MIT
     scope: global
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
   - name: systematic-debugging
     category: 01-core-engineering
     source: https://github.com/obra/superpowers/tree/HEAD/skills/systematic-debugging
@@ -40,8 +43,9 @@ skills:
     license: MIT
     scope: global
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
+    local_patches: "description sharpened for standalone triggering; superpowers: namespace removed from cross-references"
   - name: test-driven-development
     category: 01-core-engineering
     source: https://github.com/obra/superpowers/tree/HEAD/skills/test-driven-development
@@ -49,8 +53,9 @@ skills:
     license: MIT
     scope: global
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
+    local_patches: "description sharpened for standalone triggering"
   - name: verification-before-completion
     category: 01-core-engineering
     source: https://github.com/obra/superpowers/tree/HEAD/skills/verification-before-completion
@@ -58,8 +63,9 @@ skills:
     license: MIT
     scope: global
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
+    local_patches: "description sharpened for standalone triggering"
   - name: ask-matt
     category: 02-planning-architecture
     source: https://github.com/mattpocock/skills/tree/HEAD/skills/engineering/ask-matt
@@ -67,8 +73,9 @@ skills:
     license: MIT
     scope: global
     activation: manual
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
+    local_patches: "library note mapping uninstalled Matt skills to installed owners"
     notes: "Manual helper only. Routes over Matt's full repo; some targets not installed."
   - name: domain-modeling
     category: 02-planning-architecture
@@ -77,8 +84,8 @@ skills:
     license: MIT
     scope: global
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
   - name: grill-with-docs
     category: 02-planning-architecture
     source: https://github.com/mattpocock/skills/tree/HEAD/skills/engineering/grill-with-docs
@@ -86,9 +93,19 @@ skills:
     license: MIT
     scope: global
     activation: manual
-    status: upstream, not yet evaluated here
-    last_evaluated: null
-    notes: "Owns clarification; don't also run Superpowers brainstorming."
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
+    notes: "Owns clarification; don't also run Superpowers brainstorming. Calls the `grilling` skill, which must be installed alongside it."
+  - name: grilling
+    category: 02-planning-architecture
+    source: https://github.com/mattpocock/skills/tree/HEAD/skills/productivity/grilling
+    commit: 4ae2317
+    license: MIT
+    scope: global
+    activation: auto
+    status: upstream, added 2026-11-04 (dependency of grill-with-docs)
+    last_evaluated: 2026-11-04
+    notes: "The interview primitive grill-with-docs dispatches. Auto-activation is upstream's choice; it triggers on 'grill'/'stress-test my thinking' phrasing."
   - name: requesting-code-review
     category: 03-review-workflow
     source: https://github.com/obra/superpowers/tree/HEAD/skills/requesting-code-review
@@ -96,8 +113,8 @@ skills:
     license: MIT
     scope: global
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
   - name: using-git-worktrees
     category: 03-review-workflow
     source: https://github.com/obra/superpowers/tree/HEAD/skills/using-git-worktrees
@@ -105,8 +122,9 @@ skills:
     license: MIT
     scope: global
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
+    local_patches: "Step 2 Python setup chooses uv/poetry/pip from the lockfile"
   - name: find-bugs
     category: 04-security-correctness
     source: https://github.com/getsentry/skills/tree/HEAD/skills/find-bugs
@@ -114,8 +132,9 @@ skills:
     license: Apache-2.0
     scope: project
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
+    local_patches: "description sharpened vs built-in security-review; git merge-base fallback when gh is unavailable"
     notes: "Security/bug sweep of branch changes. requesting-code-review owns general review; this is the second pass."
   - name: property-based-testing
     category: 04-security-correctness
@@ -124,8 +143,8 @@ skills:
     license: CC-BY-SA-4.0
     scope: project
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
   - name: security-model
     category: 04-security-correctness
     source: https://github.com/getsentry/skills/tree/HEAD/skills/security-model
@@ -133,8 +152,9 @@ skills:
     license: Apache-2.0
     scope: project
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
+    local_patches: "resolver forces UTF-8 stdout/stderr; selftest Windows encoding + symlink skips"
     notes: "Writes SECURITY_MODEL.md. Add LLM threats yourself: prompt injection via documents, tool permissions."
   - name: spec-to-code-compliance
     category: 04-security-correctness
@@ -143,8 +163,9 @@ skills:
     license: CC-BY-SA-4.0
     scope: project
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
+    local_patches: "standalone fallback section; agents/spec-compliance-checker.md vendored from the plugin"
   - name: supply-chain-risk-auditor
     category: 04-security-correctness
     source: https://github.com/trailofbits/skills/tree/HEAD/plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor
@@ -152,8 +173,9 @@ skills:
     license: CC-BY-SA-4.0
     scope: project
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
+    local_patches: "{baseDir}/no-uv note; test_sources.py Windows skips"
     notes: "Calls PyPI/npm/OSV/deps.dev/GitHub APIs. Run gh auth login first. Reads uv.lock not poetry.lock."
   - name: huggingface-local-models
     category: 05-ai-engineering
@@ -162,8 +184,8 @@ skills:
     license: Apache-2.0
     scope: project
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
+    status: upstream, evaluated 2026-11-04 (static + activation)
+    last_evaluated: 2026-11-04
     notes: "Only when deploying open models locally."
   - name: context-continuity-check
     category: 06-custom-domain
@@ -172,8 +194,9 @@ skills:
     license: yours
     scope: project
     activation: auto
-    status: draft — has evals/evals.json
-    last_evaluated: null
+    status: draft — activation 2026-11-04/05; e2e 2026-11-05: 54/54 assertions with skill vs 50/54 without (synthetic fixtures, 5 scenarios x2, incl. injection + secret); real-task use pending
+    last_evaluated: 2026-11-05
+    local_patches: "description rewritten after activation tests 2026-11-04; Rules section added after e2e tests 2026-11-04"
   - name: procurement-evidence-review
     category: 06-custom-domain
     source: custom (draft)
@@ -181,8 +204,9 @@ skills:
     license: yours
     scope: project
     activation: auto
-    status: draft — has evals/evals.json
-    last_evaluated: null
+    status: draft — activation 2026-11-04/05; e2e 2026-11-05: 74/76 with skill vs 71/76 without (was 67/76 before the Rules fix; synthetic tender, 5 scenarios x2, incl. injection); real-tender use pending
+    last_evaluated: 2026-11-05
+    local_patches: "description rewritten after activation tests 2026-11-04; Rules section added after e2e tests 2026-11-04"
   - name: rag-evaluation
     category: 06-custom-domain
     source: custom (draft)
@@ -190,19 +214,21 @@ skills:
     license: yours
     scope: project
     activation: auto
-    status: draft — has evals/evals.json
-    last_evaluated: null
+    status: draft — activation 2026-11-04/05; e2e 2026-11-05: 74-76/76 with skill vs 74/76 without (synthetic harness, 5 scenarios x2, incl. injection + harness crash); real-project use pending
+    last_evaluated: 2026-11-05
+    local_patches: "description rewritten after activation tests 2026-11-04"
     notes: "Set EVAL_CMD and BASELINE in AGENTS.md first."
   - name: skill-creator
-    category: 07-skill-development
+    category: _optional
     source: https://github.com/anthropics/skills/tree/HEAD/skills/skill-creator
     commit: ca45fc4
     license: Apache-2.0 (LICENSE.txt in skill)
-    scope: global
+    scope: optional
     activation: auto
-    status: upstream, not yet evaluated here
-    last_evaluated: null
-    notes: "Use to run evals/evals.json in each 06-custom-domain skill."
+    status: upstream, evaluated 2026-11-04 (static + activation); moved from 07-skill-development to _optional 2026-11-04
+    last_evaluated: 2026-11-04
+    local_patches: "UTF-8 reads; run_eval.py thread reader instead of select(), shutil.which(claude), query via stdin; improve_description.py shutil.which(claude)"
+    notes: "Not installed by default: Claude Code already provides the newer account-synced anthropic-skills:skill-creator (case-folder evals, reads evals.json too), and installing both lists it twice. Keep this copy for agents without that skill and for its Windows-patched scripts (run_eval.py, improve_description.py), which run from this path without installing."
   - name: huggingface-best
     category: _optional
     source: https://github.com/huggingface/skills/tree/HEAD/skills/huggingface-best

@@ -1,0 +1,77 @@
+{
+  "scenario": "ccc-stale",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "context-continuity-check"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the test command",
+      "passed": true,
+      "detail": "python -m pytest -q"
+    },
+    {
+      "type": "regex",
+      "desc": "reports the failing test",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The commit mismatch is detected (handoff says a1b2c3d; the repository HEAD differs / has an extra WIP commit).",
+      "passed": true,
+      "evidence": "\"HEAD `a1b2c3d` ... That commit doesn't exist. HEAD is `e776211` (\"WIP: test for Arabic font embedding\")\""
+    },
+    {
+      "assertion": "The test mismatch is detected: one test fails (test_arabic_font_embedded) and the count is not 14 passed.",
+      "passed": true,
+      "evidence": "\"1 failed, 9 passed. tests/test_rtl_font.py::test_arabic_font_embedded fails\" vs handoff's 14 passed"
+    },
+    {
+      "assertion": "The handoff is reported as stale / inaccurate, with corrected values or a proposed patch.",
+      "passed": true,
+      "evidence": "\"The handoff was not accurate... I've rewritten HANDOFF.md with corrections\"; new file has corrected HEAD, test counts, known failures"
+    },
+    {
+      "assertion": "The test result is established by running the test command, not by trusting the handoff.",
+      "passed": true,
+      "evidence": "Agent ran Bash: python -m pytest -q before reporting results"
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1952,
+  "turns": 14,
+  "duration_s": 27.0,
+  "tokens": {
+    "input": 12,
+    "cache_creation": 15863,
+    "cache_read": 92996,
+    "output": 2477
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "The handoff was not accurate. I compared it with the repo and the test run and found three statements that are wrong, so I've rewritten `HANDOFF.md` with corrections.\n\n**What was wrong:**\n\n| Handoff said | What the repo shows |\n|---|---|\n| HEAD `a1b2c3d` | That commit doesn't exist. HEAD is `e776211` (\"WIP: test for Arabic font embedding\"), and the working tree is clean. |\n| `pytest -q` \u2192 14 passed | **1 failed, 9 passed.** `tests/test_rtl_font.py::test_arabic_font_embedded` fails because there's no `@font-face` in the rendered HTML. |\n| Known failures: none | That test fails. It was added in `e776211` as a test written before the fix, which the handoff never mentions. |\n\n**What it left out:**\n- `app/fonts/` doesn't exist yet, and neither does a README, so step 2 means creating one.\n- It didn't say which Arabic font to use or under what license. Nothing in the repo records this.\n\n**What checks out:** the branch (`feat/quote-pdf`), the goal, and the ADR-0007 decisions (WeasyPrint, A4, `dir=\"rtl\"` for Arabic, embedded fonts in `app/fonts/`). `app/pdf.py` and `tests/test_pdf.py` exist as described.\n\n**Next step:** embed the Arabic font, following ADR-0007:\n1. Add a font file under `app/fonts/`.\n2. Make `render_html` in `app/pdf.py:9` emit an `@font-face` rule pointing to that file for Arabic quotes. The current code sets `dir=\"rtl\"` but loads no font.\n3. This is done when `test_arabic_font_embedded` passes and `python -m pytest -q` shows no failures.\n\nBefore I write any code, which Arabic font do you want to ship, for example Noto Naskh Arabic or Amiri, both under the OFL license? I'd rather not guess, because that choice affects licensing."
+  ],
+  "bash": [
+    "git log -5 --stat",
+    "git status",
+    "python -m pytest -q",
+    "cat .gitignore"
+  ],
+  "artifacts": "--- changed file: HANDOFF.md\n# Handoff \u2014 quote PDF export\n\nGoal: add PDF export at GET /quotes/{id}/pdf.\nBranch: feat/quote-pdf (HEAD e776211 \"WIP: test for Arabic font embedding\"; working tree clean)\nDecided (docs/adr/0007-pdf-rendering-weasyprint.md, status: accepted):\n- WeasyPrint with HTML templates; page size A4.\n- Templates set `dir=\"rtl\"` when quote language is Arabic.\n- Fonts are embedded, never referenced from the system; font files ship in `app/fonts/`.\nDone:\n- cda58ff: app/pdf.py (route `route_quote_pdf` + HTML template `render_html`), tests/test_pdf.py.\n- e776211: tests/test_rtl_font.py \u2014 failing test for Arabic font embedding (written ahead of the fix).\n- `python -m pytest -q` -> 1 failed, 9 passed (checked 2026-11-04).\nPending, in order:\n1. Embed the Arabic font, per ADR-0007: add a font file under `app/fonts/` (does not exist yet)\n   and emit an `@font-face` rule in `render_html` (app/pdf.py) for Arabic quotes.\n   Done when tests/test_rtl_font.py::test_arabic_font_embedded passes and nothing else fails.\n2. Document the endpoint in the README (no README exists yet; create one).\nKnown failures:\n- tests/test_rtl_font.py::test_arabic_font_embedded \u2014 expected; `@font-face` not yet in the HTML.\nOpen questions:\n- Which Arabic font (and its license) to ship in `app/fonts/` is not recorded anywhere.\n"
+}

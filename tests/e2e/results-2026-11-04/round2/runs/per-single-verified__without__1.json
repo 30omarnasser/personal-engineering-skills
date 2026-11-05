@@ -1,0 +1,66 @@
+{
+  "scenario": "per-single-verified",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "marks it compliant",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The requirement is marked verified / compliant because IP66 meets or exceeds IP65.",
+      "passed": true,
+      "evidence": "\"IP66 meets 'IP65 or better'... \u2705 for panels\" \u2014 the agent explicitly states IP66 meets or exceeds IP65."
+    },
+    {
+      "assertion": "The source (RFQ p.3 section 2.1) is cited and applicability (all panels) is stated.",
+      "passed": false,
+      "evidence": "Agent rejects the given source: \"p.3, section 2.1... \u274c Wrong reference\" and \"All panels... \u274c Too narrow\"; it substitutes clause 4.5."
+    },
+    {
+      "assertion": "The response does not invent other RFQ requirements as if they were in the source (noting that only one line was given is fine).",
+      "passed": false,
+      "evidence": "Asserts unprovided requirements as the RFQ's: motor terminal enclosures, \"clause 4.3... ATEX Ex d\", \"50 \u00b0C ambient (clause 9.2)\"."
+    },
+    {
+      "assertion": "The response does not conclude no-go for this item.",
+      "passed": true,
+      "evidence": "No no-go stated; the agent says IP66 meets the rating and recommends corrections, not rejection."
+    }
+  ],
+  "rubric_passed": 2,
+  "rubric_total": 4,
+  "score": 0.6,
+  "denials": [],
+  "cost_usd": 0.1127,
+  "turns": 4,
+  "duration_s": 18.9,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 9297,
+    "cache_read": 33879,
+    "output": 1569
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I checked this against `tenders/T-2026-014/tender.md`, the only tender in the repo. There is no saved requirement analysis there, so I compared your extraction with the tender text directly.\n\n**Verdict: the citation and the applicability are both wrong. IP66 meets the rating, but your offer has to cover more equipment than the extraction says.**\n\n| Field | Extraction says | Tender actually says | Status |\n|---|---|---|---|\n| Source location | p.3, section 2.1 | Clause **4.5**, Section 4 (Electrical requirements), `tender.md:25`. The tender has no section 2. | \u274c Wrong reference |\n| Quoted text | \"Enclosures shall be IP65 or better.\" | \"**Panel and motor terminal** enclosures shall be IP65 or better.\" | \u274c Quote is cut short and leaves out what the rule covers |\n| Applicability | All panels | All panels **and motor terminal enclosures** (P-01 90 kW and P-02 37 kW motors) | \u274c Too narrow |\n| Requirement | IP65 minimum | IP65 or better | \u2705 |\n| Our offer | IP66 | IP66 meets \"IP65 or better\". Under IEC 60529, second digit 6 also covers 5 (water jets). | \u2705 for panels; \u26a0\ufe0f motors not addressed |\n\n**What to change:**\n1. Change the source to clause 4.5 and use the full quote. I can't confirm the page number because the repo copy is markdown with no pages. If \"p.3\" came from the issued PDF, check it there.\n2. Change the applicability to panels and motor terminal boxes for P-01 and P-02.\n3. Make sure the offer says the motor terminal boxes are IP65 or better, not only the panels. Right now the extraction makes the motor side look already covered when it isn't.\n\n**Related points I noticed (outside this line item, worth checking elsewhere in the analysis):**\n- P-01 sits in the wet well, which Annex B lists as Zone 1. Under clause 4.3 its motor must be ATEX Ex d, and the IP rating doesn't satisfy that. Confirm the Ex d motor's terminal box is also IP65+.\n- The 50 \u00b0C ambient design temperature (clause 9.2) applies to the IP66 panels too. Their thermal rating should be checked with the enclosure sealed.\n\nSince the extraction cites a section that doesn't exist, it may have been run on a different document or version. Check the other citations in the same analysis as well."
+  ],
+  "bash": [
+    "git ls-files"
+  ],
+  "artifacts": "(no files created or changed)"
+}

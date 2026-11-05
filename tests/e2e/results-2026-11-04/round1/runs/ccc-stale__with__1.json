@@ -1,0 +1,79 @@
+{
+  "scenario": "ccc-stale",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "context-continuity-check"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the test command",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "reports the failing test",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The commit mismatch is detected (handoff says a1b2c3d; the repository HEAD differs / has an extra WIP commit).",
+      "passed": true,
+      "evidence": "Checklist: HEAD handoff says a1b2c3d, repo shows e776211; identifies extra 'WIP: test for Arabic font embedding' commit."
+    },
+    {
+      "assertion": "The test mismatch is detected: one test fails (test_arabic_font_embedded) and the count is not 14 passed.",
+      "passed": true,
+      "evidence": "States 10 tests, 14 impossible; expects 9 passed, 1 failed (test_arabic_font_embedded) via code reading."
+    },
+    {
+      "assertion": "The handoff is reported as stale / inaccurate, with corrected values or a proposed patch.",
+      "passed": true,
+      "evidence": "Says handoff is 'out of date' and gives proposed fixes: HEAD e776211, test status, known failures."
+    },
+    {
+      "assertion": "The test result is established by running the test command, not by trusting the handoff.",
+      "passed": false,
+      "evidence": "Agent admits 'I couldn't run the tests because the shell was blocked'; findings come from reading code."
+    }
+  ],
+  "rubric_passed": 3,
+  "rubric_total": 4,
+  "score": 0.667,
+  "denials": [
+    {
+      "tool": "Bash",
+      "input": "{\"command\": \"cd \\\"<HOME>/AppData/Local/Temp/e2e-ccc-stale-with-1-pxp08ym9/repo\\\" && cat .gitignore; echo ----; for f in docs/adr/0007-pdf-rendering-weasyprint.md app/pdf.py tests/test_pdf.py tests/test_rtl_font.py; do echo \\\"=== $f\\\"; "
+    }
+  ],
+  "cost_usd": 0.1888,
+  "turns": 13,
+  "duration_s": 34.5,
+  "tokens": {
+    "input": 14,
+    "cache_creation": 13421,
+    "cache_read": 105594,
+    "output": 3007
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "The handoff gets the goal and the design decisions right, but it's out of date: it predates the latest commit and gives the wrong test status. I couldn't run the tests because the shell was blocked when I tried, so the test findings below come from reading the code.\n\n## Checklist\n\n| Item | Handoff says | What the repo shows | Status |\n|---|---|---|---|\n| Goal | PDF export at `GET /quotes/{id}/pdf` | Matches `app/pdf.py:17-19` | \u2705 |\n| Branch | `feat/quote-pdf` | Same branch, nothing uncommitted | \u2705 |\n| HEAD | `a1b2c3d` | `e776211`. No commit `a1b2c3d` appears in the log. | \u274c Wrong |\n| Decisions | WeasyPrint, A4, RTL, embedded fonts, ADR-0007 | Matches `docs/adr/0007-pdf-rendering-weasyprint.md` | \u2705 |\n| Done | `app/pdf.py`, `tests/test_pdf.py` | Both are in `cda58ff` | \u2705 |\n| Tests | `14 passed` | The repo has 10 tests: 5 in `test_quotes.py`, 4 in `test_pdf.py` and 1 in `test_rtl_font.py`. None are parametrized, so 14 isn't possible. | \u274c Wrong |\n| Known failures | none | `e776211` added `tests/test_rtl_font.py`, which checks for `@font-face` in the Arabic quote's HTML. `render_html` never outputs that, so this test should fail. | \u274c Missing |\n| Pending order | 1. font, 2. README | Neither has started: there's no `app/fonts/` folder and no README | \u2705 but incomplete |\n\n**What went wrong:** the handoff was written before the last commit (`e776211 WIP: test for Arabic font embedding`). So it doesn't mention the test already written for step 1, and it reports a green suite that probably isn't green any more.\n\n**Also missing:**\n- The handoff doesn't say which Arabic font to use or how it's licensed. ADR-0007 only says fonts are embedded and the files go in `app/fonts/`. Someone needs to pick the font.\n- `HANDOFF.md` isn't tracked by git. Git doesn't list it, yet `git status` shows nothing uncommitted, so something is probably hiding it from git. It will disappear if this checkout is removed.\n\n## Next step\n1. Run `python -m pytest -q` to confirm the actual result. I expect 9 passed and 1 failed (`test_arabic_font_embedded`). If you want me to run it, I need permission to use the shell.\n2. Then do pending step 1 using the test that's already written. Choose an Arabic font with a license that allows embedding (for example Noto Naskh Arabic, under the OFL), put it in `app/fonts/`, and have `render_html` add an `@font-face` rule pointing to it for `ar` quotes, so the PDF uses that file rather than a system font. The goal is to make `tests/test_rtl_font.py` pass.\n3. Step 2, documenting the endpoint in a README, comes after that.\n\n## Proposed handoff fixes\n- `HEAD a1b2c3d` \u2192 `HEAD e776211`\n- Tests \u2192 \"10 tests; `test_rtl_font.py::test_arabic_font_embedded` expected to fail (WIP test for pending step 1, commit e776211)\", updated with the real output once the tests run\n- Known failures \u2192 that same test\n- Add: \"Open question: which Arabic font, and is its license OK to embed?\"\n\nShould I apply these edits to `HANDOFF.md`? If you allow the shell, I'll fill in the real test result."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-ccc-stale-with-1-pxp08ym9/repo\" && cat HANDOFF.md && echo ---- && git log -5 --stat && git status && echo ---- && ls -R docs src tests 2>/dev/null; git ls-files"
+  ],
+  "artifacts": "(no files created or changed)"
+}

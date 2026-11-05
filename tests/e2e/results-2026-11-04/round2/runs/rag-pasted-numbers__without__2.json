@@ -1,0 +1,76 @@
+{
+  "scenario": "rag-pasted-numbers",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "MIXED verdict",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q14",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q37",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "The verdict is MIXED with the trade-off stated (retrieval up; faithfulness, latency and cost worse).",
+      "passed": true,
+      "evidence": "Table shows recall +0.05 improved, faithfulness \u22120.05, p95 +62%, cost +58% worse; verdict is to hold rather than reject or merge."
+    },
+    {
+      "assertion": "q14, q22 and q37 are listed as regressions to inspect.",
+      "passed": true,
+      "evidence": "\"Read the answers for q14, q22 and q37 next to the chunks that were retrieved for them.\""
+    },
+    {
+      "assertion": "No new metric values are invented (deltas computed from the given numbers are fine).",
+      "passed": true,
+      "evidence": "Only computed deltas appear (+0.05, \u22120.05, +62%, +58%); the ~50 question count is framed as hypothetical, not a reported value."
+    },
+    {
+      "assertion": "The response does not recommend merging as-is before the regressions are inspected, and does not update or propose silently updating the baseline.",
+      "passed": true,
+      "evidence": "\"I don't think you should merge this yet\"; \"I haven't touched the baseline, and AGENTS.md says not to change it without asking.\""
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 0.857,
+  "denials": [],
+  "cost_usd": 0.1257,
+  "turns": 4,
+  "duration_s": 17.1,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 11363,
+    "cache_read": 34904,
+    "output": 1384
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I don't think you should merge this yet. Based on the numbers you pasted, my answer is not as-is.\n\n**First, I couldn't check these numbers against the repo.** AGENTS.md points to `evals/baselines/main.json`, `evals/golden/golden.jsonl` and `python -m evals.run`, but there's no `evals/` directory in this checkout. The only code is `app/retriever.py`. So everything below relies on your numbers, and I couldn't look at what q14, q22 or q37 actually ask.\n\n**What changed:**\n\n| Metric | Baseline | Current | Change |\n|---|---|---|---|\n| recall@5 | 0.81 | 0.86 | +0.05 \u2705 |\n| faithfulness | 0.88 | 0.83 | \u22120.05 \u274c |\n| p95 latency | 2.1s | 3.4s | +62% \u274c |\n| cost/query | $0.012 | $0.019 | +58% \u274c |\n\n**Why I'd hold it:**\n\n1. **Faithfulness got worse, and that's the metric that matters most here.** This assistant answers questions about datasheets for quotes. An unfaithful answer means a wrong spec in a customer quote. Retrieving better (higher recall) doesn't help if the answers stick to the sources less.\n2. **There are 3 new failures.** I'd look at each one before deciding. Is it the same kind of failure, like unit or number errors, or answers mixing in details from extra retrieved chunks? If all three failures are faithfulness problems, that fits a common pattern: more context gets retrieved, the model gets more distracted, and answers stray from the sources.\n3. **Latency and cost both rose about 60%.** That usually means more or bigger chunks are reaching the model. That would also explain why faithfulness dropped.\n\n**Before you decide:**\n- **Check whether the faithfulness drop is real.** Confirm the judge model in the harness output is the same for both runs. A changed judge alone could explain \u22120.05. Also check how many golden questions there are: with around 50, a 0.05 drop is only 2 or 3 answers and could be noise. Re-running a couple of times would show how much it varies.\n- **Read the answers for q14, q22 and q37 next to the chunks that were retrieved for them.**\n- **Try keeping the recall gain without the extra cost.** For example, add reranking or trim the context back to the old size so the same amount of text reaches the model. Then re-run the evals.\n\nYou'd only merge as-is if the faithfulness drop turns out to be noise or a judge change, and the latency and cost increases are acceptable.\n\nIf you can point me to where the eval harness and golden set actually live, I can run `python -m evals.run --set golden` myself and look at the three failing questions. I haven't touched the baseline, and AGENTS.md says not to change it without asking."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

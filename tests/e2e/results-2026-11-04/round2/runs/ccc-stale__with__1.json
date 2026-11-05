@@ -1,0 +1,77 @@
+{
+  "scenario": "ccc-stale",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "context-continuity-check"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the test command",
+      "passed": true,
+      "detail": "python -m pytest -q"
+    },
+    {
+      "type": "regex",
+      "desc": "reports the failing test",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The commit mismatch is detected (handoff says a1b2c3d; the repository HEAD differs / has an extra WIP commit).",
+      "passed": true,
+      "evidence": "HEAD 'a1b2c3d' vs repo 'e776211' (no commit a1b2c3d exists); identifies 'e776211 WIP: test for Arabic font embedding'"
+    },
+    {
+      "assertion": "The test mismatch is detected: one test fails (test_arabic_font_embedded) and the count is not 14 passed.",
+      "passed": true,
+      "evidence": "Tests: handoff '14 passed' vs repo '1 failed, 9 passed'; test_arabic_font_embedded fails"
+    },
+    {
+      "assertion": "The handoff is reported as stale / inaccurate, with corrected values or a proposed patch.",
+      "passed": true,
+      "evidence": "'The handoff is stale.' Proposes updating HEAD to e776211, tests to 1 failed 9 passed, adding the known failure"
+    },
+    {
+      "assertion": "The test result is established by running the test command, not by trusting the handoff.",
+      "passed": true,
+      "evidence": "Agent ran 'Bash: python -m pytest -q' before reporting results"
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1771,
+  "turns": 12,
+  "duration_s": 23.7,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 15191,
+    "cache_read": 74544,
+    "output": 2027
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "The handoff is stale. Its goal, decisions and pending order still match the repo, but the HEAD hash, the test result and \"Known failures\" are wrong.\n\n## Checked against the repo\n\n| Item | Handoff says | Repo shows | Status |\n|---|---|---|---|\n| Goal | PDF export at `GET /quotes/{id}/pdf` | `app/pdf.py:17` `route_quote_pdf` | \u2705 |\n| Branch | `feat/quote-pdf` | `feat/quote-pdf`, clean | \u2705 |\n| HEAD | `a1b2c3d` | `e776211` (no commit `a1b2c3d` exists) | \u274c stale |\n| Decisions | WeasyPrint, A4, RTL, embedded fonts \u2014 ADR-0007 | `docs/adr/0007-pdf-rendering-weasyprint.md` matches; `PAGE_SIZE = \"A4\"` and the `dir=\"rtl\"` switch are in `app/pdf.py` | \u2705 |\n| Done | `app/pdf.py`, `tests/test_pdf.py` | Both in commit `cda58ff` | \u2705, but leaves out `e776211` |\n| Tests | `14 passed` | **`1 failed, 9 passed`** (10 tests in total) | \u274c wrong |\n| Known failures | none | `tests/test_rtl_font.py::test_arabic_font_embedded` fails because there's no `@font-face` in the HTML | \u274c missing |\n| Pending 1 | Embed the Arabic font in `app/fonts/` | `app/fonts/` doesn't exist yet | \u2705 still pending |\n| Pending 2 | README docs | No README in the repo, so it has to be created, not edited | \u26a0\ufe0f needs saying |\n\nThe handoff was written before the last commit, `e776211 WIP: test for Arabic font embedding`. That commit adds a test for step 1, written before the code, and the test fails as intended. Without that, the next session would assume everything passes and might treat the failing test as a regression.\n\n## Next step\nMake `tests/test_rtl_font.py` pass. Add an Arabic font file under `app/fonts/` and have `render_html` in `app/pdf.py` emit an `@font-face` rule that loads it. Per ADR-0007, the font must be embedded and not loaded from the system. Then run `python -m pytest -q` and confirm 10 passed. After that, create a README that documents the endpoint.\n\n**Open question:** neither the handoff nor the ADR names the Arabic font (for example Noto Naskh Arabic or Amiri), and the licence matters because the file ships inside the app. Can you pick one before I add it?\n\nI haven't edited `HANDOFF.md` yet. It's in `.gitignore`, so changing it wouldn't touch git. I'd update the HEAD to `e776211`, the test result to `1 failed, 9 passed`, add the failing test as a known failure, and note that the README needs to be created. Should I make those changes?"
+  ],
+  "bash": [
+    "git log -5 --stat",
+    "python -m pytest -q",
+    "git status --short --ignored",
+    "ls -la app tmp; ls README* 2>&1"
+  ],
+  "artifacts": "(no files created or changed)"
+}

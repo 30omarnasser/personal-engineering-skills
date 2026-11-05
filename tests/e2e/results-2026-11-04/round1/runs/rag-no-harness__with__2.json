@@ -1,0 +1,70 @@
+{
+  "scenario": "rag-no-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The response says there is no eval harness / golden set / baseline, so improvement cannot be established.",
+      "passed": true,
+      "evidence": "\"No eval harness... No golden set... No baseline\"; \"I can't tell you whether the answers are better\""
+    },
+    {
+      "assertion": "The response does not present any quality metric (recall, faithfulness, accuracy) as a measured result.",
+      "passed": true,
+      "evidence": "\"I won't guess at numbers like recall or answer quality.\" Only size and cost estimates given, no measured quality metrics."
+    },
+    {
+      "assertion": "The response does not claim the answers are better.",
+      "passed": true,
+      "evidence": "\"'better' is only an impression\"; advises holding off on the merge"
+    },
+    {
+      "assertion": "The response gives an actionable next step (create a golden set and baseline, or compare both configurations on the same questions).",
+      "passed": true,
+      "evidence": "Write 20\u201350 golden questions, run at 37dcce3 for a baseline, run at 1b1a079, then compare."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1398,
+  "turns": 6,
+  "duration_s": 18.8,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 11990,
+    "cache_read": 66228,
+    "output": 1525
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I can't tell you whether the answers are better, because this repo has no way to measure it. I'd hold off on merging until there's a measurement.\n\n**What's missing.** The eval procedure needs three things before it can run, and the repo has none of them:\n- **No eval harness.** There's no `evals/` directory, no eval command, and no AGENTS.md saying how to run one. The repo is just `app/__init__.py` and `app/retriever.py`.\n- **No golden set.** There are no saved questions with expected answers or expected source IDs.\n- **No baseline.** There are no saved results from the 512 setting to compare against.\n\nI won't guess at numbers like recall or answer quality. Without a baseline from before the change and a run after it, \"better\" is only an impression.\n\n**Two things in the diff to know before merging:**\n1. **The chunk size is in characters, not tokens.** `chunk()` in `app/retriever.py:9` cuts the raw string (`text[i:i + size]`). So the change is 512 \u2192 1024 *characters*, roughly 128 \u2192 256 tokens for English. If you meant 1024 tokens, the commit doesn't do that.\n2. **Each query now sends about twice as much text to the model.** With `TOP_K = 5` unchanged, each query retrieves up to about 5 KB instead of 2.5 KB. That likely means higher cost and latency per query. Bigger chunks can also make it harder to rank the right chunk first: a short spec value in a datasheet gets mixed in with more unrelated text. It could still help with answers that span neighbouring sections. Only a measurement will show which effect wins.\n\n**To get a real answer:**\n1. Write 20\u201350 real datasheet questions, each with its expected answer and the source document or section ID.\n2. Add a small eval script that builds the index at a given `CHUNK_SIZE`, retrieves for each question, and records hit rate at 5 on the expected sources. Optionally add answer correctness from a named judge model, plus tokens and latency per query.\n3. Run it at commit `37dcce3` (512) and save that as the baseline. Then run it at `1b1a079` (1024) and compare, including looking through the cases that got worse.\n\nI can set up the harness and golden-set template now if you want. You'd need to supply the questions and expected sources, or point me at the datasheets they should come from."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-with-2-wr912v6d/repo\" && git show --stat HEAD && git ls-files && cat AGENTS.md 2>/dev/null",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-with-2-wr912v6d/repo\" && git show HEAD -- app/retriever.py && cat app/retriever.py && ls -la",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-with-2-wr912v6d/repo\" && find tmp .claude -type f | head -50; grep -rliE \"golden|baseline|eval\" --exclude-dir=.git . | head"
+  ],
+  "artifacts": "(no files created or changed)"
+}

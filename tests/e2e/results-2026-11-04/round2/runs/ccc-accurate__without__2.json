@@ -1,0 +1,69 @@
+{
+  "scenario": "ccc-accurate",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "verified against the repository",
+      "passed": true,
+      "detail": "python -m pytest -q"
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The branch and commit are checked against the repository, and the test command is actually run (not inferred by counting tests in files) and its result compared with the handoff.",
+      "passed": true,
+      "evidence": "Ran `git show --stat HEAD` (shows branch/commit) and `python -m pytest -q`; reported 'feat/quote-pdf at cda58ff', '9 passed'."
+    },
+    {
+      "assertion": "The handoff is judged complete / accurate; no mismatch is reported that does not exist (minor suggestions are fine).",
+      "passed": true,
+      "evidence": "'it's accurate. I found no false claims'; extra gaps are grounded in code observations, not invented mismatches."
+    },
+    {
+      "assertion": "The next step given is embedding the Arabic font (pending item 1), with the ADR-0007 constraint.",
+      "passed": true,
+      "evidence": "'Do pending item 1: embed the Arabic font' under app/fonts/, per ADR-0007 embedded-font constraint."
+    },
+    {
+      "assertion": "The logo question is kept open, not answered by invention.",
+      "passed": true,
+      "evidence": "'The logo question is still open and nothing in the code depends on it yet.'"
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1526,
+  "turns": 10,
+  "duration_s": 25.6,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 11889,
+    "cache_read": 68857,
+    "output": 2179
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I checked the handoff against the repo and it's accurate. I found no false claims, only a few gaps worth knowing about.\n\n**What checks out**\n- **Branch and commit:** you're on `feat/quote-pdf` at `cda58ff`, and the working tree is clean.\n- **ADR:** `docs/adr/0007-pdf-rendering-weasyprint.md` exists and says what the handoff says: WeasyPrint, A4, `dir=\"rtl\"` for Arabic quotes, and embedded fonts shipped in `app/fonts/`.\n- **Done items:** `app/pdf.py` has the route and the HTML template, and `tests/test_pdf.py` exists with 4 tests: status, A4, RTL for quote 2 (`ar`), and LTR for quote 1.\n- **Tests:** `python -m pytest -q` gives **9 passed**, so \"Known failures: none\" holds.\n- **Pending items are really pending:** there's no `app/fonts/` directory, nothing in the template mentions a font, and there's no README in the repo at all.\n\n**Gaps the handoff doesn't mention**\n1. **Nothing is actually rendered to PDF yet.** `route_quote_pdf` is a plain function that returns `{\"status\", \"page_size\", \"html\"}`. No WeasyPrint call is made and no web framework is wired up (the module docstring says \"rendering is stubbed\"). So \"PDF export done\" really means the HTML template is done.\n2. **Pending item 1 needs a decision first:** which Arabic font to use. The handoff and ADR only say it must be embedded, and the font's licence has to allow shipping it in the container image.\n3. **The README task means creating the file,** since none exists yet.\n4. **`HANDOFF.md` is git-ignored,** along with `.env` and `tmp/`. The rule isn't in `.gitignore`, so it's probably in `.git/info/exclude` or your global ignore file. The handoff exists only on this machine, which is fine if that's what you want.\n5. **The logo question is still open** and nothing in the code depends on it yet. It will matter once the template gets a header.\n\n**Next step**\nDo pending item 1: embed the Arabic font.\n1. Choose an Arabic font whose licence allows redistribution and add the font file under `app/fonts/`.\n2. Write the failing test first, for example: the Arabic quote's HTML includes an `@font-face` pointing to `app/fonts/<file>` and applies that font to the body.\n3. Update `render_html` to include that `@font-face`, using a relative or `file://` URL that WeasyPrint can resolve. Only the RTL template needs it, or both templates if you want one shared stylesheet.\n4. Run `python -m pytest -q` and expect 10 passing.\n\nTell me which font you want, or I can suggest options, and I'll start with the test."
+  ],
+  "bash": [
+    "git ls-files; git show --stat HEAD",
+    "python -m pytest -q",
+    "git status --short --ignored; ls app; cat .gitignore",
+    "ls -la tmp"
+  ],
+  "artifacts": "(no files created or changed)"
+}

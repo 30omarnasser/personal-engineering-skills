@@ -13,7 +13,7 @@ try:
     src = Path(data.get("transcript_path", "")).expanduser()
     if src.is_file():
         dest_dir = Path.home() / ".claude" / "transcript-backups"
-        dest_dir.mkdir(parents=True, exist_ok=True)
+        dest_dir.mkdir(parents=True, exist_ok=True, mode=0o700)  # transcripts can hold secrets
         sid = data.get("session_id", "session")[:12]
         trig = data.get("trigger", "auto")
         shutil.copy2(src, dest_dir / f"{sid}_{time.strftime('%Y%m%d-%H%M%S')}_{trig}.jsonl")

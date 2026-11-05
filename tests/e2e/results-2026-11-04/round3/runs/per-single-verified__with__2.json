@@ -1,0 +1,66 @@
+{
+  "scenario": "per-single-verified",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "marks it compliant",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The requirement is marked verified / compliant because IP66 meets or exceeds IP65.",
+      "passed": false,
+      "evidence": "Offer-compliance row 3 is 'NEEDS HUMAN'; row 1's VERIFIED only confirms the clause exists, not that IP66 complies."
+    },
+    {
+      "assertion": "The source (RFQ p.3 section 2.1) is cited and applicability (all panels) is stated.",
+      "passed": false,
+      "evidence": "Source p.3 \u00a72.1 is cited, but 'all panels' applicability is marked UNKNOWN/NEEDS HUMAN rather than stated."
+    },
+    {
+      "assertion": "The response does not invent other RFQ requirements as if they were in the source (noting that only one line was given is fine).",
+      "passed": true,
+      "evidence": "'none found in the excerpt you gave me. I only had one clause'. No other requirements invented."
+    },
+    {
+      "assertion": "The response does not conclude no-go for this item.",
+      "passed": true,
+      "evidence": "'GO / NO-GO: Conditional GO.'"
+    }
+  ],
+  "rubric_passed": 2,
+  "rubric_total": 4,
+  "score": 0.6,
+  "denials": [],
+  "cost_usd": 0.11,
+  "turns": 3,
+  "duration_s": 16.4,
+  "tokens": {
+    "input": 4,
+    "cache_creation": 9427,
+    "cache_read": 19957,
+    "output": 1521
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "# Review: IP65 enclosure requirement (RFQ p.3, \u00a72.1)\n\n| # | Finding | Source (doc / clause) | Applicability | Exceptions checked | Result |\n|---|---------|-----------------------|---------------|--------------------|--------|\n| 1 | Enclosures must be IP65 or better | RFQ p.3 \u00a72.1: *\"Enclosures shall be IP65 or better.\"* | APPLIES to enclosures | Only the excerpt was provided. I could not check addenda, special conditions or later revisions. | VERIFIED |\n| 2 | The requirement applies to all panels | Same clause | UNKNOWN | The clause says \"Enclosures\", not \"panels\". Nothing in the excerpt says every panel counts as an enclosure, or names which panels are covered. | NEEDS HUMAN |\n| 3 | Our offer (IP66) meets the requirement | Not given. No datasheet or test certificate was cited. | APPLIES | Rating check below | NEEDS HUMAN |\n\n**Rating check (IEC 60529):**\n- **Dust (first digit):** both are 6, which means dust-tight. Equal.\n- **Water (second digit):** 6 (powerful water jets) is higher than 5 (water jets). Under IEC 60529, a rating up to and including 6 also meets the lower ratings, so IP66 counts as \"IP65 or better.\"\n- **When this would not hold:** if the offered rating were IPX7 or IPX8, it would not automatically meet IPX5. Those products need a dual marking such as IP66/IP67. That doesn't apply to an IP66 offer.\n\n**Counts:** VERIFIED 1 \u00b7 NEEDS HUMAN 2 \u00b7 UNSUPPORTED 0 \u00b7 CONTRADICTED 0\n\n**Missed requirements:** none found in the excerpt you gave me. I only had one clause, so I couldn't check the rest of the RFQ for gaps.\n\n**Before release:**\n1. Confirm the scope of \"Enclosures\" in \u00a72.1. Check the definitions section, and whether any panels are excluded or given a different rating, for example indoor panels or panels in hazardous areas.\n2. Check the addenda and special conditions for anything that overrides \u00a72.1, and state which document takes precedence.\n3. Attach the evidence for IP66: the manufacturer's datasheet or test certificate for the exact enclosure model you're offering.\n\n**GO / NO-GO: Conditional GO.** IP66 meets the clause as quoted, but don't send it until the \"all panels\" scope is confirmed and the IP66 evidence is attached."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

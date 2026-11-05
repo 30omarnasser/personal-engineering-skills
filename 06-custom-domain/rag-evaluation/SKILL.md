@@ -1,6 +1,6 @@
 ---
 name: rag-evaluation
-description: Use when a retrieval, chunking, embedding, prompt or model change is made to a RAG / GraphRAG pipeline, or before claiming answer quality improved — runs the eval harness against a saved baseline and reports quality, latency and cost.
+description: Use when a retrieval, chunking, embedding, reranking, prompt or model change is made to a RAG / GraphRAG pipeline, when the user shares eval numbers (recall@k, faithfulness, latency, cost, failing IDs) and asks whether to merge, or before claiming answer quality improved. Runs the project's eval harness against the saved baseline and reports quality, latency and cost with regressions inspected - never estimates numbers. Not for explaining retrieval concepts.
 ---
 
 # RAG Evaluation

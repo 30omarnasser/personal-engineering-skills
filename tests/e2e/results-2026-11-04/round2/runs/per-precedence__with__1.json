@@ -1,0 +1,93 @@
+{
+  "scenario": "per-precedence",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "cites special condition 9.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "uses the Annex B hazardous-area schedule",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "overall no-go",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "Finding 1 (IE3 incl. 90 kW P-01) is marked contradicted / non-compliant because clause 9.1 requires IE4 above 75 kW.",
+      "passed": true,
+      "evidence": "Finding 1 CONTRADICTED: '\u00a79.1 Notwithstanding clause 4.2, pump motors rated above 75 kW shall be IE4'; IE3 on P-01 does not comply."
+    },
+    {
+      "assertion": "Finding 2 (ATEX not required) is marked contradicted or unsupported because P-01 sits in the wet well, Zone 1 per Annex B, so clause 4.3 applies.",
+      "passed": true,
+      "evidence": "Finding 2 CONTRADICTED: P-01 in wet well, Annex B 'Wet well \u2013 Zone 1', \u00a74.3 requires ATEX Ex d."
+    },
+    {
+      "assertion": "Finding 3 (60 Hz) is marked contradicted by clause 4.1 (50 Hz).",
+      "passed": true,
+      "evidence": "Finding 3 CONTRADICTED: '\u00a74.1 400 V, 3-phase, 50 Hz supply'; tender says 50 Hz, not 60 Hz."
+    },
+    {
+      "assertion": "Finding 4 (IP66 vs IP65) is marked verified / compliant.",
+      "passed": true,
+      "evidence": "Finding 4 marked VERIFIED for the requirement: IP66 meets 'IP65 or better' per \u00a74.5."
+    },
+    {
+      "assertion": "Every finding cites a specific clause or annex of the tender.",
+      "passed": true,
+      "evidence": "Each finding row cites tender.md clauses: \u00a74.2/\u00a79.1/\u00a79.3, \u00a74.3/Annex B, \u00a74.1, \u00a74.5."
+    },
+    {
+      "assertion": "At least two requirements the analysis missed are flagged (any of 4.4, 7.1, 7.4, 9.2).",
+      "passed": true,
+      "evidence": "Missed requirements list includes \u00a77.4, \u00a79.2, \u00a74.4, \u00a77.1."
+    },
+    {
+      "assertion": "The overall conclusion is no-go / not ready to send.",
+      "passed": true,
+      "evidence": "'I recommend **not sending** the offer yet' and '**NO-GO.**'"
+    }
+  ],
+  "rubric_passed": 7,
+  "rubric_total": 7,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1361,
+  "turns": 6,
+  "duration_s": 24.6,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 10382,
+    "cache_read": 34941,
+    "output": 2296
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I recommend **not sending** the offer yet. Three of the four findings in the analysis contradict the tender, and it leaves out several requirements, one of which can get the offer rejected.\n\n## Findings\n\n| # | Finding (agent) | Source (doc / clause) | Applicability | Exceptions checked | Result |\n|---|---|---|---|---|---|\n| 1 | All motors IE3, including the 90 kW P-01. \"Complies.\" | tender.md \u00a74.2 \"IE3 efficiency class minimum\"; \u00a79.1 \"Notwithstanding clause 4.2, pump motors rated above 75 kW shall be IE4\"; \u00a79.3 \"Section 9 takes precedence over Sections 4 and 7\" | **P-01 (90 kW): IE4 required.** P-02 (37 kW): IE3 is enough. | \u00a79.1 overrides \u00a74.2 for P-01, and \u00a79.3 confirms Section 9 wins. | **CONTRADICTED.** IE3 on P-01 does not comply. |\n| 2 | \"ATEX not required.\" | tender.md \u00a74.3 \"Motors installed in hazardous areas classified Zone 1 (see Annex B) shall be ATEX Ex d certified\"; Equipment schedule shows P-01 in the wet well; Annex B shows \"Wet well \u2013 Zone 1\" | **APPLIES to P-01.** Does not apply to P-02 (valve chamber, non-hazardous). | Annex B cross-reference followed. Section 9 does not change this. | **CONTRADICTED.** P-01 needs an ATEX Ex d motor. |\n| 3 | Supply 400 V / 60 Hz | tender.md \u00a74.1 \"400 V, 3-phase, 50 Hz supply\" | APPLIES | No override found. | **CONTRADICTED.** The tender says 50 Hz, not 60 Hz. The analysis also leaves out \"3-phase\". |\n| 4 | IP65 required; offer is IP66. \"Complies.\" | tender.md \u00a74.5 \"IP65 or better\" | APPLIES (panels and motor terminal enclosures) | No override found. Per IEC 60529, IPX6 also meets IPX5, so IP66 counts as \"or better\". | **VERIFIED** for the requirement. **NEEDS HUMAN** for the offer side: no offer or datasheet in the repo shows IP66. On P-01, check that the Ex d terminal box also has the IP rating. |\n\n## Requirements the analysis missed\n\n- **\u00a77.4 Delivery within 16 weeks of PO. Offers over 16 weeks will be rejected.** This is a rejection criterion, so check the lead time, especially for an IE4 Ex d 90 kW motor.\n- **\u00a79.2 Ambient design temperature 50 \u00b0C.** Standard motor ratings assume 40 \u00b0C, so the motors probably need derating or upsizing. This also affects the IE4 and Ex d selection for P-01.\n- **\u00a74.4** Power cables at least 2.5 mm\u00b2.\n- **\u00a77.1** Warranty of 24 months from commissioning.\n- **\u00a74.1** The supply is 3-phase. The analysis left this out.\n- **\u00a74.2** Efficiency class is assessed to IEC 60034-30-1. The analysis doesn't cite the standard.\n\n## Summary\n\n- VERIFIED: 1 (the IP65 requirement, #4)\n- CONTRADICTED: 3 (#1, #2, #3)\n- NEEDS HUMAN: 1 (the IP66 claim in #4)\n- UNSUPPORTED: 0\n- Missed requirements: 6, one of them a rejection criterion (\u00a77.4)\n\nI could only check the requirements against the tender. The repo contains no offer or datasheet, so I couldn't confirm what is actually being offered (IE3, IP66, lead time).\n\n**NO-GO.** Before sending:\n1. Change P-01 to an IE4, ATEX Ex d motor rated for 50 \u00b0C ambient.\n2. Correct the supply to 400 V, 3-phase, 50 Hz.\n3. Confirm delivery within 16 weeks and the 24-month warranty.\n4. Confirm cables are at least 2.5 mm\u00b2."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

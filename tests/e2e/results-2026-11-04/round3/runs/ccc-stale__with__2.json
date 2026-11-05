@@ -1,0 +1,76 @@
+{
+  "scenario": "ccc-stale",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "context-continuity-check"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the test command",
+      "passed": true,
+      "detail": "python -m pytest -q"
+    },
+    {
+      "type": "regex",
+      "desc": "reports the failing test",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The commit mismatch is detected (handoff says a1b2c3d; the repository HEAD differs / has an extra WIP commit).",
+      "passed": true,
+      "evidence": "Says `a1b2c3d`... actual HEAD is `e776211` (\"WIP: test for Arabic font embedding\")"
+    },
+    {
+      "assertion": "The test mismatch is detected: one test fails (test_arabic_font_embedded) and the count is not 14 passed.",
+      "passed": true,
+      "evidence": "Says `14 passed`. `python -m pytest -q` now gives 1 failed, 9 passed; test_arabic_font_embedded fails"
+    },
+    {
+      "assertion": "The handoff is reported as stale / inaccurate, with corrected values or a proposed patch.",
+      "passed": true,
+      "evidence": "Marks HEAD, Done, Known failures as stale; provides suggested patch with HEAD e776211 and corrected test counts"
+    },
+    {
+      "assertion": "The test result is established by running the test command, not by trusting the handoff.",
+      "passed": true,
+      "evidence": "Agent ran `python -m pytest -q` via Bash before reporting results"
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.183,
+  "turns": 13,
+  "duration_s": 24.9,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 15162,
+    "cache_read": 75495,
+    "output": 2320
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I checked HANDOFF.md against the repo. Its plan is still right, but the handoff is out of date: it says nothing is failing, and the test suite currently has one failure.\n\n## Checklist\n\n| Item | Status | Evidence |\n|---|---|---|\n| Goal | present | \"add PDF export at GET /quotes/{id}/pdf\" matches the docstring at `app/pdf.py:18` |\n| Constraints and decisions | present | WeasyPrint, A4, RTL for Arabic, embedded fonts all match `docs/adr/0007-pdf-rendering-weasyprint.md` (accepted). Fonts must go in `app/fonts/` (ADR \"Consequences\") |\n| Branch | present | `feat/quote-pdf` is correct |\n| HEAD commit | **stale** | Says `a1b2c3d`, but no commit with that hash exists. The actual HEAD is `e776211` (\"WIP: test for Arabic font embedding\") |\n| Done, with evidence | **stale** | Says `14 passed`. `python -m pytest -q` now gives **1 failed, 9 passed** (10 tests in total). It also doesn't list `tests/test_rtl_font.py`, which was added in `e776211` |\n| Known failures | **stale** | Says \"none\". `tests/test_rtl_font.py::test_arabic_font_embedded` fails because there is no `@font-face` in the rendered HTML |\n| Pending work, in order | present | 1. Embed the Arabic font. 2. Add the endpoint to the README. Both are still open: `app/fonts/` doesn't exist and there's no README |\n| File paths and sources | mostly present | It doesn't say that rendering is **stubbed**. `route_quote_pdf` returns HTML and never calls WeasyPrint (`app/pdf.py:1`). It's unclear whether actually calling WeasyPrint is in scope for this branch |\n\nOne more thing: the working tree shows as clean but HANDOFF.md exists, so the file is probably excluded from git. That means it isn't versioned.\n\n## Suggested patch for HANDOFF.md\n```\nBranch: feat/quote-pdf (HEAD e776211)\nDone: app/pdf.py (route + inline HTML template; WeasyPrint call still stubbed), tests/test_pdf.py,\n      tests/test_rtl_font.py (WIP, intentionally failing). `python -m pytest -q` -> 1 failed, 9 passed.\nKnown failures: tests/test_rtl_font.py::test_arabic_font_embedded \u2014 no @font-face in rendered HTML (pending item 1).\nOpen question: is wiring real WeasyPrint rendering in scope for this branch?\n```\n\n## Next step\nEmbed the Arabic font, following ADR-0007:\n- Add the font file under `app/fonts/`.\n- Add an `@font-face` rule that points to that file in `render_html` (`app/pdf.py:9`). Don't use a system font reference.\n\nThe failing `test_arabic_font_embedded` test already covers this, so the task is done when the full suite passes. After that, add the endpoint to the README.\n\nOne decision is needed first: which Arabic font to use, and whether its license allows embedding it. Neither the handoff nor the ADR says.\n\nDo you want me to apply the patch to HANDOFF.md and start on the font work?"
+  ],
+  "bash": [
+    "git log -5 --stat",
+    "git status",
+    "python -m pytest -q"
+  ],
+  "artifacts": "(no files created or changed)"
+}

@@ -1,0 +1,90 @@
+{
+  "scenario": "per-units",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "converts 14 AWG to about 2.08 mm2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "cites delivery clause 7.4",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "overall no-go",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "The 14 AWG cable finding is marked contradicted / non-compliant, with the conversion to about 2.08 mm2 against the 2.5 mm2 minimum.",
+      "passed": true,
+      "evidence": "\"CONTRADICTED: 14 AWG is 2.08 mm\u00b2, below the 2.5 mm\u00b2 minimum.\""
+    },
+    {
+      "assertion": "The 122 F ambient finding is marked verified (122 F = 50 C).",
+      "passed": true,
+      "evidence": "\"VERIFIED for motors: 122 \u00b0F = 50.0 \u00b0C exactly.\""
+    },
+    {
+      "assertion": "The 18-week delivery finding is marked contradicted by clause 7.4 (16 weeks maximum, longer offers rejected).",
+      "passed": true,
+      "evidence": "\"CONTRADICTED: 18 weeks is more than 16. Under 7.4 this is grounds for rejection\""
+    },
+    {
+      "assertion": "The 2-year warranty finding is marked verified against 24 months in 7.1.",
+      "passed": true,
+      "evidence": "\"VERIFIED: 2 years = 24 months, and both start at commissioning.\""
+    },
+    {
+      "assertion": "No unit conversion in the response is wrong.",
+      "passed": true,
+      "evidence": "14 AWG=2.08 mm\u00b2, 12 AWG=3.31 mm\u00b2, 122 \u00b0F=50 \u00b0C, 2 years=24 months are all correct."
+    },
+    {
+      "assertion": "The overall conclusion is no-go.",
+      "passed": true,
+      "evidence": "\"NO-GO.\" and \"Do not send the offer.\""
+    }
+  ],
+  "rubric_passed": 6,
+  "rubric_total": 6,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1262,
+  "turns": 4,
+  "duration_s": 20.0,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 10092,
+    "cache_read": 34502,
+    "output": 1912
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I reviewed the requirement analysis against `tender.md`. **Do not send the offer.** Two of its four \"Complies\" claims are wrong, and one of them alone gets the offer rejected. The analysis also leaves out most of the electrical requirements.\n\n## What the analysis claims, checked against the tender\n\n| # | Finding | Source (doc / clause) | Applicability | Exceptions checked | Result |\n|---|---------|-----------------------|---------------|--------------------|--------|\n| 1 | Cables: 14 AWG offered, \"complies with 4.4\" | tender.md \u00a74.4: \"minimum conductor cross-section of 2.5 mm\u00b2\" | APPLIES (all power cables) | \u00a79 doesn't change 4.4 | **CONTRADICTED**: 14 AWG is 2.08 mm\u00b2, below the 2.5 mm\u00b2 minimum. The nearest AWG size that meets it is 12 AWG (3.31 mm\u00b2). The usual metric 2.5 mm\u00b2 cable is easier. |\n| 2 | Ambient: motors rated for 122 \u00b0F, \"complies with 9.2\" | tender.md \u00a79.2: \"Ambient design temperature: 50 \u00b0C\" | APPLIES | \u00a79 has top precedence (\u00a79.3) | **VERIFIED** for motors: 122 \u00b0F = 50.0 \u00b0C exactly. Note that 9.2 is the design ambient for all equipment, but the analysis only covers motors. Panels and cabling at 50 \u00b0C aren't addressed. |\n| 3 | Delivery: 18 weeks from PO, \"Complies\" | tender.md \u00a77.4: \"within 16 weeks\u2026 Offers exceeding 16 weeks will be rejected\" | APPLIES | \u00a79 doesn't relax 7.4 | **CONTRADICTED**: 18 weeks is more than 16. Under 7.4 this is grounds for rejection, not just a non-compliance. The analysis also cites no clause for this one. |\n| 4 | Warranty: 2 years from commissioning, \"complies with 7.1\" | tender.md \u00a77.1: \"24 months from the date of commissioning\" | APPLIES | \u00a79 has no warranty override | **VERIFIED**: 2 years = 24 months, and both start at commissioning. |\n\n**Counts:** VERIFIED 2 \u00b7 CONTRADICTED 2 \u00b7 UNSUPPORTED 0 \u00b7 NEEDS HUMAN 0\n\nThe offered values themselves (14 AWG, 122 \u00b0F, 18 weeks) aren't tied to any datasheet or quote. I could only check them against the tender, not confirm they're what you're actually offering.\n\n## Requirements the analysis left out\n\n| Clause | Requirement | What it means for this tender |\n|---|---|---|\n| \u00a74.1 | 400 V, 3-phase, 50 Hz | Applies to all equipment. Not addressed. |\n| \u00a74.2 + \u00a79.1 + \u00a79.3 | IE3 minimum, but motors above 75 kW must be IE4, and \u00a79 overrides \u00a74 | **P-01 (90 kW) must be IE4.** P-02 (37 kW) must be IE3. This override is the easiest one to get wrong, and the analysis doesn't mention it. |\n| \u00a74.3 + Annex B | ATEX Ex d for motors in Zone 1 areas | **P-01 is in the wet well, which is Zone 1, so it needs Ex d.** P-02 is in the valve chamber, which is non-hazardous, so it doesn't. |\n| \u00a74.5 | IP65 or better for panels and motor terminal boxes | Applies to all of them. Not addressed. |\n| \u00a79.2 | 50 \u00b0C ambient for non-motor equipment | Panel and cable ratings at 50 \u00b0C aren't covered. |\n\n## Go / no-go\n\n**NO-GO.** Before this goes out:\n- Get delivery down to 16 weeks or less (\u00a77.4 means rejection otherwise).\n- Change the cables to 2.5 mm\u00b2 or larger (or 12 AWG or larger).\n- Confirm P-01 is IE4 and ATEX Ex d.\n- Confirm IP65 and 400 V / 3-phase / 50 Hz compliance.\n- Tie every offered value to a datasheet or supplier quote."
+  ],
+  "bash": [
+    "cd tenders/T-2026-014 && ls -la && cat -n tender.md && echo ---- && cat -n agent_analysis.md"
+  ],
+  "artifacts": "(no files created or changed)"
+}

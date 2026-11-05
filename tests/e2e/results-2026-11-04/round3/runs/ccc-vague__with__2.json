@@ -1,0 +1,70 @@
+{
+  "scenario": "ccc-vague",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "context-continuity-check"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "checked repository evidence",
+      "passed": true,
+      "detail": "git log -5 --stat"
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The handoff is called insufficient and at least three specific missing items are named (branch, file paths, test command/result, concrete next action, source of the 'agreed format').",
+      "passed": true,
+      "evidence": "\"I can't tell you what's next from this handoff alone\"; table marks branch, file paths, next action, agreed format, commit/test command missing."
+    },
+    {
+      "assertion": "Repository evidence (git log/status/branch, tests, ADR) is used to reconstruct state instead of guessing.",
+      "passed": true,
+      "evidence": "Ran git log/status, pytest (9 passed), read ADR-0007 and source files; reports branch feat/quote-pdf and commit cda58ff."
+    },
+    {
+      "assertion": "The response does not invent what the client-agreed format is; if ADR-0007 is offered as a candidate, the uncertainty is stated.",
+      "passed": true,
+      "evidence": "\"ADR-0007 is the only candidate. If something else was agreed, it may only exist in the old chat.\" Asks user to confirm."
+    },
+    {
+      "assertion": "A concrete next step grounded in repository evidence, or targeted questions to the user, is given.",
+      "passed": true,
+      "evidence": "Asks three targeted questions; proposes failing test for real PDF output then WeasyPrint call, citing app/pdf.py:17."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1836,
+  "turns": 13,
+  "duration_s": 26.0,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 15369,
+    "cache_read": 75406,
+    "output": 2272
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I can't tell you what's next from this handoff alone. It doesn't define \"the remaining bits\" or \"the format the client agreed on\", and the repo doesn't fill those gaps. Here is what I checked and what's missing.\n\n## What the repo shows\n- **Branch:** `feat/quote-pdf`, no uncommitted changes. Only one commit beyond the initial one: `cda58ff Add PDF export route and template (ADR-0007)`.\n- **Tests:** I ran `python -m pytest -q` and got `9 passed`, so \"Tests pass\" is accurate.\n- **The only recorded decision** is `docs/adr/0007-pdf-rendering-weasyprint.md`: render with WeasyPrint, A4 pages, `dir=\"rtl\"` for Arabic quotes, fonts embedded and shipped in `app/fonts/`.\n\n## How the handoff holds up\n\n| Item | Status | Evidence |\n|---|---|---|\n| Goal | **missing** | \"Working on quote export\" doesn't say export to what or for whom. The code suggests PDF. |\n| Constraints / decisions | **missing** | Nothing in the repo records \"the format the client agreed on\". ADR-0007 is the only candidate. If something else was agreed, it may only exist in the old chat. |\n| File paths / references | **missing** | The handoff names no files, ADRs or specs. |\n| Done, with evidence | **partly present** | \"Tests pass\" is true, but \"mostly done\" has no commit hash or test command. |\n| Pending work and next action | **missing** | \"Finish the remaining bits\" isn't a task. |\n| Known failures / open questions | **missing** | None listed. |\n| Branch | **missing** | Not named in the handoff; I found it in git. |\n\n## How the code compares to ADR-0007\nThese look like the likely \"remaining bits\", but I'm inferring that from the code. The handoff doesn't say so.\n1. **There's no actual PDF yet.** `app/pdf.py:17` returns the HTML and page size; nothing calls WeasyPrint.\n2. **No fonts.** `app/fonts/` doesn't exist, so nothing embeds an Arabic font, which the ADR requires.\n3. **WeasyPrint isn't listed as a dependency.** There's no `requirements.txt`, `pyproject.toml` or Dockerfile, though the ADR says it belongs in the container image.\n4. **Not in the ADR, but worth fixing:** `render_html` (`app/pdf.py:12-14`) inserts the customer name and SKUs into the HTML without escaping them.\n5. **The tests only check strings.** Nothing checks font embedding or real PDF output.\n\n## What I need from you\n1. Is \"the format the client agreed on\" the same as ADR-0007 (A4, RTL for Arabic, embedded fonts)? Or was there something else, such as a layout, specific fields, currency or number formatting, or a file name pattern? If so, where is it written down?\n2. Are items 1\u20133 above the \"remaining bits\", and in that order? Or did the previous session mean something else?\n3. Which Arabic font should go in `app/fonts/`? The licence matters because the file ships in the image.\n\nOnce you confirm, I'd start with item 1: write a failing test for actual PDF output, then add the WeasyPrint call. I can also rewrite the handoff with the missing details so the next session doesn't hit the same gaps."
+  ],
+  "bash": [
+    "git log -5 --stat",
+    "git status",
+    "python -m pytest -q"
+  ],
+  "artifacts": "(no files created or changed)"
+}

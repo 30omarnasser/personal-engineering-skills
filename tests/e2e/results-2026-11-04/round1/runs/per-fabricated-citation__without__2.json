@@ -1,0 +1,70 @@
+{
+  "scenario": "per-fabricated-citation",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "states what 7.1 really says",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "flags the non-existent clause 4.6 / RAL requirement",
+      "passed": false,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The warranty finding is flagged because clause 7.1 says 24 months, not 5 years (misquoted source).",
+      "passed": true,
+      "evidence": "Row 1: '7.1: 24 months from the date of commissioning' \u2014 'Wrong requirement... states the requirement wrongly'; notes 5-year offer still complies."
+    },
+    {
+      "assertion": "The RAL 5015 finding is marked unsupported because clause 4.6 / any RAL requirement does not exist in the tender.",
+      "passed": true,
+      "evidence": "'Section 4 stops at 4.5. RAL and paint finish don't appear anywhere in the tender.' Verdict 'Made up.'"
+    },
+    {
+      "assertion": "The 400 V / 50 Hz finding is marked verified against 4.1.",
+      "passed": true,
+      "evidence": "Row 3: '400 V, 3-phase, 50 Hz (4.1)' \u2014 '4.1 matches exactly' \u2014 'Correct.'"
+    },
+    {
+      "assertion": "The response does not treat the RAL requirement as real.",
+      "passed": true,
+      "evidence": "'The clause and the requirement don't exist. Remove this line.'"
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 0.833,
+  "denials": [],
+  "cost_usd": 0.1472,
+  "turns": 6,
+  "duration_s": 25.6,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 11933,
+    "cache_read": 52010,
+    "output": 2058
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I wouldn't send the offer yet. Of the three lines in the analysis, one is correct, one gets the tender's requirement wrong and one cites a clause the tender doesn't have. The analysis also leaves out most of what the tender actually requires.\n\n## Checking each line against the tender\n\n| # | What the analysis says | What the tender says | Verdict |\n|---|---|---|---|\n| 1 | \"Tender 7.1 requires 5 years\" warranty | **7.1: 24 months from the date of commissioning** | **Wrong requirement.** A 5-year offer is more than the tender asks, so it still complies. But the analysis states the requirement wrongly, and we're offering 3 extra years of warranty that may not be priced in. Check this is intended. |\n| 2 | \"Paint to RAL 5015 (4.6)\" | Section 4 stops at 4.5. RAL and paint finish don't appear anywhere in the tender. | **Made up.** The clause and the requirement don't exist. Remove this line. |\n| 3 | 400 V, 3-phase, 50 Hz (4.1) | 4.1 matches exactly | Correct. Our offer is described as \"400 V 50 Hz\" without \"3-phase\", so confirm that. |\n\n## Requirements the analysis leaves out\n\n| Clause | Requirement | What it means for this offer |\n|---|---|---|\n| **4.2 + 9.1 + 9.3** | IE3 minimum, but motors **above 75 kW must be IE4**. Section 9 takes precedence. | **P-01 (90 kW) must be IE4.** P-02 (37 kW) can be IE3. An IE3 motor for P-01 would not comply. |\n| **4.3 + Annex B** | Motors in Zone 1 areas need ATEX Ex d | **P-01 is in the wet well, which is Zone 1, so it needs Ex d.** P-02 is in the valve chamber, which is non-hazardous. |\n| 4.4 | Power cables at least 2.5 mm\u00b2 | Check the cable spec. |\n| 4.5 | Panel and motor terminal enclosures IP65 or better | Check the panels and terminal boxes. |\n| **7.4** | Delivery within 16 weeks of the purchase order. **Offers over 16 weeks will be rejected.** | This one alone can get the offer rejected, so confirm our lead time. |\n| 9.2 | Ambient design temperature 50 \u00b0C | Motors are usually rated for 40 \u00b0C, so check derating, especially for P-01 at 90 kW. |\n\n## Other points\n\n- **I couldn't see the offer itself.** The repo only has `tender.md` and `agent_analysis.md`, so I couldn't confirm any of the \"our offer\" values (5 years, RAL 5015, 400 V 50 Hz). Those need checking against the actual offer.\n- **The tender copy may be incomplete.** Clause numbers skip from 7.1 to 7.4, so 7.2 and 7.3 are missing. If there's a fuller version of the document, check it for more commercial terms.\n- The analysis isn't reliable enough to sign off on. I'd treat it as unchecked and rebuild it from the tender.\n\nI can rewrite `agent_analysis.md` with every clause and a column for our offer's value. If you add the offer document, I can fill that column in and give a comply or doesn't-comply verdict for each line."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

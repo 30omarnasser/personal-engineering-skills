@@ -1,0 +1,73 @@
+{
+  "scenario": "ccc-stale",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the test command",
+      "passed": true,
+      "detail": "cd \"<HOME>/AppData/Local/Temp/e2e-ccc-stale-without-2-i7__v2_0/repo\" && cat .gitignore; echo ----; cat docs/adr/0007-pdf-rendering-weasyprint.md; echo ----"
+    },
+    {
+      "type": "regex",
+      "desc": "reports the failing test",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The commit mismatch is detected (handoff says a1b2c3d; the repository HEAD differs / has an extra WIP commit).",
+      "passed": true,
+      "evidence": "HEAD is `e776211`. No commit `a1b2c3d` exists... latest commit, `e776211 WIP: test for Arabic font embedding`"
+    },
+    {
+      "assertion": "The test mismatch is detected: one test fails (test_arabic_font_embedded) and the count is not 14 passed.",
+      "passed": true,
+      "evidence": "10 tests: 9 passed, 1 failed; test_arabic_font_embedded fails"
+    },
+    {
+      "assertion": "The handoff is reported as stale / inaccurate, with corrected values or a proposed patch.",
+      "passed": true,
+      "evidence": "Table of handoff claims vs repository with corrected values; offers to correct HANDOFF.md"
+    },
+    {
+      "assertion": "The test result is established by running the test command, not by trusting the handoff.",
+      "passed": true,
+      "evidence": "Agent ran `python -m pytest -q 2>&1 | tail -30` in second Bash call"
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1293,
+  "turns": 3,
+  "duration_s": 20.5,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 10792,
+    "cache_read": 34835,
+    "output": 1792
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "The handoff has the right goal and next step, but several of its facts don't match the repository. Here is what I found after reading the handoff, the git log, the ADR, the code and tests, and running `python -m pytest -q`.\n\n## What doesn't match\n\n| Handoff says | Repository shows |\n|---|---|\n| HEAD `a1b2c3d` | HEAD is `e776211`. No commit `a1b2c3d` exists. |\n| `pytest` \u2192 14 passed | **10 tests: 9 passed, 1 failed** |\n| Known failures: none | `tests/test_rtl_font.py::test_arabic_font_embedded` fails: there is no `@font-face` in the Arabic quote's HTML. |\n| Done: `app/pdf.py`, `tests/test_pdf.py` | It leaves out the latest commit, `e776211 WIP: test for Arabic font embedding`, which added that failing test. The failure is expected: the test was written first for pending item 1. |\n| \"Document the endpoint in the README\" | There is no README, so this step means creating one. |\n| Route is done | `route_quote_pdf` returns the HTML and page size, but nothing calls WeasyPrint yet. The docstring in `app/pdf.py` says rendering is stubbed. \"Done\" means the HTML/template layer, not real PDF output. |\n\nWhat does match: the branch is `feat/quote-pdf`, ADR-0007 says what the handoff says (WeasyPrint, A4, `dir=\"rtl\"`, embedded fonts in `app/fonts/`), the RTL/LTR and A4 tests pass, and the working tree is clean. `app/fonts/` doesn't exist yet, which fits item 1 still being pending.\n\nOne more thing: `render_html` puts `customer` and `sku` into the HTML without escaping them. That's out of scope for this handoff, but worth fixing before the PDF goes to real customers.\n\n## Next step\n\nPending item 1: embed the Arabic font. It already has a failing test, so the work is to make `test_arabic_font_embedded` pass:\n1. Add an Arabic font file under `app/fonts/`.\n2. Add an `@font-face` rule that points to that file in the template `render_html` builds. To keep with ADR-0007, it should load from the bundled file, never a system font.\n3. Re-run `python -m pytest -q` and confirm all 10 pass.\n\nBefore I start, you need to pick the font. Its license has to allow shipping it inside the container image. I'd suggest Noto Naskh Arabic (SIL Open Font License). I can also correct HANDOFF.md with the facts above. I haven't changed anything yet."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-ccc-stale-without-2-i7__v2_0/repo\" && cat HANDOFF.md && echo ---- && git ls-files && echo ---- && git log --stat --format='%h %s' && git status",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-ccc-stale-without-2-i7__v2_0/repo\" && cat .gitignore; echo ----; cat docs/adr/0007-pdf-rendering-weasyprint.md; echo ----; cat app/pdf.py; echo ----; cat tests/test_pdf.py tests/test_rtl_font.py; echo ----; ls -la app; ls README* 2>&1; echo ----; python -m pytest -q 2>&1 | tail -30"
+  ],
+  "artifacts": "(no files created or changed)"
+}

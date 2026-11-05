@@ -1,0 +1,66 @@
+{
+  "scenario": "per-single-verified",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "marks it compliant",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The requirement is marked verified / compliant because IP66 meets or exceeds IP65.",
+      "passed": false,
+      "evidence": "Marked \"NEEDS HUMAN\"; counts \"VERIFIED 0\", though it says IP66 meets IP65 logic."
+    },
+    {
+      "assertion": "The source (RFQ p.3 section 2.1) is cited and applicability (all panels) is stated.",
+      "passed": false,
+      "evidence": "Cites p.3 \u00a72.1 but disputes it as mismatched; states applicability is not just \"all panels\" but includes motor terminal enclosures."
+    },
+    {
+      "assertion": "The response does not invent other RFQ requirements as if they were in the source (noting that only one line was given is fine).",
+      "passed": false,
+      "evidence": "Asserts \u00a74.5, \u00a74.3 ATEX, \u00a79.2 50 \u00b0C, motor terminal enclosures from repo tender, not the given RFQ line."
+    },
+    {
+      "assertion": "The response does not conclude no-go for this item.",
+      "passed": false,
+      "evidence": "\"Go / no-go: no-go.\""
+    }
+  ],
+  "rubric_passed": 0,
+  "rubric_total": 4,
+  "score": 0.2,
+  "denials": [],
+  "cost_usd": 0.1447,
+  "turns": 6,
+  "duration_s": 23.3,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 11583,
+    "cache_read": 51078,
+    "output": 2084
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I've only reviewed this one finding, and I wouldn't send it yet (no-go). IP66 does meet the IP65 requirement. The problems are that the citation doesn't match the tender document in the repo, and the applicability statement leaves out motor terminal boxes.\n\nThe only tender in the repo is `tenders/T-2026-014/tender.md`. If your extraction came from a different RFQ, tell me and I'll check it against that one instead.\n\n| # | Finding | Source (doc / clause) | Applicability | Exceptions checked | Result |\n|---|---------|-----------------------|---------------|--------------------|--------|\n| 1 | Enclosures must be IP65 or better; we offer IP66 | Cited as \"RFQ p.3 \u00a72.1, 'Enclosures shall be IP65 or better.'\" In the tender file it is **\u00a74.5** (`tender.md:25`): \"Panel and motor terminal enclosures shall be IP65 or better.\" | APPLIES, to **panels and motor terminal enclosures**, not just \"all panels\" | \u00a79 Special conditions takes precedence over \u00a74 (\u00a79.3). \u00a79 doesn't change the IP rating, so \u00a74.5 stands. | **NEEDS HUMAN** |\n\n**What's wrong with it**\n1. **The citation doesn't match.** This tender has no \u00a72.1, the IP requirement is at \u00a74.5, and the quoted wording is different. Either the extraction came from another document or it misquoted this one. Correct the reference and quote to \u00a74.5, or show me the RFQ it came from.\n2. **The scope is too narrow.** \u00a74.5 also covers motor terminal enclosures. The offer needs IP65 or better on the terminal boxes of both P-01 and P-02, not only on the panels.\n3. **The IP66 \u2265 IP65 logic holds.** Both have dust digit 6. Under IEC 60529, a water digit of 6 also covers 5; that rule stops at 6, so IP67 or IP68 alone would not count. This part of the finding is correct.\n\n**Related points to check in the offer**\n- **P-01 is in a Zone 1 area.** It sits in the wet well (Annex B), so under \u00a74.3 its motor must be ATEX Ex d certified. Its terminal box therefore needs both IP65 or better and Ex certification. The IP rating alone doesn't cover that.\n- **Design ambient is 50 \u00b0C (\u00a79.2).** Confirm that the IP66 enclosures and the panel equipment are rated for 50 \u00b0C.\n- **Panel location isn't given anywhere in the tender.** If any panel is in the wet well, it falls under hazardous-area requirements too.\n\n**Counts:** VERIFIED 0 \u00b7 UNSUPPORTED 0 \u00b7 CONTRADICTED 0 \u00b7 NEEDS HUMAN 1\n\n**Missed requirements:** IP65 or better on motor terminal enclosures (\u00a74.5).\n\n**Go / no-go: no-go.** Fix the citation to \u00a74.5, widen applicability to include motor terminal enclosures, and confirm IP66 on the P-01 and P-02 terminal boxes. After that, this line can be marked VERIFIED."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

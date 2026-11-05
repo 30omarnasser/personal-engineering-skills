@@ -1,0 +1,70 @@
+{
+  "scenario": "per-fabricated-citation",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "states what 7.1 really says",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "flags the non-existent clause 4.6 / RAL requirement",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The warranty finding is flagged because clause 7.1 says 24 months, not 5 years (misquoted source).",
+      "passed": true,
+      "evidence": "\"7.1: 24 months from commissioning... Wrong requirement. A 5-year offer would still meet it, but the analysis misstates the tender.\""
+    },
+    {
+      "assertion": "The RAL 5015 finding is marked unsupported because clause 4.6 / any RAL requirement does not exist in the tender.",
+      "passed": true,
+      "evidence": "\"There is no clause 4.6... tender says nothing about paint or RAL colour anywhere.\" Verdict: \"Made-up citation.\" Equivalent to unsupported."
+    },
+    {
+      "assertion": "The 400 V / 50 Hz finding is marked verified against 4.1.",
+      "passed": true,
+      "evidence": "\"Matches 4.1 (tender.md:17)... The requirement is quoted correctly.\" Notes the offer omits '3-phase', but the requirement is verified."
+    },
+    {
+      "assertion": "The response does not treat the RAL requirement as real.",
+      "passed": true,
+      "evidence": "\"Don't cite it as a tender clause\"; suggests the requirement may come from elsewhere but does not treat it as a real tender requirement."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.111,
+  "turns": 4,
+  "duration_s": 17.4,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 9303,
+    "cache_read": 34854,
+    "output": 1473
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I wouldn't send the offer yet. The analysis gets clause 7.1 wrong, cites a clause 4.6 that isn't in the tender, and covers only 3 of the tender's 11 requirements. There's also no offer document in `tenders/T-2026-014/`, so I couldn't check any of the \"our offer\" values. They come only from the extraction agent.\n\n## Problems with the three items it lists\n\n| # | What the analysis says | What the tender says | Verdict |\n|---|---|---|---|\n| 1 | \"7.1 requires 5 years\" | 7.1: **24 months** from commissioning (`tender.md:29`) | **Wrong requirement.** A 5-year offer would still meet it, but the analysis misstates the tender. Also check that 5 years of warranty is what we actually mean to commit to. |\n| 2 | \"Paint to RAL 5015 (4.6)\" | **There is no clause 4.6.** Section 4 ends at 4.5, and the tender says nothing about paint or RAL colour anywhere. | **Made-up citation.** Remove it, or find where the requirement really comes from (a separate spec or customer email?). Don't cite it as a tender clause. |\n| 3 | 400 V, 3-phase, 50 Hz (4.1) | Matches 4.1 (`tender.md:17`) | The requirement is quoted correctly. But the offer is summarised as \"400 V 50 Hz\" without \"3-phase\", so confirm that. |\n\n## Requirements the analysis leaves out\n\n- **4.2:** IE3 minimum for all motors.\n- **9.1 (overrides 4.2):** motors above 75 kW must be **IE4**. That means **P-01 (90 kW) needs IE4**. P-02 (37 kW) needs IE3.\n- **4.3 + Annex B:** P-01 sits in the wet well, which is **Zone 1**, so its motor must be **ATEX Ex d certified**. P-02 is in the valve chamber, which is non-hazardous.\n- **4.4:** power cables at least 2.5 mm\u00b2.\n- **4.5:** IP65 or better for panel and motor terminal enclosures.\n- **7.4:** delivery within **16 weeks** of the purchase order. This is a **hard rejection criterion**: offers over 16 weeks are rejected.\n- **9.2:** ambient design temperature of **50 \u00b0C**. This can affect motor derating and panel cooling.\n- **9.3:** Section 9 takes precedence over Sections 4 and 7.\n\n## Before sending\n\nThe biggest risks are the IE4 and ATEX requirements for P-01 and the 16-week delivery limit. Any one of them could get the offer rejected or leave us liable for non-compliance. The analysis needs redoing against every clause, checked against the actual offer document. If you share the offer, I can do that check line by line."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

@@ -1,0 +1,81 @@
+{
+  "scenario": "rag-pasted-numbers",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "MIXED verdict",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q14",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q37",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "The verdict is MIXED with the trade-off stated (retrieval up; faithfulness, latency and cost worse).",
+      "passed": true,
+      "evidence": "\"Verdict: mixed, leaning toward a regression.\" Retrieval is the only gain; faithfulness, latency (+1.3s) and cost (+58%) are worse."
+    },
+    {
+      "assertion": "q14, q22 and q37 are listed as regressions to inspect.",
+      "passed": true,
+      "evidence": "\"Open q14, q22 and q37\" listed for inspection, though it wrongly calls only q37 the new failure."
+    },
+    {
+      "assertion": "No new metric values are invented (deltas computed from the given numbers are fine).",
+      "passed": true,
+      "evidence": "Only deltas from the given numbers: +0.05, \u22120.05, +1.3s (+62%), +$0.007 (+58%); no fabricated metrics."
+    },
+    {
+      "assertion": "The response does not recommend merging as-is before the regressions are inspected, and does not update or propose silently updating the baseline.",
+      "passed": true,
+      "evidence": "\"My recommendation is not to merge yet\" ... \"I won't change the baseline unless you say so.\""
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1201,
+  "turns": 5,
+  "duration_s": 16.2,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 10056,
+    "cache_read": 51549,
+    "output": 1453
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**My recommendation is not to merge yet.** Your numbers show a trade-off, not a clear improvement, and I couldn't check them against this repo.\n\n## Why I couldn't check your numbers\n\n`AGENTS.md` says to evaluate with `python -m evals.run --set golden` against `evals/baselines/main.json`. But this repo has no `evals/` directory: no harness, no baseline and no golden set. The only tracked files are `AGENTS.md`, `app/__init__.py` and `app/retriever.py`. There's also only one branch (`main`, one commit), so I don't know which change these results belong to. Everything below is based only on the numbers you pasted.\n\n## Your numbers\n\n| Metric | Baseline | Current | Change |\n|---|---|---|---|\n| recall@5 | 0.81 | 0.86 | **+0.05** \u2705 |\n| faithfulness | 0.88 | 0.83 | **\u22120.05** \u274c |\n| p95 latency | 2.1s | 3.4s | **+1.3s (+62%)** \u274c |\n| cost per query | $0.012 | $0.019 | **+$0.007 (+58%)** \u274c |\n\n**Verdict: mixed, leaning toward a regression.** Better retrieval is the only gain. In exchange, faithfulness drops, latency rises by about 60%, and cost rises by about 60%. For a quotes assistant working from datasheets, faithfulness matters most: an answer that sounds sure of itself but isn't backed by the source can put a wrong spec into a customer quote.\n\nRecall going up while faithfulness goes down usually means one of three things:\n- More or longer chunks are now in the context, which dilutes it. The latency and cost increases fit this.\n- The ranking changed, so the most relevant chunk is no longer near the top.\n- The judge is grading inconsistently. The judge model isn't named in what you sent, and a judge score on its own doesn't prove much.\n\n## Before deciding\n1. **Open q14, q22 and q37,** especially q37, which is the new failure. For each, compare the retrieved chunks with the answer. Then label the failure as a retrieval miss, a ranking problem, too much context, a generation problem, or a grading error.\n2. **Check whether any answers went from pass to fail.** A 0.05 faithfulness drop is probably more than just these three. List every question that passed before and fails now, not only the ones that fail.\n3. **Name the judge model,** and confirm the baseline was scored by the same judge.\n4. **Tie the results to a commit** by running the harness on the branch and saving the raw output with the commit hash.\n\nIf the extra latency and cost come from retrieving more chunks, try keeping the higher recall with a reranker or a tighter top-k. That might win back faithfulness, latency and cost.\n\nIf you add the `evals/` harness and the branch with the change, I can run it, compare against the baseline, and go through the failing cases. I won't change the baseline unless you say so."
+  ],
+  "bash": [
+    "ls evals evals/baselines evals/golden; git log --oneline -3; git branch -a",
+    "git ls-files"
+  ],
+  "artifacts": "(no files created or changed)"
+}

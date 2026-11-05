@@ -1,0 +1,68 @@
+{
+  "scenario": "per-single-verified",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "marks it compliant",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The requirement is marked verified / compliant because IP66 meets or exceeds IP65.",
+      "passed": false,
+      "evidence": "Requirement row marked 'NEEDS HUMAN'; only a separate offer row is VERIFIED, and the overall verdict is NO-GO."
+    },
+    {
+      "assertion": "The source (RFQ p.3 section 2.1) is cited and applicability (all panels) is stated.",
+      "passed": false,
+      "evidence": "Says the cited p.3 \u00a72.1 'can't be traced' and disputes 'all panels', replacing it with \u00a74.5 panels and motor terminal enclosures."
+    },
+    {
+      "assertion": "The response does not invent other RFQ requirements as if they were in the source (noting that only one line was given is fine).",
+      "passed": false,
+      "evidence": "Presents \u00a74.5, \u00a74.3 ATEX and \u00a79.2 50 \u00b0C from an unrelated repo tender as 'Missed requirements'."
+    },
+    {
+      "assertion": "The response does not conclude no-go for this item.",
+      "passed": false,
+      "evidence": "Explicitly states 'NO-GO as written.'"
+    }
+  ],
+  "rubric_passed": 0,
+  "rubric_total": 4,
+  "score": 0.2,
+  "denials": [],
+  "cost_usd": 0.1328,
+  "turns": 6,
+  "duration_s": 22.3,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 10380,
+    "cache_read": 49875,
+    "output": 1982
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I checked this extraction against the only tender in the repo, `tenders/T-2026-014/tender.md`. **The citation doesn't match that document**, and the extraction leaves out part of the requirement.\n\n| # | Finding | Source (doc / clause) | Applicability | Exceptions checked | Result |\n|---|---------|-----------------------|---------------|--------------------|--------|\n| 1 | Enclosures IP65 or better | Cited: \"RFQ p.3 \u00a72.1, 'Enclosures shall be IP65 or better.'\" The tender has no \u00a72.1. The nearest clause is **\u00a74.5: \"Panel and motor terminal enclosures shall be IP65 or better.\"** | APPLIES, to **panels and motor terminal enclosures**, not just \"all panels\" | \u00a79 Special conditions (which override \u00a74 and \u00a77 under \u00a79.3) doesn't change the IP rating. No addenda in the repo. | **NEEDS HUMAN** |\n| 2 | Our offer IP66 meets the requirement | IEC 60529: the first digit is the same (6, dust-tight), and a second digit of 6 also covers 5 | APPLIES | n/a | **VERIFIED**, provided the IP66 applies to every enclosure that \u00a74.5 covers |\n\n**Problems found**\n1. **The source can't be traced.** \"p.3 \u00a72.1\" and the quoted wording don't exist in T-2026-014. Either the extraction came from another RFQ that isn't in the repo, or the clause number and quote are wrong. Someone needs to confirm which document it came from before the offer cites it.\n2. **The scope is too narrow.** \u00a74.5 also covers motor terminal enclosures. The offer needs to show IP65 or better for the terminal boxes on both P-01 (90 kW) and P-02 (37 kW), not only the panels.\n3. **The P-01 motor is in a hazardous area.** It sits in the Wet well, which Annex B classifies as Zone 1, so \u00a74.3 requires ATEX Ex d. An Ex d certification doesn't tell you the IP rating, so the datasheet must state IP65 or better for the terminal box too.\n4. **Panel temperature needs checking.** \u00a79.2 sets a 50 \u00b0C ambient. A sealed IP66 panel at 50 \u00b0C needs a heat-dissipation or derating check. This doesn't block the IP requirement, but it does affect whether the IP66 offer works in practice.\n\n**Counts:** VERIFIED 1 \u00b7 NEEDS HUMAN 1 \u00b7 UNSUPPORTED 0 \u00b7 CONTRADICTED 0\n**Missed requirements:** motor terminal enclosures (\u00a74.5), including the Ex d motor P-01 (\u00a74.3).\n\n**NO-GO as written.** Correct the citation to T-2026-014 \u00a74.5 (or provide the actual RFQ), widen the scope to cover motor terminal enclosures, and confirm the motor datasheets show IP65 or better. IP66 itself meets the requirement."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-per-single-verified-with-1-80ksffgg/repo\" && git ls-files | head -50"
+  ],
+  "artifacts": "(no files created or changed)"
+}

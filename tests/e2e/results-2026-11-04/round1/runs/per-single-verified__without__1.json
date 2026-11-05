@@ -1,0 +1,67 @@
+{
+  "scenario": "per-single-verified",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "marks it compliant",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The requirement is marked verified / compliant because IP66 meets or exceeds IP65.",
+      "passed": false,
+      "evidence": "Overall verdict is \"this extraction fails the check\"; IP66 is only noted as meeting \"for the panels\", not marked verified."
+    },
+    {
+      "assertion": "The source (RFQ p.3 section 2.1) is cited and applicability (all panels) is stated.",
+      "passed": false,
+      "evidence": "Agent calls the citation \"\u274c Wrong reference\" and applicability \"\u274c Incomplete\" instead of accepting p.3 \u00a72.1 and all panels."
+    },
+    {
+      "assertion": "The response does not invent other RFQ requirements as if they were in the source (noting that only one line was given is fine).",
+      "passed": false,
+      "evidence": "Treats a repo tender as the RFQ and introduces clauses 4.3, 4.5, 9.2, 9.3 and Annex B, which were not in the source given."
+    },
+    {
+      "assertion": "The response does not conclude no-go for this item.",
+      "passed": true,
+      "evidence": "States IP66 \"Meets it, for the panels\"; no no-go conclusion for the item."
+    }
+  ],
+  "rubric_passed": 1,
+  "rubric_total": 4,
+  "score": 0.4,
+  "denials": [],
+  "cost_usd": 0.2019,
+  "turns": 5,
+  "duration_s": 21.5,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 19401,
+    "cache_read": 33922,
+    "output": 1985
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "The only tender document in the repo is `tenders/T-2026-014/tender.md`. If that's the RFQ you mean, **this extraction fails the check.** IP66 meets the requirement, but the source citation is wrong and the applicability is incomplete.\n\n| Field | Extraction says | Tender actually says | Verdict |\n|---|---|---|---|\n| Source | RFQ p.3, section 2.1 | Clause **4.5**, Section 4 (Electrical requirements), `tenders/T-2026-014/tender.md:25`. The document has no page numbers and no section 2. | \u274c Wrong reference |\n| Quoted text | \"Enclosures shall be IP65 or better.\" | \"**Panel and motor terminal enclosures** shall be IP65 or better.\" | \u274c Quote is not exact; the subject was dropped |\n| Applicability | All panels | Panels **and motor terminal enclosures**. That means the P-01 (90 kW) and P-02 (37 kW) motor terminal boxes too. | \u274c Incomplete |\n| Requirement | IP65 | IP65 minimum (\"or better\") | \u2705 |\n| Our offer | IP66 | Under IEC 60529, codes up to 6 are cumulative. IP66 has the same dust rating as IP65 (6) and survives stronger water jets (6 vs 5), so IP66 counts as \"better.\" | \u2705 Meets it, for the panels |\n\n**What to fix**\n1. Change the source to clause 4.5 and quote it word for word.\n2. Change applicability to \"panels and motor terminal enclosures (P-01, P-02).\"\n3. Confirm the IP rating of the motor terminal boxes. Nothing in the extraction shows that IP66 (or at least IP65) covers them. P-01's terminal box also has to work with the Ex d certification required by 4.3, because the wet well is Zone 1 (Annex B).\n\n**Related points to check (not part of this requirement)**\n- Clause 9.2 sets a 50 \u00b0C ambient design temperature. Make sure the IP66 panels are rated for that, especially sealed enclosures that need cooling.\n- Section 9 overrides Sections 4 and 7 (clause 9.3). Nothing in Section 9 changes the IP rating, so 4.5 still stands.\n\n**What I couldn't verify**\n- The repo has no extraction or analysis file and no offer document, so I couldn't confirm that the offer really says IP66. I checked only the text you pasted.\n- The \"p.3 section 2.1\" reference might come from a different RFQ (for example, a PDF that isn't in the repo). If so, send it to me and I'll check against that instead.\n\nA wrong clause number that still has the right value usually means the extractor paraphrased instead of quoting. Spot-check the other extracted requirements from this tender for the same problem."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-per-single-verified-without-1-hqmt30ie/repo\" && git ls-files && ls -la",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-per-single-verified-without-1-hqmt30ie/repo\" && ls -laR tmp .claude"
+  ],
+  "artifacts": "(no files created or changed)"
+}

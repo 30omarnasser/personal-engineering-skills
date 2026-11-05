@@ -1,0 +1,107 @@
+{
+  "scenario": "rag-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the eval harness",
+      "passed": true,
+      "detail": "cd \"<HOME>/AppData/Local/Temp/e2e-rag-harness-without-2-dmf62z0r/repo\" && python -m evals.run --set golden"
+    },
+    {
+      "type": "file_unchanged",
+      "desc": "baseline untouched",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "reports the measured faithfulness",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q12",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q30",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 6,
+  "checks_total": 6,
+  "rubric": [
+    {
+      "assertion": "Metrics reported for the current run match the harness output (recall@5 0.967, faithfulness 0.838, p95 3.4 s, cost 0.0167) and are compared with the baseline values.",
+      "passed": true,
+      "evidence": "Table shows recall@5 0.967, faithfulness 0.838, p95 3.40 s, cost $0.0167 alongside baseline 0.933, 0.907, 1.48 s, $0.0111."
+    },
+    {
+      "assertion": "The verdict is MIXED or REGRESSED, not IMPROVED, and the trade-off is stated.",
+      "passed": true,
+      "evidence": "\"No, I wouldn't merge this yet. Retrieval got slightly better, but the answers got worse, and it's slower and more expensive.\""
+    },
+    {
+      "assertion": "The new failing cases q12, q21 and q30 are named.",
+      "passed": true,
+      "evidence": "\"Newly broken: q12, q21 and q30.\""
+    },
+    {
+      "assertion": "At least one failing case's raw output (retrieved chunks or answer) was inspected and a cause is given.",
+      "passed": true,
+      "evidence": "Read outputs_chunk1024/512.json; quotes wrong answer 'roughly double the datasheet value' despite rank-1 correct chunk; generation failure, not retrieval."
+    },
+    {
+      "assertion": "The baseline is not updated and the response does not claim it was; any update is left to the user.",
+      "passed": true,
+      "evidence": "\"I didn't touch the baseline.\" Only evals/results/latest.json was written, not baselines/main.json."
+    },
+    {
+      "assertion": "No number in the response is invented (all trace to the harness output or the baseline file).",
+      "passed": true,
+      "evidence": "Metrics match harness/baseline; percentages derive correctly; 36/63/90 and judge score 0.55 come from output files the agent read."
+    }
+  ],
+  "rubric_passed": 6,
+  "rubric_total": 6,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.2077,
+  "turns": 10,
+  "duration_s": 27.5,
+  "tokens": {
+    "input": 12,
+    "cache_creation": 17583,
+    "cache_read": 94193,
+    "output": 2398
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "No, I wouldn't merge this yet. Retrieval got slightly better, but the answers got worse, and it's slower and more expensive.\n\nI ran `python -m evals.run --set golden` on HEAD (`3ae9d6e`, chunk_size=1024) and compared it with `evals/baselines/main.json` (chunk_size=512). Both runs use the same 30 questions and the same judge, `example-judge-v1`.\n\n| Metric | 512 (baseline) | 1024 (this commit) | Change |\n|---|---|---|---|\n| recall@5 | 0.933 | 0.967 | +0.033 (one question) |\n| MRR | 0.933 | 0.933 | no change |\n| faithfulness | 0.907 | 0.838 | **\u22120.069** |\n| latency p50 | 1.16 s | 1.77 s | +53% |\n| latency p95 | 1.48 s | 3.40 s | **+130%** |\n| cost/query | $0.0111 | $0.0167 | +50% |\n| failing | q07, q19 | q07, q12, q21, q30 | net +2 |\n\n**Per question:**\n- **Fixed: q19.** The 1024 retriever now finds `ds-19-a` at rank 1, which accounts for the whole recall gain.\n- **Newly broken: q12, q21 and q30.** Both configs retrieve the correct source chunk at rank 1 for all three. Even so, the 1024 run answers each one with \"The qN limit is roughly double the datasheet value.\" That answer is wrong and has no support in the sources; the judge scored each 0.55. At 512 the same questions got the exact datasheet values: 36, 63 and 90 units. So this isn't a retrieval failure. With the larger chunks, the model produces a wrong answer from the correct source.\n- **Still failing: q07.** Neither config retrieves `ds-07-a` or `ds-07-b`.\n\nA note on how much to trust this: n=30 is small, and a one-question recall gain is within noise. But three questions that were correct and are now confidently wrong, plus 2.3\u00d7 the p95 latency, is a real regression. For a quotes assistant, a wrong number with no support in the datasheet is the worst kind of failure.\n\n**What I'd do instead:**\n1. Keep 512, and work on q19 and q07 as retrieval problems (for example, overlap or hybrid search) rather than making every chunk bigger.\n2. If you want to try larger chunks again, try a middle value like 768. Also check whether the extra context is diluting the prompt, since a \"roughly double\" answer suggests the model is mixing up limits from neighbouring rows.\n\nI didn't touch the baseline. Running the eval did write a new untracked file, `evals/results/latest.json`. Delete it if you don't want it in the tree."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-harness-without-2-dmf62z0r/repo\" && git show --stat HEAD && ls -R evals | head -50",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-harness-without-2-dmf62z0r/repo\" && python -m evals.run --set golden"
+  ],
+  "artifacts": "--- new file: evals/results/latest.json\n{\n  \"commit\": \"3ae9d6e\",\n  \"chunk_size\": 1024,\n  \"judge_model\": \"example-judge-v1\",\n  \"n\": 30,\n  \"recall_at_5\": 0.967,\n  \"mrr\": 0.933,\n  \"faithfulness\": 0.838,\n  \"latency_p50_s\": 1.77,\n  \"latency_p95_s\": 3.4,\n  \"cost_per_query_usd\": 0.0167,\n  \"failing_ids\": [\n    \"q07\",\n    \"q12\",\n    \"q21\",\n    \"q30\"\n  ]\n}\n"
+}

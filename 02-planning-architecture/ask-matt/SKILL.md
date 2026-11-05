@@ -6,6 +6,16 @@ disable-model-invocation: true
 
 # Ask Matt
 
+> **Library note (personal-engineering-skills).** This router describes Matt Pocock's full skill set. Only
+> `grill-with-docs`, `grilling`, `domain-modeling`, `handoff`, `research` and `ask-matt` are installed here.
+> Where the flow below names one of the others, use the library's owner instead:
+> `/tdd` → `test-driven-development`; `/diagnosing-bugs` → `systematic-debugging`;
+> `/code-review` → `requesting-code-review` (then `find-bugs` for the security pass);
+> `/to-spec` → OpenSpec; `/grill-me` → `grilling`; `/pr` → `verification-before-completion` first.
+> `/to-tickets`, `/implement`, `/implement-spec`, `/triage`, `/wayfinder`, `/retro`, `/prototype`, `/wizard`,
+> `/codebase-design`, `/improve-codebase-architecture`, `/to-questionnaire`, `/wait-what`, `/teach`,
+> `/writing-for-agents` and `/setup-matt-pocock-skills` are **not installed**; treat them as ideas, not commands.
+
 You don't remember every skill, so ask.
 
 Before stating what a skill does or recommending a step be skipped, read that skill's SKILL.md: the summaries here are for orientation only.

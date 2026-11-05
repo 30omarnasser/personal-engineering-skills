@@ -1,0 +1,67 @@
+{
+  "scenario": "per-single-verified",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "marks it compliant",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The requirement is marked verified / compliant because IP66 meets or exceeds IP65.",
+      "passed": true,
+      "evidence": "\"Offering IP66 complies. 'IP65 or better' allows a higher rating.\" Panels are marked compliant."
+    },
+    {
+      "assertion": "The source (RFQ p.3 section 2.1) is cited and applicability (all panels) is stated.",
+      "passed": false,
+      "evidence": "Rejects the given source: \"There's no section 2.1... requirement is clause 4.5\". Calls 'all panels' applicability \"too narrow\"."
+    },
+    {
+      "assertion": "The response does not invent other RFQ requirements as if they were in the source (noting that only one line was given is fine).",
+      "passed": false,
+      "evidence": "Treats a repo tender as the RFQ and adds motor terminal, Ex d (4.3) and Zone 1 requirements. Ground truth says nothing else is known."
+    },
+    {
+      "assertion": "The response does not conclude no-go for this item.",
+      "passed": true,
+      "evidence": "No no-go. Status: \"Compliant for panels; open for motors until terminal box IP ratings are confirmed\"."
+    }
+  ],
+  "rubric_passed": 2,
+  "rubric_total": 4,
+  "score": 0.6,
+  "denials": [],
+  "cost_usd": 0.115,
+  "turns": 3,
+  "duration_s": 20.2,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 9081,
+    "cache_read": 33673,
+    "output": 1774
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I checked this against the only tender in the repo, `tenders/T-2026-014/tender.md`. I'm assuming that's the RFQ you mean; if it's a different document, tell me. The extraction gets compliance right but gets the source and the scope wrong.\n\n**Errors**\n\n1. **Wrong citation.** There's no section 2.1 in the tender. The requirement is **clause 4.5** (Section 4, Electrical requirements). The file is markdown and has no page numbers, so \"p.3\" can't be checked either.\n2. **Misquote.** The tender says: *\"Panel and motor terminal enclosures shall be IP65 or better.\"* The extraction dropped \"Panel and motor terminal\" and quoted it as \"Enclosures shall be\u2026\", which changes what the clause covers.\n3. **Applicability is too narrow.** \"Applies to all panels\" leaves out **motor terminal enclosures**. That means the terminal boxes on both motors, P-01 (90 kW, wet well) and P-02 (37 kW, valve chamber), need IP65 or better as well.\n\n**What's correct**\n\n- **Offering IP66 complies.** \"IP65 or better\" allows a higher rating. Under IEC 60529, a second digit of 6 (powerful water jets) also covers 5 (water jets). That rule stops at 6: digits 7 and 8 (immersion) don't cover 5 or 6. The dust digit is 6 in both, so IP66 meets the requirement.\n\n**Corrected entry**\n\n| Field | Value |\n|---|---|\n| Requirement | Panel and motor terminal enclosures IP65 or better |\n| Source | Tender T-2026-014, clause 4.5: \"Panel and motor terminal enclosures shall be IP65 or better.\" |\n| Applicability | All panels, plus the motor terminal boxes on P-01 and P-02 |\n| Our offer | Panels IP66: compliant. Motor terminal boxes: **needs confirming** |\n| Status | Compliant for panels; open for motors until terminal box IP ratings are confirmed |\n\n**Before the offer goes out:**\n- Get the IP rating of both motors' terminal boxes from the motor datasheets. The offer currently only states IP66 for panels.\n- P-01 sits in the wet well, which is Zone 1 (Annex B), so its motor has to be Ex d certified (4.3). Its terminal box has to meet IP65+ in addition to that, not instead of it.\n\nI haven't changed any files. If you want, I can add the corrected entry to the tender folder."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-per-single-verified-without-2-9qkv3fy4/repo\" && git ls-files | head -50",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-per-single-verified-without-2-9qkv3fy4/repo\" && cat README.md && echo ---- && cat tenders/T-2026-014/tender.md"
+  ],
+  "artifacts": "(no files created or changed)"
+}

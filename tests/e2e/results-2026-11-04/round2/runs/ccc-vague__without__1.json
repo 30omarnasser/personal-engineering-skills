@@ -1,0 +1,67 @@
+{
+  "scenario": "ccc-vague",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "checked repository evidence",
+      "passed": true,
+      "detail": "git log --stat -3"
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The handoff is called insufficient and at least three specific missing items are named (branch, file paths, test command/result, concrete next action, source of the 'agreed format').",
+      "passed": false,
+      "evidence": "Says only 'The handoff is vague'; only the agreed-format source is named as missing. Branch, paths, test command and next action aren't listed as gaps."
+    },
+    {
+      "assertion": "Repository evidence (git log/status/branch, tests, ADR) is used to reconstruct state instead of guessing.",
+      "passed": true,
+      "evidence": "Ran git log, read pdf.py, ADR-0007 and the tests, and ran pytest; reports the branch, commit cda58ff, 9 passing tests and a clean tree."
+    },
+    {
+      "assertion": "The response does not invent what the client-agreed format is; if ADR-0007 is offered as a candidate, the uncertainty is stated.",
+      "passed": true,
+      "evidence": "'Nothing in the repo is labelled as the client's format... I'm assuming that's what the handoff means, but please confirm.'"
+    },
+    {
+      "assertion": "A concrete next step grounded in repository evidence, or targeted questions to the user, is given.",
+      "passed": true,
+      "evidence": "Suggests fixing the 404 and escaping issues test-first, and asks for the client's format spec and the Arabic font file."
+    }
+  ],
+  "rubric_passed": 3,
+  "rubric_total": 4,
+  "score": 0.8,
+  "denials": [],
+  "cost_usd": 0.1575,
+  "turns": 9,
+  "duration_s": 22.3,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 13795,
+    "cache_read": 56781,
+    "output": 1782
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "The handoff is vague. Here's what the repo shows, so you don't have to rely on it.\n\n**Where things stand**\n- Branch `feat/quote-pdf` has one commit on top of the initial one: `cda58ff Add PDF export route and template (ADR-0007)`. The working tree is clean.\n- All 9 tests pass (`python -m pytest -q`).\n- `app/pdf.py` builds the HTML for `GET /quotes/{id}/pdf` and sets A4 plus `dir=\"rtl\"` for Arabic quotes. No PDF is actually produced yet. The module docstring says rendering is stubbed.\n\n**\"The format the client agreed on\"**\nNothing in the repo is labelled as the client's format. The closest thing is `docs/adr/0007-pdf-rendering-weasyprint.md` (accepted): WeasyPrint with HTML templates, A4 pages, RTL for Arabic, and fonts embedded rather than taken from the system. I'm assuming that's what the handoff means, but please confirm. If the client agreed to something else (layout, fields, currency format, header or logo), it isn't written down here.\n\n**What still differs from ADR-0007, as \"the remaining bits\"**\n1. **No real PDF rendering.** `route_quote_pdf` returns HTML. WeasyPrint isn't called and doesn't appear as a dependency anywhere.\n2. **No embedded Arabic font.** The ADR says font files ship in `app/fonts/`, but that folder doesn't exist and the template has no `@font-face`. Arabic quotes would fall back to system fonts, which the ADR rules out.\n3. **Unknown quote IDs crash the route.** `get_quote` raises `KeyError`, which comes through `route_quote_pdf` uncaught. The route should return a 404.\n4. **Values go into the HTML unescaped.** `customer` and `sku` are inserted into the HTML as-is (`app/pdf.py:12-13`). A customer name containing `<` or `&` would break the output or inject markup. They should go through `html.escape`.\n5. **Smaller items:** money isn't formatted (Decimal is printed as-is, with no currency), and the table has no header row. Both depend on what the client agreed.\n\n**Suggested order:** 3 and 4 first, since they're small and clear-cut and can be done test-first. Then 2 and 1, which need a font file and a WeasyPrint dependency you'd have to choose or supply. I'd leave 5 until you confirm the agreed format.\n\nShould I start on 3 and 4? And do you have the client's format spec, or the font file you want to use for Arabic?"
+  ],
+  "bash": [
+    "git log --stat -3",
+    "python -m pytest -q"
+  ],
+  "artifacts": "(no files created or changed)"
+}

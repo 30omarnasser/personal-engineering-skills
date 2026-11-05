@@ -1,0 +1,1052 @@
+{
+ "q01": {
+  "retrieved_ids": [
+   "ds-01-a",
+   "ds-32-x",
+   "ds-33-x",
+   "ds-34-x",
+   "ds-35-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-01-a",
+    "text": "Excerpt from ds-01-a: general description of the product family."
+   },
+   {
+    "id": "ds-32-x",
+    "text": "Excerpt from ds-32-x: general description of the product family."
+   },
+   {
+    "id": "ds-33-x",
+    "text": "Excerpt from ds-33-x: general description of the product family."
+   },
+   {
+    "id": "ds-34-x",
+    "text": "Excerpt from ds-34-x: general description of the product family."
+   },
+   {
+    "id": "ds-35-x",
+    "text": "Excerpt from ds-35-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 3 units for the VX-40 valve.",
+  "faithfulness": 0.87,
+  "latency_ms": 2055,
+  "cost_usd": 0.0159
+ },
+ "q02": {
+  "retrieved_ids": [
+   "ds-02-a",
+   "ds-33-x",
+   "ds-34-x",
+   "ds-35-x",
+   "ds-36-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-02-a",
+    "text": "Excerpt from ds-02-a: general description of the product family."
+   },
+   {
+    "id": "ds-33-x",
+    "text": "Excerpt from ds-33-x: general description of the product family."
+   },
+   {
+    "id": "ds-34-x",
+    "text": "Excerpt from ds-34-x: general description of the product family."
+   },
+   {
+    "id": "ds-35-x",
+    "text": "Excerpt from ds-35-x: general description of the product family."
+   },
+   {
+    "id": "ds-36-x",
+    "text": "Excerpt from ds-36-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 6 units for the MC-7 motor.",
+  "faithfulness": 0.92,
+  "latency_ms": 1769,
+  "cost_usd": 0.0171
+ },
+ "q03": {
+  "retrieved_ids": [
+   "ds-34-x",
+   "ds-03-a",
+   "ds-35-x",
+   "ds-36-x",
+   "ds-37-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-34-x",
+    "text": "Excerpt from ds-34-x: general description of the product family."
+   },
+   {
+    "id": "ds-03-a",
+    "text": "Excerpt from ds-03-a: general description of the product family."
+   },
+   {
+    "id": "ds-35-x",
+    "text": "Excerpt from ds-35-x: general description of the product family."
+   },
+   {
+    "id": "ds-36-x",
+    "text": "Excerpt from ds-36-x: general description of the product family."
+   },
+   {
+    "id": "ds-37-x",
+    "text": "Excerpt from ds-37-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 9 units for the FL-3 flow meter.",
+  "faithfulness": 0.85,
+  "latency_ms": 1620,
+  "cost_usd": 0.0174
+ },
+ "q04": {
+  "retrieved_ids": [
+   "ds-04-a",
+   "ds-35-x",
+   "ds-36-x",
+   "ds-37-x",
+   "ds-38-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-04-a",
+    "text": "Excerpt from ds-04-a: general description of the product family."
+   },
+   {
+    "id": "ds-35-x",
+    "text": "Excerpt from ds-35-x: general description of the product family."
+   },
+   {
+    "id": "ds-36-x",
+    "text": "Excerpt from ds-36-x: general description of the product family."
+   },
+   {
+    "id": "ds-37-x",
+    "text": "Excerpt from ds-37-x: general description of the product family."
+   },
+   {
+    "id": "ds-38-x",
+    "text": "Excerpt from ds-38-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 12 units for the CP-9 control panel.",
+  "faithfulness": 0.87,
+  "latency_ms": 1774,
+  "cost_usd": 0.0172
+ },
+ "q05": {
+  "retrieved_ids": [
+   "ds-05-a",
+   "ds-36-x",
+   "ds-37-x",
+   "ds-38-x",
+   "ds-39-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-05-a",
+    "text": "Excerpt from ds-05-a: general description of the product family."
+   },
+   {
+    "id": "ds-36-x",
+    "text": "Excerpt from ds-36-x: general description of the product family."
+   },
+   {
+    "id": "ds-37-x",
+    "text": "Excerpt from ds-37-x: general description of the product family."
+   },
+   {
+    "id": "ds-38-x",
+    "text": "Excerpt from ds-38-x: general description of the product family."
+   },
+   {
+    "id": "ds-39-x",
+    "text": "Excerpt from ds-39-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 15 units for the PX-200 pump.",
+  "faithfulness": 0.93,
+  "latency_ms": 3400,
+  "cost_usd": 0.0171
+ },
+ "q06": {
+  "retrieved_ids": [
+   "ds-06-a",
+   "ds-37-x",
+   "ds-38-x",
+   "ds-39-x",
+   "ds-40-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-06-a",
+    "text": "Excerpt from ds-06-a: general description of the product family."
+   },
+   {
+    "id": "ds-37-x",
+    "text": "Excerpt from ds-37-x: general description of the product family."
+   },
+   {
+    "id": "ds-38-x",
+    "text": "Excerpt from ds-38-x: general description of the product family."
+   },
+   {
+    "id": "ds-39-x",
+    "text": "Excerpt from ds-39-x: general description of the product family."
+   },
+   {
+    "id": "ds-40-x",
+    "text": "Excerpt from ds-40-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 18 units for the VX-40 valve.",
+  "faithfulness": 0.88,
+  "latency_ms": 2058,
+  "cost_usd": 0.018
+ },
+ "q07": {
+  "retrieved_ids": [
+   "ds-38-x",
+   "ds-39-x",
+   "ds-40-x",
+   "ds-41-x",
+   "ds-42-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-38-x",
+    "text": "Excerpt from ds-38-x: general description of the product family."
+   },
+   {
+    "id": "ds-39-x",
+    "text": "Excerpt from ds-39-x: general description of the product family."
+   },
+   {
+    "id": "ds-40-x",
+    "text": "Excerpt from ds-40-x: general description of the product family."
+   },
+   {
+    "id": "ds-41-x",
+    "text": "Excerpt from ds-41-x: general description of the product family."
+   },
+   {
+    "id": "ds-42-x",
+    "text": "Excerpt from ds-42-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 21 units for the MC-7 motor.",
+  "faithfulness": 0.84,
+  "latency_ms": 2077,
+  "cost_usd": 0.0164
+ },
+ "q08": {
+  "retrieved_ids": [
+   "ds-08-a",
+   "ds-39-x",
+   "ds-40-x",
+   "ds-41-x",
+   "ds-42-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-08-a",
+    "text": "Excerpt from ds-08-a: general description of the product family."
+   },
+   {
+    "id": "ds-39-x",
+    "text": "Excerpt from ds-39-x: general description of the product family."
+   },
+   {
+    "id": "ds-40-x",
+    "text": "Excerpt from ds-40-x: general description of the product family."
+   },
+   {
+    "id": "ds-41-x",
+    "text": "Excerpt from ds-41-x: general description of the product family."
+   },
+   {
+    "id": "ds-42-x",
+    "text": "Excerpt from ds-42-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 24 units for the FL-3 flow meter.",
+  "faithfulness": 0.9,
+  "latency_ms": 2184,
+  "cost_usd": 0.0154
+ },
+ "q09": {
+  "retrieved_ids": [
+   "ds-09-a",
+   "ds-40-x",
+   "ds-41-x",
+   "ds-42-x",
+   "ds-43-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-09-a",
+    "text": "Excerpt from ds-09-a: general description of the product family."
+   },
+   {
+    "id": "ds-40-x",
+    "text": "Excerpt from ds-40-x: general description of the product family."
+   },
+   {
+    "id": "ds-41-x",
+    "text": "Excerpt from ds-41-x: general description of the product family."
+   },
+   {
+    "id": "ds-42-x",
+    "text": "Excerpt from ds-42-x: general description of the product family."
+   },
+   {
+    "id": "ds-43-x",
+    "text": "Excerpt from ds-43-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 27 units for the CP-9 control panel.",
+  "faithfulness": 0.84,
+  "latency_ms": 1770,
+  "cost_usd": 0.0152
+ },
+ "q10": {
+  "retrieved_ids": [
+   "ds-10-a",
+   "ds-41-x",
+   "ds-42-x",
+   "ds-43-x",
+   "ds-44-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-10-a",
+    "text": "Excerpt from ds-10-a: general description of the product family."
+   },
+   {
+    "id": "ds-41-x",
+    "text": "Excerpt from ds-41-x: general description of the product family."
+   },
+   {
+    "id": "ds-42-x",
+    "text": "Excerpt from ds-42-x: general description of the product family."
+   },
+   {
+    "id": "ds-43-x",
+    "text": "Excerpt from ds-43-x: general description of the product family."
+   },
+   {
+    "id": "ds-44-x",
+    "text": "Excerpt from ds-44-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 30 units for the PX-200 pump.",
+  "faithfulness": 0.86,
+  "latency_ms": 1774,
+  "cost_usd": 0.0154
+ },
+ "q11": {
+  "retrieved_ids": [
+   "ds-11-a",
+   "ds-42-x",
+   "ds-43-x",
+   "ds-44-x",
+   "ds-45-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-11-a",
+    "text": "Excerpt from ds-11-a: general description of the product family."
+   },
+   {
+    "id": "ds-42-x",
+    "text": "Excerpt from ds-42-x: general description of the product family."
+   },
+   {
+    "id": "ds-43-x",
+    "text": "Excerpt from ds-43-x: general description of the product family."
+   },
+   {
+    "id": "ds-44-x",
+    "text": "Excerpt from ds-44-x: general description of the product family."
+   },
+   {
+    "id": "ds-45-x",
+    "text": "Excerpt from ds-45-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 33 units for the VX-40 valve.",
+  "faithfulness": 0.9,
+  "latency_ms": 2086,
+  "cost_usd": 0.0162
+ },
+ "q12": {
+  "retrieved_ids": [
+   "ds-12-a",
+   "ds-43-x",
+   "ds-44-x",
+   "ds-45-x",
+   "ds-46-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-12-a",
+    "text": "Excerpt from ds-12-a: general description of the product family."
+   },
+   {
+    "id": "ds-43-x",
+    "text": "Excerpt from ds-43-x: general description of the product family."
+   },
+   {
+    "id": "ds-44-x",
+    "text": "Excerpt from ds-44-x: general description of the product family."
+   },
+   {
+    "id": "ds-45-x",
+    "text": "Excerpt from ds-45-x: general description of the product family."
+   },
+   {
+    "id": "ds-46-x",
+    "text": "Excerpt from ds-46-x: general description of the product family."
+   }
+  ],
+  "answer": "The q12 limit is roughly double the datasheet value.",
+  "faithfulness": 0.55,
+  "latency_ms": 1581,
+  "cost_usd": 0.0163
+ },
+ "q13": {
+  "retrieved_ids": [
+   "ds-13-a",
+   "ds-44-x",
+   "ds-45-x",
+   "ds-46-x",
+   "ds-47-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-13-a",
+    "text": "Excerpt from ds-13-a: general description of the product family."
+   },
+   {
+    "id": "ds-44-x",
+    "text": "Excerpt from ds-44-x: general description of the product family."
+   },
+   {
+    "id": "ds-45-x",
+    "text": "Excerpt from ds-45-x: general description of the product family."
+   },
+   {
+    "id": "ds-46-x",
+    "text": "Excerpt from ds-46-x: general description of the product family."
+   },
+   {
+    "id": "ds-47-x",
+    "text": "Excerpt from ds-47-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 39 units for the FL-3 flow meter.",
+  "faithfulness": 0.85,
+  "latency_ms": 1592,
+  "cost_usd": 0.0176
+ },
+ "q14": {
+  "retrieved_ids": [
+   "ds-14-a",
+   "ds-45-x",
+   "ds-46-x",
+   "ds-47-x",
+   "ds-48-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-14-a",
+    "text": "Excerpt from ds-14-a: general description of the product family."
+   },
+   {
+    "id": "ds-45-x",
+    "text": "Excerpt from ds-45-x: general description of the product family."
+   },
+   {
+    "id": "ds-46-x",
+    "text": "Excerpt from ds-46-x: general description of the product family."
+   },
+   {
+    "id": "ds-47-x",
+    "text": "Excerpt from ds-47-x: general description of the product family."
+   },
+   {
+    "id": "ds-48-x",
+    "text": "Excerpt from ds-48-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 42 units for the CP-9 control panel.",
+  "faithfulness": 0.85,
+  "latency_ms": 1436,
+  "cost_usd": 0.0157
+ },
+ "q15": {
+  "retrieved_ids": [
+   "ds-15-a",
+   "ds-46-x",
+   "ds-47-x",
+   "ds-48-x",
+   "ds-49-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-15-a",
+    "text": "Excerpt from ds-15-a: general description of the product family."
+   },
+   {
+    "id": "ds-46-x",
+    "text": "Excerpt from ds-46-x: general description of the product family."
+   },
+   {
+    "id": "ds-47-x",
+    "text": "Excerpt from ds-47-x: general description of the product family."
+   },
+   {
+    "id": "ds-48-x",
+    "text": "Excerpt from ds-48-x: general description of the product family."
+   },
+   {
+    "id": "ds-49-x",
+    "text": "Excerpt from ds-49-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 45 units for the PX-200 pump.",
+  "faithfulness": 0.82,
+  "latency_ms": 2178,
+  "cost_usd": 0.0175
+ },
+ "q16": {
+  "retrieved_ids": [
+   "ds-47-x",
+   "ds-16-a",
+   "ds-48-x",
+   "ds-49-x",
+   "ds-50-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-47-x",
+    "text": "Excerpt from ds-47-x: general description of the product family."
+   },
+   {
+    "id": "ds-16-a",
+    "text": "Excerpt from ds-16-a: general description of the product family."
+   },
+   {
+    "id": "ds-48-x",
+    "text": "Excerpt from ds-48-x: general description of the product family."
+   },
+   {
+    "id": "ds-49-x",
+    "text": "Excerpt from ds-49-x: general description of the product family."
+   },
+   {
+    "id": "ds-50-x",
+    "text": "Excerpt from ds-50-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 48 units for the VX-40 valve.",
+  "faithfulness": 0.86,
+  "latency_ms": 2264,
+  "cost_usd": 0.0174
+ },
+ "q17": {
+  "retrieved_ids": [
+   "ds-17-a",
+   "ds-48-x",
+   "ds-49-x",
+   "ds-50-x",
+   "ds-51-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-17-a",
+    "text": "Excerpt from ds-17-a: general description of the product family."
+   },
+   {
+    "id": "ds-48-x",
+    "text": "Excerpt from ds-48-x: general description of the product family."
+   },
+   {
+    "id": "ds-49-x",
+    "text": "Excerpt from ds-49-x: general description of the product family."
+   },
+   {
+    "id": "ds-50-x",
+    "text": "Excerpt from ds-50-x: general description of the product family."
+   },
+   {
+    "id": "ds-51-x",
+    "text": "Excerpt from ds-51-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 51 units for the MC-7 motor.",
+  "faithfulness": 0.87,
+  "latency_ms": 1500,
+  "cost_usd": 0.0176
+ },
+ "q18": {
+  "retrieved_ids": [
+   "ds-18-a",
+   "ds-49-x",
+   "ds-50-x",
+   "ds-51-x",
+   "ds-52-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-18-a",
+    "text": "Excerpt from ds-18-a: general description of the product family."
+   },
+   {
+    "id": "ds-49-x",
+    "text": "Excerpt from ds-49-x: general description of the product family."
+   },
+   {
+    "id": "ds-50-x",
+    "text": "Excerpt from ds-50-x: general description of the product family."
+   },
+   {
+    "id": "ds-51-x",
+    "text": "Excerpt from ds-51-x: general description of the product family."
+   },
+   {
+    "id": "ds-52-x",
+    "text": "Excerpt from ds-52-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 54 units for the FL-3 flow meter.",
+  "faithfulness": 0.89,
+  "latency_ms": 1607,
+  "cost_usd": 0.018
+ },
+ "q19": {
+  "retrieved_ids": [
+   "ds-19-a",
+   "ds-50-x",
+   "ds-51-x",
+   "ds-52-x",
+   "ds-53-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-19-a",
+    "text": "Excerpt from ds-19-a: general description of the product family."
+   },
+   {
+    "id": "ds-50-x",
+    "text": "Excerpt from ds-50-x: general description of the product family."
+   },
+   {
+    "id": "ds-51-x",
+    "text": "Excerpt from ds-51-x: general description of the product family."
+   },
+   {
+    "id": "ds-52-x",
+    "text": "Excerpt from ds-52-x: general description of the product family."
+   },
+   {
+    "id": "ds-53-x",
+    "text": "Excerpt from ds-53-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 57 units for the CP-9 control panel.",
+  "faithfulness": 0.86,
+  "latency_ms": 1582,
+  "cost_usd": 0.0165
+ },
+ "q20": {
+  "retrieved_ids": [
+   "ds-20-a",
+   "ds-51-x",
+   "ds-52-x",
+   "ds-53-x",
+   "ds-54-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-20-a",
+    "text": "Excerpt from ds-20-a: general description of the product family."
+   },
+   {
+    "id": "ds-51-x",
+    "text": "Excerpt from ds-51-x: general description of the product family."
+   },
+   {
+    "id": "ds-52-x",
+    "text": "Excerpt from ds-52-x: general description of the product family."
+   },
+   {
+    "id": "ds-53-x",
+    "text": "Excerpt from ds-53-x: general description of the product family."
+   },
+   {
+    "id": "ds-54-x",
+    "text": "Excerpt from ds-54-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 60 units for the PX-200 pump.",
+  "faithfulness": 0.91,
+  "latency_ms": 1527,
+  "cost_usd": 0.0162
+ },
+ "q21": {
+  "retrieved_ids": [
+   "ds-21-a",
+   "ds-52-x",
+   "ds-53-x",
+   "ds-54-x",
+   "ds-55-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-21-a",
+    "text": "Excerpt from ds-21-a: general description of the product family."
+   },
+   {
+    "id": "ds-52-x",
+    "text": "Excerpt from ds-52-x: general description of the product family."
+   },
+   {
+    "id": "ds-53-x",
+    "text": "Excerpt from ds-53-x: general description of the product family."
+   },
+   {
+    "id": "ds-54-x",
+    "text": "Excerpt from ds-54-x: general description of the product family."
+   },
+   {
+    "id": "ds-55-x",
+    "text": "Excerpt from ds-55-x: general description of the product family."
+   }
+  ],
+  "answer": "The q21 limit is roughly double the datasheet value.",
+  "faithfulness": 0.55,
+  "latency_ms": 2246,
+  "cost_usd": 0.018
+ },
+ "q22": {
+  "retrieved_ids": [
+   "ds-22-a",
+   "ds-53-x",
+   "ds-54-x",
+   "ds-55-x",
+   "ds-56-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-22-a",
+    "text": "Excerpt from ds-22-a: general description of the product family."
+   },
+   {
+    "id": "ds-53-x",
+    "text": "Excerpt from ds-53-x: general description of the product family."
+   },
+   {
+    "id": "ds-54-x",
+    "text": "Excerpt from ds-54-x: general description of the product family."
+   },
+   {
+    "id": "ds-55-x",
+    "text": "Excerpt from ds-55-x: general description of the product family."
+   },
+   {
+    "id": "ds-56-x",
+    "text": "Excerpt from ds-56-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 66 units for the MC-7 motor.",
+  "faithfulness": 0.87,
+  "latency_ms": 1552,
+  "cost_usd": 0.0171
+ },
+ "q23": {
+  "retrieved_ids": [
+   "ds-23-a",
+   "ds-54-x",
+   "ds-55-x",
+   "ds-56-x",
+   "ds-57-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-23-a",
+    "text": "Excerpt from ds-23-a: general description of the product family."
+   },
+   {
+    "id": "ds-54-x",
+    "text": "Excerpt from ds-54-x: general description of the product family."
+   },
+   {
+    "id": "ds-55-x",
+    "text": "Excerpt from ds-55-x: general description of the product family."
+   },
+   {
+    "id": "ds-56-x",
+    "text": "Excerpt from ds-56-x: general description of the product family."
+   },
+   {
+    "id": "ds-57-x",
+    "text": "Excerpt from ds-57-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 69 units for the FL-3 flow meter.",
+  "faithfulness": 0.91,
+  "latency_ms": 1698,
+  "cost_usd": 0.0156
+ },
+ "q24": {
+  "retrieved_ids": [
+   "ds-24-a",
+   "ds-55-x",
+   "ds-56-x",
+   "ds-57-x",
+   "ds-58-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-24-a",
+    "text": "Excerpt from ds-24-a: general description of the product family."
+   },
+   {
+    "id": "ds-55-x",
+    "text": "Excerpt from ds-55-x: general description of the product family."
+   },
+   {
+    "id": "ds-56-x",
+    "text": "Excerpt from ds-56-x: general description of the product family."
+   },
+   {
+    "id": "ds-57-x",
+    "text": "Excerpt from ds-57-x: general description of the product family."
+   },
+   {
+    "id": "ds-58-x",
+    "text": "Excerpt from ds-58-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 72 units for the CP-9 control panel.",
+  "faithfulness": 0.9,
+  "latency_ms": 1488,
+  "cost_usd": 0.0175
+ },
+ "q25": {
+  "retrieved_ids": [
+   "ds-25-a",
+   "ds-56-x",
+   "ds-57-x",
+   "ds-58-x",
+   "ds-59-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-25-a",
+    "text": "Excerpt from ds-25-a: general description of the product family."
+   },
+   {
+    "id": "ds-56-x",
+    "text": "Excerpt from ds-56-x: general description of the product family."
+   },
+   {
+    "id": "ds-57-x",
+    "text": "Excerpt from ds-57-x: general description of the product family."
+   },
+   {
+    "id": "ds-58-x",
+    "text": "Excerpt from ds-58-x: general description of the product family."
+   },
+   {
+    "id": "ds-59-x",
+    "text": "Excerpt from ds-59-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 75 units for the PX-200 pump.",
+  "faithfulness": 0.82,
+  "latency_ms": 1535,
+  "cost_usd": 0.0171
+ },
+ "q26": {
+  "retrieved_ids": [
+   "ds-26-a",
+   "ds-57-x",
+   "ds-58-x",
+   "ds-59-x",
+   "ds-60-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-26-a",
+    "text": "Excerpt from ds-26-a: general description of the product family."
+   },
+   {
+    "id": "ds-57-x",
+    "text": "Excerpt from ds-57-x: general description of the product family."
+   },
+   {
+    "id": "ds-58-x",
+    "text": "Excerpt from ds-58-x: general description of the product family."
+   },
+   {
+    "id": "ds-59-x",
+    "text": "Excerpt from ds-59-x: general description of the product family."
+   },
+   {
+    "id": "ds-60-x",
+    "text": "Excerpt from ds-60-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 78 units for the VX-40 valve.",
+  "faithfulness": 0.86,
+  "latency_ms": 1473,
+  "cost_usd": 0.0174
+ },
+ "q27": {
+  "retrieved_ids": [
+   "ds-27-a",
+   "ds-58-x",
+   "ds-59-x",
+   "ds-60-x",
+   "ds-31-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-27-a",
+    "text": "Excerpt from ds-27-a: general description of the product family."
+   },
+   {
+    "id": "ds-58-x",
+    "text": "Excerpt from ds-58-x: general description of the product family."
+   },
+   {
+    "id": "ds-59-x",
+    "text": "Excerpt from ds-59-x: general description of the product family."
+   },
+   {
+    "id": "ds-60-x",
+    "text": "Excerpt from ds-60-x: general description of the product family."
+   },
+   {
+    "id": "ds-31-x",
+    "text": "Excerpt from ds-31-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 81 units for the MC-7 motor.",
+  "faithfulness": 0.85,
+  "latency_ms": 3400,
+  "cost_usd": 0.0158
+ },
+ "q28": {
+  "retrieved_ids": [
+   "ds-28-a",
+   "ds-59-x",
+   "ds-60-x",
+   "ds-31-x",
+   "ds-32-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-28-a",
+    "text": "Excerpt from ds-28-a: general description of the product family."
+   },
+   {
+    "id": "ds-59-x",
+    "text": "Excerpt from ds-59-x: general description of the product family."
+   },
+   {
+    "id": "ds-60-x",
+    "text": "Excerpt from ds-60-x: general description of the product family."
+   },
+   {
+    "id": "ds-31-x",
+    "text": "Excerpt from ds-31-x: general description of the product family."
+   },
+   {
+    "id": "ds-32-x",
+    "text": "Excerpt from ds-32-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 84 units for the FL-3 flow meter.",
+  "faithfulness": 0.88,
+  "latency_ms": 1792,
+  "cost_usd": 0.0179
+ },
+ "q29": {
+  "retrieved_ids": [
+   "ds-29-a",
+   "ds-60-x",
+   "ds-31-x",
+   "ds-32-x",
+   "ds-33-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-29-a",
+    "text": "Excerpt from ds-29-a: general description of the product family."
+   },
+   {
+    "id": "ds-60-x",
+    "text": "Excerpt from ds-60-x: general description of the product family."
+   },
+   {
+    "id": "ds-31-x",
+    "text": "Excerpt from ds-31-x: general description of the product family."
+   },
+   {
+    "id": "ds-32-x",
+    "text": "Excerpt from ds-32-x: general description of the product family."
+   },
+   {
+    "id": "ds-33-x",
+    "text": "Excerpt from ds-33-x: general description of the product family."
+   }
+  ],
+  "answer": "Datasheet value 87 units for the CP-9 control panel.",
+  "faithfulness": 0.84,
+  "latency_ms": 1463,
+  "cost_usd": 0.0159
+ },
+ "q30": {
+  "retrieved_ids": [
+   "ds-30-a",
+   "ds-31-x",
+   "ds-32-x",
+   "ds-33-x",
+   "ds-34-x"
+  ],
+  "retrieved_chunks": [
+   {
+    "id": "ds-30-a",
+    "text": "Excerpt from ds-30-a: general description of the product family."
+   },
+   {
+    "id": "ds-31-x",
+    "text": "Excerpt from ds-31-x: general description of the product family."
+   },
+   {
+    "id": "ds-32-x",
+    "text": "Excerpt from ds-32-x: general description of the product family."
+   },
+   {
+    "id": "ds-33-x",
+    "text": "Excerpt from ds-33-x: general description of the product family."
+   },
+   {
+    "id": "ds-34-x",
+    "text": "Excerpt from ds-34-x: general description of the product family."
+   }
+  ],
+  "answer": "The q30 limit is roughly double the datasheet value.",
+  "faithfulness": 0.55,
+  "latency_ms": 1995,
+  "cost_usd": 0.0158
+ }
+}

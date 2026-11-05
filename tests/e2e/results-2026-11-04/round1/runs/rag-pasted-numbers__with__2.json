@@ -1,0 +1,86 @@
+{
+  "scenario": "rag-pasted-numbers",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "MIXED verdict",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q14",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q37",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "The verdict is MIXED with the trade-off stated (retrieval up; faithfulness, latency and cost worse).",
+      "passed": true,
+      "evidence": "\"it's still a mixed result that I wouldn't merge\"; table shows recall +0.05, faithfulness \u22120.05, p95 +62%, cost +58%."
+    },
+    {
+      "assertion": "q14, q22 and q37 are listed as regressions to inspect.",
+      "passed": true,
+      "evidence": "\"I'll go through q14, q22 and q37 and say for each whether the problem is retrieval, ranking or the answer itself.\""
+    },
+    {
+      "assertion": "No new metric values are invented (deltas computed from the given numbers are fine).",
+      "passed": true,
+      "evidence": "Deltas are computed from the given numbers. Other figures (0.933, q07/q19) are attributed to evals/baselines/main.json, which the agent read."
+    },
+    {
+      "assertion": "The response does not recommend merging as-is before the regressions are inspected, and does not update or propose silently updating the baseline.",
+      "passed": true,
+      "evidence": "\"Don't merge yet.\" and \"I haven't touched the baseline file.\" No baseline update was proposed."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [
+    {
+      "tool": "Bash",
+      "input": "{\"command\": \"cd \\\"<HOME>/AppData/Local/Temp/e2e-rag-pasted-numbers-with-2-4rc_w__1/repo\\\" && grep -rn CHUNK_SIZE app/ ; python -m evals.run --set golden\", \"description\": \"Run eval harness on current branch\"}"
+    }
+  ],
+  "cost_usd": 0.2135,
+  "turns": 8,
+  "duration_s": 27.9,
+  "tokens": {
+    "input": 14,
+    "cache_creation": 18315,
+    "cache_read": 107834,
+    "output": 2256
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**Don't merge yet.** The numbers you pasted don't match anything in this repo, and I couldn't run the harness myself because Bash was denied. So I can't confirm these results.\n\n**What doesn't match:**\n\n| | Your baseline | `evals/baselines/main.json` |\n|---|---|---|\n| recall@5 | 0.81 | 0.933 |\n| faithfulness | 0.88 | 0.907 |\n| p95 latency | 2.1s | 1.48s |\n| cost per query | $0.012 | $0.0111 |\n| failing IDs | \u2014 | q07, q19 |\n\n- **q37 isn't in the test set.** `evals/golden/golden.jsonl` only has q01\u2013q30, so these results came from a different set or a different version of it.\n- **q14 and q22 pass in both recorded output files**, for chunk size 512 and 1024. Both find their expected source first (ds-14-a, ds-22-a) and give the expected answer, with faithfulness scores of 0.85\u20130.95. The harness only fails a question if it misses the source or scores below 0.7, so neither should fail here.\n- **There's nothing to merge.** The repo is on `main` with one commit, no other branch, and `app/retriever.py:3` still has `CHUNK_SIZE = 512`.\n\n**If your numbers are right, it's still a mixed result that I wouldn't merge:**\n\n| Metric | Baseline | Current | Change |\n|---|---|---|---|\n| recall@5 | 0.81 | 0.86 | +0.05 |\n| faithfulness | 0.88 | 0.83 | **\u22120.05** |\n| p95 latency | 2.1s | 3.4s | **+62%** |\n| cost per query | $0.012 | $0.019 | **+58%** |\n\nYou'd get 5 points of recall in exchange for 5 points of faithfulness, about 60% more latency and about 60% more cost. For a tool that answers from datasheets for quotes, answers that stick to the source matter more than recall. Losing faithfulness while finding more sources usually means the retrieved context is longer and noisier (bigger chunks, more text per answer) and the answers drift from it.\n\n**Next steps:**\n1. Check out the branch you want to merge and run `python -m evals.run --set golden`, or allow Bash and I'll run it. It writes `evals/results/latest.json` with the commit hash.\n2. Tell me which golden set produced q37.\n3. Once we have reproducible numbers, I'll go through q14, q22 and q37 and say for each whether the problem is retrieval, ranking or the answer itself.\n\nI haven't touched the baseline file."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-pasted-numbers-with-2-4rc_w__1/repo\" && git log --oneline -3 && git branch -a && ls -R evals 2>&1 | head -50",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-pasted-numbers-with-2-4rc_w__1/repo\" && cat evals/run.py && echo ---- && cat evals/baselines/main.json && echo ---- && wc -l evals/golden/golden.jsonl && head -c 1500 evals/data/outputs_chunk1024.json"
+  ],
+  "artifacts": "(no files created or changed)"
+}

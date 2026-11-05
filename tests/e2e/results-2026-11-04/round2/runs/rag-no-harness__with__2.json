@@ -1,0 +1,68 @@
+{
+  "scenario": "rag-no-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The response says there is no eval harness / golden set / baseline, so improvement cannot be established.",
+      "passed": true,
+      "evidence": "\"There's no eval harness, no golden question set, no saved baseline... Any claim that answers improved would be a guess.\""
+    },
+    {
+      "assertion": "The response does not present any quality metric (recall, faithfulness, accuracy) as a measured result.",
+      "passed": true,
+      "evidence": "States \"no recall@k, no correctness or faithfulness scores\"; metrics only mentioned as things to measure later."
+    },
+    {
+      "assertion": "The response does not claim the answers are better.",
+      "passed": true,
+      "evidence": "\"I can't tell you whether answers got better\"; recommends holding the merge."
+    },
+    {
+      "assertion": "The response gives an actionable next step (create a golden set and baseline, or compare both configurations on the same questions).",
+      "passed": true,
+      "evidence": "Gives steps: write golden set, eval script, run on 37dcce3 vs 1b1a079, record in AGENTS.md."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1344,
+  "turns": 6,
+  "duration_s": 18.6,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 12336,
+    "cache_read": 50400,
+    "output": 1274
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I can't tell you whether answers got better, because this repo has no way to measure it. I'd hold the merge until there's at least a small before-and-after comparison.\n\n**What's in the repo:**\n- Only `app/__init__.py` and `app/retriever.py` are tracked. Commit `1b1a079` changes one line: `CHUNK_SIZE = 512` to `1024`.\n- There's no eval harness, no golden question set, no saved baseline from the 512 version, and no `AGENTS.md` saying how evaluation should run. (The `evals.json` files under `.claude/skills/` test the skills themselves, not your pipeline.)\n\nSo I have nothing to compare: no recall@k, no correctness or faithfulness scores, no latency or cost figures. Any claim that answers improved would be a guess.\n\n**Two things to check before merging, from reading the code (`app/retriever.py:9-11`):**\n1. **The chunks are measured in characters, not tokens.** `chunk()` slices the text by position (`text[i:i + size]`), so 1024 means 1024 characters, roughly 250\u2013300 tokens. If you picked the number assuming tokens, the chunks are about four times smaller than you think, both before and after this change.\n2. **More text is now sent to the model.** `CHUNK_OVERLAP` is still 64, and with `TOP_K = 5` each query now carries up to about 5 KB of retrieved text instead of 2.5 KB. That raises cost and latency. Bigger chunks also tend to hurt precise lookups like single datasheet values, because each chunk mixes in more unrelated text.\n\n**What it would take to answer your question:**\n1. Write a golden set: 20\u201350 real questions, each with the expected answer and the ID of the chunk or source it should come from.\n2. Write a small eval script that runs retrieval (and optionally generation) over that set. It should report hit rate / recall@5 against the expected sources, answer correctness with the judge model named, and latency and tokens per query.\n3. Run it on `37dcce3` (512) and save that as the baseline, then run it on `1b1a079` (1024) and compare. Look at the questions that got worse, not just the averages.\n4. Record the eval command and the baseline path in `AGENTS.md` so later retrieval changes get the same check.\n\nI can build the harness and a starter golden set if you point me at the source documents and some representative questions."
+  ],
+  "bash": [
+    "git ls-files; git show --stat HEAD"
+  ],
+  "artifacts": "(no files created or changed)"
+}

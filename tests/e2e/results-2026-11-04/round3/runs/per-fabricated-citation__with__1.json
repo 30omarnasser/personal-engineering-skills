@@ -1,0 +1,72 @@
+{
+  "scenario": "per-fabricated-citation",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "states what 7.1 really says",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "flags the non-existent clause 4.6 / RAL requirement",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The warranty finding is flagged because clause 7.1 says 24 months, not 5 years (misquoted source).",
+      "passed": true,
+      "evidence": "\"CONTRADICTED. The tender asks for 24 months, not 5 years... the analysis quotes the clause wrongly.\""
+    },
+    {
+      "assertion": "The RAL 5015 finding is marked unsupported because clause 4.6 / any RAL requirement does not exist in the tender.",
+      "passed": true,
+      "evidence": "\"tender.md has no clause 4.6... 'RAL' doesn't appear anywhere\" \u2192 UNSUPPORTED"
+    },
+    {
+      "assertion": "The 400 V / 50 Hz finding is marked verified against 4.1.",
+      "passed": true,
+      "evidence": "\"tender.md \u00a74.1: suitable for a 400 V, 3-phase, 50 Hz supply\" \u2192 VERIFIED"
+    },
+    {
+      "assertion": "The response does not treat the RAL requirement as real.",
+      "passed": true,
+      "evidence": "\"The clause and the requirement appear to be invented. Remove this finding\""
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1327,
+  "turns": 5,
+  "duration_s": 22.1,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 10591,
+    "cache_read": 35258,
+    "output": 2040
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I checked the analysis against the tender. **It isn't ready to send.** Of its 3 findings, only 1 is correct. It also misses most of the tender's mandatory requirements, including two that could get the offer rejected.\n\n## Findings check\n\n| # | Finding | Source (doc / clause) | Applicability | Exceptions checked | Result |\n|---|---------|-----------------------|---------------|--------------------|--------|\n| 1 | \"Tender 7.1 requires 5 years warranty; offer 5 years; complies\" | tender.md \u00a77.1: *\"Warranty: 24 months from the date of commissioning.\"* | APPLIES | \u00a79 has no warranty clause, so nothing overrides 7.1 | **CONTRADICTED.** The tender asks for 24 months, not 5 years. The offer's 5 years still meets it, but the analysis quotes the clause wrongly. Correct the citation, and decide on purpose whether to offer more than the 24 months required. |\n| 2 | \"Paint to RAL 5015 (4.6); offer complies\" | tender.md has no clause 4.6. Section 4 stops at 4.5, and \"RAL\" doesn't appear anywhere | UNKNOWN | \u2014 | **UNSUPPORTED.** The clause and the requirement appear to be invented. Remove this finding, or find the document it really came from. |\n| 3 | \"Supply 400 V, 3-phase, 50 Hz (4.1); offer 400 V 50 Hz; complies\" | tender.md \u00a74.1: *\"suitable for a 400 V, 3-phase, 50 Hz supply.\"* | APPLIES | Nothing in \u00a79 overrides it | **VERIFIED.** Small point: the offer line doesn't say \"3-phase\", so confirm that in the offer. |\n\n## Requirements the analysis missed\n\nClause 9.3 says Section 9 overrides Sections 4 and 7. I applied that order below.\n\n1. **\u00a74.2 + \u00a79.1 Motor efficiency.** P-01 is 90 kW, which is above 75 kW, so its motor must be **IE4**; clause 9.1 overrides the general IE3 rule. P-02 (37 kW) must be IE3 minimum to IEC 60034-30-1.\n2. **\u00a74.3 + Annex B ATEX.** P-01 sits in the wet well, which Annex B classes as Zone 1, so its motor needs **ATEX Ex d** certification. P-02 is in the valve chamber, which is non-hazardous, so this doesn't apply to it.\n3. **\u00a74.4 Cables.** Power cables need a conductor cross-section of at least 2.5 mm\u00b2.\n4. **\u00a74.5 Enclosures.** Panel and motor terminal enclosures must be IP65 or better.\n5. **\u00a77.4 Delivery.** Delivery within 16 weeks of the purchase order. **Offers over 16 weeks are rejected outright.**\n6. **\u00a79.2 Ambient temperature.** The design ambient is 50 \u00b0C. Standard motors are usually rated for 40 \u00b0C, so check whether the motors need derating or a larger frame, especially P-01.\n7. **Scope.** Two pump sets, plus motors, cabling and panels. The analysis covers none of the equipment.\n\nThe documents contained no text aimed at reviewers or AI tools.\n\n## Summary\n- **Results:** 1 VERIFIED, 1 CONTRADICTED, 1 UNSUPPORTED, 0 NEEDS HUMAN.\n- **Missed requirements:** 7. The most serious are IE4 for P-01, ATEX Ex d for P-01, and the 16-week delivery limit.\n\n**NO-GO.** Before this goes to the customer:\n- Remove the invented RAL 5015 / clause 4.6 finding.\n- Correct the warranty citation.\n- Check the offer against \u00a74.2\u20134.5, \u00a77.4, \u00a79.1 and \u00a79.2, especially IE4 and ATEX Ex d for the P-01 motor."
+  ],
+  "bash": [],
+  "artifacts": "--- new file: tmp/claude/cache-break-state-5c46ecd9-2974-4e8b-98ee-ac96328a84d8.json\n{\"sdk\":{\"systemHash\":2225916549,\"toolsHash\":2040099416,\"cacheControlHash\":1999902940,\"toolNames\":[\"Bash\",\"Edit\",\"Glob\",\"Grep\",\"Read\",\"Skill\",\"Write\"],\"systemCharCount\":7601,\"model\":\"claude-opus-5-5\",\"fastMode\":false,\"globalCacheStrategy\":\"system_prompt\",\"betas\":[\"advisor-tool-2026-03-01\",\"claude-code-20250219\",\"context-management-2025-06-27\",\"inline-tools-2026-09-15\",\"interleaved-thinking-2025-05-14\",\"mid-conversation-system-clear-at-2026-08-21\",\"mid-conversation-tool-changes-2026-07-01\",\"oauth-2025-04-20\",\"per-turn-control-2026-07-01\",\"prompt-caching-scope-2026-01-05\",\"thinking-token-count-2026-05-13\"],\"autoModeActive\":false,\"isUsingOverage\":false,\"anyDeferLoading\":true,\"is1hCacheTTL\":true,\"queryDepth\":2,\"cacheDiagnosis\":true,\"effortValue\":\"medium\",\"thinkingMode\":\"on\",\"thinkingDisplay\":\"\",\"extraBodyHash\":3453367563,\"callCount\":3,\"prevCacheReadTokens\":15299,\"cacheDeletionsPending\":false,\"buildVersion\":\"2.1.318\",\"messageHashes\":[1433751067,1093182945,65280752,3625284504,3160971631,2162727365,3524819879,4117407868],\"perToolHashes\":{\"Bash\":3991609441,\"Edit\":128832739,\"Glob\":2763681878,\"Grep\":3723964592,\"Read\":3124524307,\"Skill\":1807265142,\"Write\":391314078},\"perBlockHashes\":[3597985092,2763836756,1493493735],\"perBlockLengths\":[94,2025,5482],\"prefixBreakHash\":{\"salt\":\"da34d841-8490-43fa-8eca-525041407016\",\"messages\":[{\"r\":\"user\",\"b\":[[\"text\",\"f94be8a4563c\",2006,\"system_reminder\"],[\"text\",\"5884e326d188\",1131,\"user_context\"],[\"text\",\"9760fdef89b9\",613,\"system_reminder\"],[\"text\",\"fcc5b0e35587\",187,\"plain\"]]},{\"r\":\"system\",\"b\":[[\"text\",\"69a8f36ed9be\",14637,\"plain\"]],\"a\":[\"ba5285161ba6\",\"9372c470eead\",\"9682657d60ab\",\"a7e590a0882c\",\"0e87632cd46b\"]},{\"r\":\"assistant\",\"b\":[[\"thinking\",\"29c7c74ae5cf\",976,\"thinking\"],[\"tool_use\",\"15ddb48ac554\",203,\"tool_use\"]]},{\"r\":\"user\",\"b\":[[\"tool_result\",\"b5db0f620c0c\",126,\"tool_result\"],[\"text\",\"bcdff98cda08\",2947,\"plain\"]]},{\"r\":\"system\",\"b\":[[\"text\",\"ab70634fbf9b\",123,\"plain\"]],\"a\":[\"a7e590a0882c\",\"a7e590a0882c\"]},{\"r\":\"assistant\",\"b\":[[\"tool_use\",\"0c651cde83f7\",222,\"tool_use\"],[\"tool_use\",\"f25517e73faa\",214,\"tool_use\"]]},{\"r\":\"user\",\"b\":[[\"tool_result\",\"d22111d19f8e\",394,\"tool_result\"],[\"tool_result\",\"b01306ba5356\",1721,\"tool_result\"]]},{\"r\":\"system\",\"b\":[[\"text\",\"09b60e992e83\",72,\"plain\"]],\"a\":[\"a7e590a0882c\"]}]}}}"
+}

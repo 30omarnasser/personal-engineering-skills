@@ -1,0 +1,66 @@
+{
+  "scenario": "per-single-verified",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "marks it compliant",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The requirement is marked verified / compliant because IP66 meets or exceeds IP65.",
+      "passed": false,
+      "evidence": "Marked 'CONTRADICTED' and 'NEEDS HUMAN'; summary 'VERIFIED: 0'. The requirement is never marked verified."
+    },
+    {
+      "assertion": "The source (RFQ p.3 section 2.1) is cited and applicability (all panels) is stated.",
+      "passed": true,
+      "evidence": "Quotes 'RFQ p.3 \u00a72.1' and discusses 'all panels' applicability, though it disputes both."
+    },
+    {
+      "assertion": "The response does not invent other RFQ requirements as if they were in the source (noting that only one line was given is fine).",
+      "passed": false,
+      "evidence": "Adds motor terminal enclosures \u00a74.5, IE4 \u00a79.1, Ex d \u00a74.3 and 50 \u00b0C \u00a79.2 as RFQ requirements, beyond the one given line."
+    },
+    {
+      "assertion": "The response does not conclude no-go for this item.",
+      "passed": false,
+      "evidence": "Final verdict: '**NO-GO.**'"
+    }
+  ],
+  "rubric_passed": 1,
+  "rubric_total": 4,
+  "score": 0.4,
+  "denials": [],
+  "cost_usd": 0.1461,
+  "turns": 6,
+  "duration_s": 27.5,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 11545,
+    "cache_read": 51166,
+    "output": 2169
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I reviewed this against the only tender in the workspace, `tenders/T-2026-014/tender.md`. You didn't name the RFQ, so if this extraction belongs to a different document, the result for row 1 changes.\n\n## Review\n\n| # | Finding | Source (doc / clause) | Applicability | Exceptions checked | Result |\n|---|---------|-----------------------|---------------|--------------------|--------|\n| 1 | Enclosures IP65 or better | Cited: \"RFQ p.3 \u00a72.1, 'Enclosures shall be IP65 or better.'\" Neither the section nor the wording exists in T-2026-014. The closest clause is `tender.md:25`, \u00a74.5: \"Panel **and motor terminal** enclosures shall be IP65 or better.\" | APPLIES, but to panels **and** motor terminal enclosures, not \"all panels\" only | \u00a79 Special Conditions (9.1\u20139.3) doesn't override \u00a74.5. Annex B puts P-01 in a Zone 1 wet well, so its motor needs Ex d (\u00a74.3), and the Ex d motor's terminal box must also be IP65+ | **CONTRADICTED**: the citation doesn't trace and the scope is too narrow |\n| 2 | Our offer IP66 meets IP65 | IEC 60529: for the second digit, ratings up to 6 cover all lower ones, so IP66 includes IP65. (7 and 8 don't include 5 or 6 unless dual-marked.) Both have first digit 6, which means dust-tight. | APPLIES | The tender doesn't name an IEC 60529 edition. No datasheet was provided to show the offered panels are IP66 | **NEEDS HUMAN**: the rating comparison is correct, but the offered IP66 hasn't been checked against a datasheet |\n\n## Problems\n1. **The citation doesn't trace.** T-2026-014 has no \u00a72.1 and no page numbers, and the quote is a shortened version of \u00a74.5. Either the extraction came from a different document or it made up the citation. Fix it to \"\u00a74.5\" with the exact wording.\n2. **The scope is too narrow.** \u00a74.5 also covers **motor terminal enclosures**. The offer needs IP65+ terminal boxes for P-01 (90 kW, Ex d, wet well) and P-02 (37 kW, valve chamber), but nothing in the extraction or the offer mentions them.\n3. **Related point not covered:** \u00a79.2 sets a 50 \u00b0C ambient temperature. IP66 doesn't tell you whether the panels are rated for 50 \u00b0C, so check the panel derating and cooling separately.\n\n## Summary\n- VERIFIED: 0 \u00b7 UNSUPPORTED: 0 \u00b7 CONTRADICTED: 1 \u00b7 NEEDS HUMAN: 1\n- Missed requirements in this extraction: IP65+ for motor terminal enclosures (\u00a74.5).\n- Other tender requirements that sit outside this IP finding but affect the same equipment: IE4 for P-01 under \u00a79.1, which overrides \u00a74.2's IE3 for motors above 75 kW; Ex d for P-01 (\u00a74.3); and the 50 \u00b0C ambient (\u00a79.2).\n\n**NO-GO.** Before this goes into the offer, correct the citation to \u00a74.5, extend the scope to motor terminal enclosures, and attach datasheets showing IP65+ for both the panels and the motor terminal boxes."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

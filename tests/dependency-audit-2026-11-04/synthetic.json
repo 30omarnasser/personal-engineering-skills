@@ -1,0 +1,637 @@
+{
+  "coverage": {
+    "criteria": {
+      "advisories": {
+        "assessed_clean": 2,
+        "assessed_flagged": 4,
+        "unassessable": 0
+      },
+      "archived": {
+        "assessed_clean": 5,
+        "assessed_flagged": 0,
+        "unassessable": 1
+      },
+      "binary_artifacts": {
+        "assessed_clean": 4,
+        "assessed_flagged": 0,
+        "unassessable": 2
+      },
+      "code_review": {
+        "assessed_clean": 4,
+        "assessed_flagged": 0,
+        "unassessable": 2
+      },
+      "dangerous_workflow": {
+        "assessed_clean": 4,
+        "assessed_flagged": 0,
+        "unassessable": 2
+      },
+      "deprecated": {
+        "assessed_clean": 6,
+        "assessed_flagged": 0,
+        "unassessable": 0
+      },
+      "downloads": {
+        "assessed_clean": 0,
+        "assessed_flagged": 0,
+        "unassessable": 6
+      },
+      "install_script": {
+        "assessed_clean": 0,
+        "assessed_flagged": 0,
+        "unassessable": 6
+      },
+      "provenance": {
+        "assessed_clean": 0,
+        "assessed_flagged": 0,
+        "unassessable": 6
+      },
+      "publisher_concentration": {
+        "assessed_clean": 0,
+        "assessed_flagged": 0,
+        "unassessable": 6
+      },
+      "security_policy": {
+        "assessed_clean": 5,
+        "assessed_flagged": 0,
+        "unassessable": 1
+      },
+      "staleness": {
+        "assessed_clean": 5,
+        "assessed_flagged": 0,
+        "unassessable": 1
+      },
+      "token_permissions": {
+        "assessed_clean": 4,
+        "assessed_flagged": 0,
+        "unassessable": 2
+      }
+    },
+    "total_dependencies": 6
+  },
+  "dependencies": [
+    {
+      "dev": false,
+      "ecosystem": "PyPI",
+      "exists": true,
+      "flagged": [],
+      "name": "fastapi",
+      "non_registry_reason": null,
+      "repo": "github.com/fastapi/fastapi",
+      "signals": {
+        "advisories": {
+          "detail": "no advisories recorded",
+          "state": "assessed_clean",
+          "value": []
+        },
+        "archived": {
+          "detail": "repository is active",
+          "state": "assessed_clean",
+          "value": false
+        },
+        "binary_artifacts": {
+          "detail": "OpenSSF Scorecard has no report for this repository",
+          "state": "unassessable",
+          "value": null
+        },
+        "code_review": {
+          "detail": "OpenSSF Scorecard has no report for this repository",
+          "state": "unassessable",
+          "value": null
+        },
+        "dangerous_workflow": {
+          "detail": "OpenSSF Scorecard has no report for this repository",
+          "state": "unassessable",
+          "value": null
+        },
+        "deprecated": {
+          "detail": "release 0.162.0 is not yanked",
+          "state": "assessed_clean",
+          "value": false
+        },
+        "downloads": {
+          "detail": "PyPI's download counters are disabled and return -1",
+          "state": "unassessable",
+          "value": null
+        },
+        "install_script": {
+          "detail": "install-time execution depends on whether a wheel or an sdist is installed, which this collector does not determine",
+          "state": "unassessable",
+          "value": null
+        },
+        "provenance": {
+          "detail": "PyPI publish attestations are not read by this collector",
+          "state": "unassessable",
+          "value": null
+        },
+        "publisher_concentration": {
+          "detail": "PyPI publishes no upload ACL, so who can publish this package is not observable",
+          "state": "unassessable",
+          "value": null
+        },
+        "security_policy": {
+          "detail": "publishes a security policy",
+          "state": "assessed_clean",
+          "value": true
+        },
+        "staleness": {
+          "detail": "pushed 0 days ago",
+          "state": "assessed_clean",
+          "value": "2026-11-04T17:41:58Z"
+        },
+        "token_permissions": {
+          "detail": "OpenSSF Scorecard has no report for this repository",
+          "state": "unassessable",
+          "value": null
+        }
+      },
+      "version": "0.162.0",
+      "version_source": "latest-release"
+    },
+    {
+      "dev": false,
+      "ecosystem": "PyPI",
+      "exists": true,
+      "flagged": [
+        "advisories"
+      ],
+      "name": "jinja2",
+      "non_registry_reason": null,
+      "repo": "github.com/pallets/jinja",
+      "signals": {
+        "advisories": {
+          "detail": "12 advisories affect the pinned 2.10",
+          "state": "assessed_flagged",
+          "value": [
+            "GHSA-462w-v97r-4m45",
+            "GHSA-cpwx-vrp4-4pq7",
+            "GHSA-g3rq-g295-4j3m",
+            "GHSA-h5c8-rqwp-cp95",
+            "GHSA-h75v-3vvj-5mfj",
+            "GHSA-q2x7-8rv6-6q7h",
+            "PYSEC-2019-217",
+            "PYSEC-2021-66",
+            "PYSEC-2026-1471",
+            "PYSEC-2026-1473",
+            "PYSEC-2026-1474",
+            "PYSEC-2026-1475"
+          ]
+        },
+        "archived": {
+          "detail": "repository is active",
+          "state": "assessed_clean",
+          "value": false
+        },
+        "binary_artifacts": {
+          "detail": "Binary-Artifacts scores 10/10",
+          "state": "assessed_clean",
+          "value": 10
+        },
+        "code_review": {
+          "detail": "Code-Review scores 0/10",
+          "state": "assessed_clean",
+          "value": 0
+        },
+        "dangerous_workflow": {
+          "detail": "Dangerous-Workflow scores 10/10",
+          "state": "assessed_clean",
+          "value": 10
+        },
+        "deprecated": {
+          "detail": "release 2.10 is not yanked",
+          "state": "assessed_clean",
+          "value": false
+        },
+        "downloads": {
+          "detail": "PyPI's download counters are disabled and return -1",
+          "state": "unassessable",
+          "value": null
+        },
+        "install_script": {
+          "detail": "install-time execution depends on whether a wheel or an sdist is installed, which this collector does not determine",
+          "state": "unassessable",
+          "value": null
+        },
+        "provenance": {
+          "detail": "PyPI publish attestations are not read by this collector",
+          "state": "unassessable",
+          "value": null
+        },
+        "publisher_concentration": {
+          "detail": "PyPI publishes no upload ACL, so who can publish this package is not observable",
+          "state": "unassessable",
+          "value": null
+        },
+        "security_policy": {
+          "detail": "publishes a security policy",
+          "state": "assessed_clean",
+          "value": true
+        },
+        "staleness": {
+          "detail": "pushed 17 months ago",
+          "state": "assessed_clean",
+          "value": "2025-06-14T20:35:04Z"
+        },
+        "token_permissions": {
+          "detail": "Token-Permissions scores 0/10",
+          "state": "assessed_clean",
+          "value": 0
+        }
+      },
+      "version": "2.10",
+      "version_source": "manifest-pin"
+    },
+    {
+      "dev": false,
+      "ecosystem": "PyPI",
+      "exists": true,
+      "flagged": [],
+      "name": "nose",
+      "non_registry_reason": null,
+      "repo": null,
+      "signals": {
+        "advisories": {
+          "detail": "no advisories recorded",
+          "state": "assessed_clean",
+          "value": []
+        },
+        "archived": {
+          "detail": "no source repository could be resolved for this package",
+          "state": "unassessable",
+          "value": null
+        },
+        "binary_artifacts": {
+          "detail": "no source repository to score",
+          "state": "unassessable",
+          "value": null
+        },
+        "code_review": {
+          "detail": "no source repository to score",
+          "state": "unassessable",
+          "value": null
+        },
+        "dangerous_workflow": {
+          "detail": "no source repository to score",
+          "state": "unassessable",
+          "value": null
+        },
+        "deprecated": {
+          "detail": "release 1.3.7 is not yanked",
+          "state": "assessed_clean",
+          "value": false
+        },
+        "downloads": {
+          "detail": "PyPI's download counters are disabled and return -1",
+          "state": "unassessable",
+          "value": null
+        },
+        "install_script": {
+          "detail": "install-time execution depends on whether a wheel or an sdist is installed, which this collector does not determine",
+          "state": "unassessable",
+          "value": null
+        },
+        "provenance": {
+          "detail": "PyPI publish attestations are not read by this collector",
+          "state": "unassessable",
+          "value": null
+        },
+        "publisher_concentration": {
+          "detail": "PyPI publishes no upload ACL, so who can publish this package is not observable",
+          "state": "unassessable",
+          "value": null
+        },
+        "security_policy": {
+          "detail": "no source repository could be resolved for this package",
+          "state": "unassessable",
+          "value": null
+        },
+        "staleness": {
+          "detail": "no source repository could be resolved for this package",
+          "state": "unassessable",
+          "value": null
+        },
+        "token_permissions": {
+          "detail": "no source repository to score",
+          "state": "unassessable",
+          "value": null
+        }
+      },
+      "version": "1.3.7",
+      "version_source": "manifest-pin"
+    },
+    {
+      "dev": false,
+      "ecosystem": "PyPI",
+      "exists": true,
+      "flagged": [
+        "advisories"
+      ],
+      "name": "pyyaml",
+      "non_registry_reason": null,
+      "repo": "github.com/yaml/pyyaml",
+      "signals": {
+        "advisories": {
+          "detail": "4 advisories affect the pinned 5.3",
+          "state": "assessed_flagged",
+          "value": [
+            "GHSA-6757-jp84-gxfx",
+            "GHSA-8q59-q68h-6hv4",
+            "PYSEC-2020-96",
+            "PYSEC-2021-142"
+          ]
+        },
+        "archived": {
+          "detail": "repository is active",
+          "state": "assessed_clean",
+          "value": false
+        },
+        "binary_artifacts": {
+          "detail": "Binary-Artifacts scores 10/10",
+          "state": "assessed_clean",
+          "value": 10
+        },
+        "code_review": {
+          "detail": "Code-Review scores 2/10",
+          "state": "assessed_clean",
+          "value": 2
+        },
+        "dangerous_workflow": {
+          "detail": "Dangerous-Workflow scores 10/10",
+          "state": "assessed_clean",
+          "value": 10
+        },
+        "deprecated": {
+          "detail": "release 5.3 is not yanked",
+          "state": "assessed_clean",
+          "value": false
+        },
+        "downloads": {
+          "detail": "PyPI's download counters are disabled and return -1",
+          "state": "unassessable",
+          "value": null
+        },
+        "install_script": {
+          "detail": "install-time execution depends on whether a wheel or an sdist is installed, which this collector does not determine",
+          "state": "unassessable",
+          "value": null
+        },
+        "provenance": {
+          "detail": "PyPI publish attestations are not read by this collector",
+          "state": "unassessable",
+          "value": null
+        },
+        "publisher_concentration": {
+          "detail": "PyPI publishes no upload ACL, so who can publish this package is not observable",
+          "state": "unassessable",
+          "value": null
+        },
+        "security_policy": {
+          "detail": "publishes a security policy",
+          "state": "assessed_clean",
+          "value": true
+        },
+        "staleness": {
+          "detail": "pushed 27 days ago",
+          "state": "assessed_clean",
+          "value": "2026-10-07T22:17:52Z"
+        },
+        "token_permissions": {
+          "detail": "Token-Permissions scores 0/10",
+          "state": "assessed_clean",
+          "value": 0
+        }
+      },
+      "version": "5.3",
+      "version_source": "manifest-pin"
+    },
+    {
+      "dev": false,
+      "ecosystem": "PyPI",
+      "exists": true,
+      "flagged": [
+        "advisories"
+      ],
+      "name": "requests",
+      "non_registry_reason": null,
+      "repo": "github.com/psf/requests",
+      "signals": {
+        "advisories": {
+          "detail": "10 advisories affect the pinned 2.19.0",
+          "state": "assessed_flagged",
+          "value": [
+            "GHSA-9hjg-9r4m-mvj7",
+            "GHSA-9wx4-h78v-vm56",
+            "GHSA-gc5v-m9x4-r6x2",
+            "GHSA-j8r2-6x86-q33q",
+            "GHSA-x84v-xcm2-53pg",
+            "PYSEC-2018-28",
+            "PYSEC-2023-74",
+            "PYSEC-2026-1872",
+            "PYSEC-2026-1873",
+            "PYSEC-2026-2275"
+          ]
+        },
+        "archived": {
+          "detail": "repository is active",
+          "state": "assessed_clean",
+          "value": false
+        },
+        "binary_artifacts": {
+          "detail": "Binary-Artifacts scores 10/10",
+          "state": "assessed_clean",
+          "value": 10
+        },
+        "code_review": {
+          "detail": "Code-Review scores 10/10",
+          "state": "assessed_clean",
+          "value": 10
+        },
+        "dangerous_workflow": {
+          "detail": "Dangerous-Workflow scores 10/10",
+          "state": "assessed_clean",
+          "value": 10
+        },
+        "deprecated": {
+          "detail": "release 2.19.0 is not yanked",
+          "state": "assessed_clean",
+          "value": false
+        },
+        "downloads": {
+          "detail": "PyPI's download counters are disabled and return -1",
+          "state": "unassessable",
+          "value": null
+        },
+        "install_script": {
+          "detail": "install-time execution depends on whether a wheel or an sdist is installed, which this collector does not determine",
+          "state": "unassessable",
+          "value": null
+        },
+        "provenance": {
+          "detail": "PyPI publish attestations are not read by this collector",
+          "state": "unassessable",
+          "value": null
+        },
+        "publisher_concentration": {
+          "detail": "PyPI publishes no upload ACL, so who can publish this package is not observable",
+          "state": "unassessable",
+          "value": null
+        },
+        "security_policy": {
+          "detail": "publishes a security policy",
+          "state": "assessed_clean",
+          "value": true
+        },
+        "staleness": {
+          "detail": "pushed 2 days ago",
+          "state": "assessed_clean",
+          "value": "2026-11-02T16:55:12Z"
+        },
+        "token_permissions": {
+          "detail": "Token-Permissions scores 10/10",
+          "state": "assessed_clean",
+          "value": 10
+        }
+      },
+      "version": "2.19.0",
+      "version_source": "manifest-pin"
+    },
+    {
+      "dev": false,
+      "ecosystem": "PyPI",
+      "exists": true,
+      "flagged": [
+        "advisories"
+      ],
+      "name": "urllib3",
+      "non_registry_reason": null,
+      "repo": "github.com/urllib3/urllib3",
+      "signals": {
+        "advisories": {
+          "detail": "26 advisories affect the pinned 1.24.1",
+          "state": "assessed_flagged",
+          "value": [
+            "GHSA-2xpw-w6gg-jr37",
+            "GHSA-34jh-p97f-mpxf",
+            "GHSA-38jv-5279-wg99",
+            "GHSA-g4mx-q9vg-27p4",
+            "GHSA-gm62-xv2j-4w53",
+            "GHSA-gwvm-45gx-3cf8",
+            "GHSA-mh33-7rrq-662w",
+            "GHSA-pq67-6m6q-mj2v",
+            "GHSA-qccp-gfcp-xxvc",
+            "GHSA-r64q-w8jr-g9qp",
+            "GHSA-v845-jxx5-vc9f",
+            "GHSA-vxq7-64xx-v4gw",
+            "GHSA-wqvq-5m8c-6g24",
+            "PYSEC-2019-132",
+            "PYSEC-2019-133",
+            "PYSEC-2020-148",
+            "PYSEC-2023-192",
+            "PYSEC-2023-207",
+            "PYSEC-2023-212",
+            "PYSEC-2026-141",
+            "PYSEC-2026-1994",
+            "PYSEC-2026-1995",
+            "PYSEC-2026-1996",
+            "PYSEC-2026-1998",
+            "PYSEC-2026-1999",
+            "PYSEC-2026-4177"
+          ]
+        },
+        "archived": {
+          "detail": "repository is active",
+          "state": "assessed_clean",
+          "value": false
+        },
+        "binary_artifacts": {
+          "detail": "Binary-Artifacts scores 10/10",
+          "state": "assessed_clean",
+          "value": 10
+        },
+        "code_review": {
+          "detail": "Code-Review scores 8/10",
+          "state": "assessed_clean",
+          "value": 8
+        },
+        "dangerous_workflow": {
+          "detail": "Dangerous-Workflow scores 10/10",
+          "state": "assessed_clean",
+          "value": 10
+        },
+        "deprecated": {
+          "detail": "release 1.24.1 is not yanked",
+          "state": "assessed_clean",
+          "value": false
+        },
+        "downloads": {
+          "detail": "PyPI's download counters are disabled and return -1",
+          "state": "unassessable",
+          "value": null
+        },
+        "install_script": {
+          "detail": "install-time execution depends on whether a wheel or an sdist is installed, which this collector does not determine",
+          "state": "unassessable",
+          "value": null
+        },
+        "provenance": {
+          "detail": "PyPI publish attestations are not read by this collector",
+          "state": "unassessable",
+          "value": null
+        },
+        "publisher_concentration": {
+          "detail": "PyPI publishes no upload ACL, so who can publish this package is not observable",
+          "state": "unassessable",
+          "value": null
+        },
+        "security_policy": {
+          "detail": "publishes a security policy",
+          "state": "assessed_clean",
+          "value": true
+        },
+        "staleness": {
+          "detail": "pushed 2 days ago",
+          "state": "assessed_clean",
+          "value": "2026-11-02T06:31:59Z"
+        },
+        "token_permissions": {
+          "detail": "Token-Permissions scores 10/10",
+          "state": "assessed_clean",
+          "value": 10
+        }
+      },
+      "version": "1.24.1",
+      "version_source": "manifest-pin"
+    }
+  ],
+  "ecosystems": {
+    "PyPI": 6
+  },
+  "notes": [
+    "cache directory ownership was not verified: os.getuid is POSIX-only, so a cache at <HOME>\\AppData\\Local\\Temp\\claude\\5d6096a35e425d74\\016e5144-fb6d-4528-97f3-d474144c2932\\scratchpad\\audit\\cache owned by another user would not be detected on this platform. Keep the cache under your own user profile, or pass --cache with a private path.",
+    "1 dependencies are specified as a version range with no lockfile, so their advisories were matched against the current latest release rather than against what this project installs \u2014 commit a lockfile for an exact answer: fastapi",
+    "Optional tooling detected: npm. Not installed, so not used: bundler-audit, cargo-audit, osv-scanner, pip-audit.",
+    "Direct dependencies only. Advisories attach to the package that ships the affected code, so an umbrella package can look clean while its components are not \u2014 rails 5.0.0 reports 0 advisories where actionpack 5.0.0 reports 10. Transitive dependencies were not examined: no lockfile resolves the transitive tree (package-lock.json, uv.lock, or a go 1.17+ go.mod).",
+    "HTTP sources: 22 fetched, 6 served from cache (oldest 0.0h old), 0 refetched as stale, 0 unavailable offline, 0 errors."
+  ],
+  "scan": {
+    "commit": null,
+    "manifests": [
+      "requirements.txt"
+    ],
+    "path": "<HOME>\\AppData\\Local\\Temp\\claude\\5d6096a35e425d74\\016e5144-fb6d-4528-97f3-d474144c2932\\scratchpad\\audit\\synthetic",
+    "scanned_at": "2026-11-04T18:56:08+00:00",
+    "subject": "synthetic"
+  },
+  "target": "<HOME>\\AppData\\Local\\Temp\\claude\\5d6096a35e425d74\\016e5144-fb6d-4528-97f3-d474144c2932\\scratchpad\\audit\\synthetic",
+  "transitive": {
+    "checked": 0,
+    "examined": false,
+    "excluded_direct": 0,
+    "flagged": [],
+    "lockfile_entries": 0,
+    "reason": "no lockfile resolves the transitive tree (package-lock.json, uv.lock, or a go 1.17+ go.mod)",
+    "sources": [],
+    "total": 0,
+    "unverifiable": []
+  }
+}

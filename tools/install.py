@@ -2,7 +2,7 @@
 """Install skills from this library into Claude Code (global) or a project.
 
 Usage (run from anywhere; the library location is found from this file):
-  python tools/install.py global                 # 01, 02, 03, 07 -> ~/.claude/skills
+  python tools/install.py global                 # 01, 02, 03 -> ~/.claude/skills
   python tools/install.py project /path/to/repo  # interactive pick from 04, 05, 06 -> <repo>/.claude/skills
   python tools/install.py project . --all        # all project-scope skills, no prompt
   python tools/install.py project . --pick security-model,rag-evaluation
@@ -17,7 +17,9 @@ import argparse, json, shutil, sys
 from pathlib import Path
 
 LIB = Path(__file__).resolve().parent.parent
-GLOBAL_CATS = ["01-core-engineering", "02-planning-architecture", "03-review-workflow", "07-skill-development"]
+# skill-creator moved to _optional/ on 2026-11-04: Claude Code already provides it as the
+# account-synced `anthropic-skills:skill-creator`, and installing both lists it twice.
+GLOBAL_CATS = ["01-core-engineering", "02-planning-architecture", "03-review-workflow"]
 PROJECT_CATS = ["04-security-correctness", "05-ai-engineering", "06-custom-domain"]
 
 
@@ -86,13 +88,13 @@ def cmd_hook(a):
     src = LIB / "_infra" / "precompact-backup" / "precompact_backup.py"
     shutil.copy2(src, hooks / src.name)
     settings = home / "settings.json"
-    cfg = json.loads(settings.read_text()) if settings.exists() else {}
+    cfg = json.loads(settings.read_text(encoding="utf-8")) if settings.exists() else {}
     cmd = f"python3 {hooks / src.name}" if sys.platform != "win32" else f'python "{hooks / src.name}"'
     entry = {"matcher": "", "hooks": [{"type": "command", "command": cmd}]}
     pre = cfg.setdefault("hooks", {}).setdefault("PreCompact", [])
     if not any("precompact_backup" in h.get("command", "") for e in pre for h in e.get("hooks", [])):
         pre.append(entry)
-        settings.write_text(json.dumps(cfg, indent=2))
+        settings.write_text(json.dumps(cfg, indent=2, ensure_ascii=False), encoding="utf-8")
         print(f"  + PreCompact hook added to {settings}")
     else:
         print("  = PreCompact hook already configured")

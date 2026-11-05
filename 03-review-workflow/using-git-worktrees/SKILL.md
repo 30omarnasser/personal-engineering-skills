@@ -110,9 +110,12 @@ if [ -f package.json ]; then npm install; fi
 # Rust
 if [ -f Cargo.toml ]; then cargo build; fi
 
-# Python
-if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-if [ -f pyproject.toml ]; then poetry install; fi
+# Python — pick the tool the lockfile names; never run poetry in a uv project
+if [ -f uv.lock ]; then uv sync
+elif [ -f poetry.lock ]; then poetry install
+elif [ -f requirements.txt ]; then pip install -r requirements.txt
+elif [ -f pyproject.toml ]; then pip install -e .
+fi
 
 # Go
 if [ -f go.mod ]; then go mod download; fi

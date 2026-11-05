@@ -46,6 +46,9 @@ The scripts enforce two rules worth knowing before you read their output:
    uv run {baseDir}/scripts/render.py <out-dir>/findings.json --out <out-dir>/report.md
    ```
 
+   `{baseDir}` is this skill's directory (the one containing this SKILL.md). The scripts are
+   stdlib-only, so where `uv` is not installed `python {baseDir}/scripts/collect.py ...` works the same.
+
    Expect a few minutes for ~50 dependencies — several HTTP requests per dependency,
    more with many Go modules, and slower without authenticated `gh`. If `collect.py`
    exits non-zero, it is refusing to report — relay its message verbatim instead of

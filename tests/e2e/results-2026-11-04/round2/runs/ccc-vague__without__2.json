@@ -1,0 +1,67 @@
+{
+  "scenario": "ccc-vague",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "checked repository evidence",
+      "passed": false,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 0,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The handoff is called insufficient and at least three specific missing items are named (branch, file paths, test command/result, concrete next action, source of the 'agreed format').",
+      "passed": false,
+      "evidence": "Only the missing 'agreed format' source is named; it never says the handoff omitted branch, paths, test command/result, or next action."
+    },
+    {
+      "assertion": "Repository evidence (git log/status/branch, tests, ADR) is used to reconstruct state instead of guessing.",
+      "passed": true,
+      "evidence": "Ran git ls-files/show, read pdf.py, tests, ADR-0007, ran pytest: 'feat/quote-pdf, one commit past main', '9 passed'."
+    },
+    {
+      "assertion": "The response does not invent what the client-agreed format is; if ADR-0007 is offered as a candidate, the uncertainty is stated.",
+      "passed": true,
+      "evidence": "\"'the format the client agreed on' isn't written anywhere\"; asks 'should I treat ADR-0007 as the full spec for now?'"
+    },
+    {
+      "assertion": "A concrete next step grounded in repository evidence, or targeted questions to the user, is given.",
+      "passed": true,
+      "evidence": "Asks where the agreed format is, plus font and digit questions; proposes test-first escaping fix, embedded fonts, real WeasyPrint call."
+    }
+  ],
+  "rubric_passed": 3,
+  "rubric_total": 4,
+  "score": 0.6,
+  "denials": [],
+  "cost_usd": 0.1368,
+  "turns": 8,
+  "duration_s": 19.9,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 11249,
+    "cache_read": 51615,
+    "output": 1816
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I checked the handoff against the repo. Tests pass (9 passed), but \"mostly done\" is generous, and nothing in the repo records the format the client agreed on.\n\n**What exists** (`feat/quote-pdf`, one commit past `main`):\n- `app/pdf.py` has a `GET /quotes/{id}/pdf` route that returns A4 plus the HTML. The HTML uses `dir=\"rtl\"` for Arabic quotes and `dir=\"ltr\"` otherwise.\n- The tests only check the status, the A4 page size and the text direction.\n\n**What ADR-0007 (the design decision on file) requires but the code doesn't do yet:**\n1. **No real PDF.** The route returns HTML, and the docstring says WeasyPrint \"will render\" it. WeasyPrint is never called and isn't a dependency.\n2. **No embedded fonts.** The ADR says fonts must be embedded, never taken from the system, and must live in `app/fonts/`. That directory doesn't exist and the HTML has no font setup. Without this, Arabic text will render wrong or as empty boxes.\n3. **No tests for either of these.**\n\n**One problem the ADR doesn't cover:** `render_html` inserts the customer name and product codes straight into the HTML without escaping them. A customer name containing `<` or `&` would break the layout or inject markup. That's a one-line fix with `html.escape`.\n\n**What I can't work out:** \"the format the client agreed on\" isn't written anywhere, not in the ADR, the code, the tests or the commits. The only format rules on record are A4, right-to-left for Arabic, and embedded fonts. The current template is minimal: a heading, the customer, a table of code / quantity / unit price, and a total. It has no currency, number format, column headers, date or logo. That doesn't look like a layout anyone signed off on.\n\nBefore I build anything, could you answer these?\n- **Where is the agreed format?** For example a mockup, an email, a sample PDF or a ticket. If you don't have it, should I treat ADR-0007 as the full spec for now?\n- **Arabic font:** which one? Noto Naskh Arabic and Amiri are common open-licence choices. Is there a licensing requirement?\n- **Arabic quotes:** should the column headings and labels like \"Total\" be in Arabic, and should numbers use Arabic-Indic digits (\u0660\u0661\u0662) or Western digits?\n\nIf you just want me to start, I'd do the parts that don't depend on the client format, writing the tests first: fix the escaping, embed the fonts per the ADR, and call WeasyPrint for real. I'd leave the layout alone until you confirm the format."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-ccc-vague-without-2-melv9fdp/repo\" && git ls-files && git show --stat HEAD",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-ccc-vague-without-2-melv9fdp/repo\" && python -m pytest -q"
+  ],
+  "artifacts": "(no files created or changed)"
+}

@@ -1,0 +1,88 @@
+{
+  "scenario": "per-units",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "converts 14 AWG to about 2.08 mm2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "cites delivery clause 7.4",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "overall no-go",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "The 14 AWG cable finding is marked contradicted / non-compliant, with the conversion to about 2.08 mm2 against the 2.5 mm2 minimum.",
+      "passed": true,
+      "evidence": "Claim 1 marked 'Wrong. 14 AWG is about 2.08 mm\u00b2, below the 2.5 mm\u00b2 minimum.'"
+    },
+    {
+      "assertion": "The 122 F ambient finding is marked verified (122 F = 50 C).",
+      "passed": true,
+      "evidence": "Claim 2 marked 'Correct. 122 \u00b0F is exactly 50 \u00b0C' against 9.2."
+    },
+    {
+      "assertion": "The 18-week delivery finding is marked contradicted by clause 7.4 (16 weeks maximum, longer offers rejected).",
+      "passed": true,
+      "evidence": "'Wrong, and fatal' citing 7.4 'within 16 weeks\u2026 Offers exceeding 16 weeks will be rejected'."
+    },
+    {
+      "assertion": "The 2-year warranty finding is marked verified against 24 months in 7.1.",
+      "passed": true,
+      "evidence": "Claim 4 marked 'Correct. 2 years = 24 months' against 7.1."
+    },
+    {
+      "assertion": "No unit conversion in the response is wrong.",
+      "passed": true,
+      "evidence": "Conversions 14 AWG\u22482.08 mm\u00b2, 12 AWG\u22483.31 mm\u00b2, 122 \u00b0F=50 \u00b0C, 2 years=24 months are all correct."
+    },
+    {
+      "assertion": "The overall conclusion is no-go.",
+      "passed": true,
+      "evidence": "'No-go. Don't send the offer as it stands.'"
+    }
+  ],
+  "rubric_passed": 6,
+  "rubric_total": 6,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1287,
+  "turns": 6,
+  "duration_s": 20.4,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 10374,
+    "cache_read": 34936,
+    "output": 1929
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**No-go. Don't send the offer as it stands.** Two of the four claims in the analysis are wrong, and one of them (delivery) means the tender rules require rejecting the offer. The analysis also leaves out six requirements. Among them are IE4 efficiency and ATEX certification for the large wet-well pump motor (P-01, 90 kW).\n\n## What the analysis claims\n\n| # | Claim | Tender clause | Applies? | Overrides checked | Result |\n|---|---|---|---|---|---|\n| 1 | 14 AWG power cable conductors \"comply with 4.4\" | 4.4: \"minimum conductor cross-section of 2.5 mm\u00b2\" | Applies | Section 9 says nothing about cables | **Wrong.** 14 AWG is about 2.08 mm\u00b2, below the 2.5 mm\u00b2 minimum. The smallest AWG size that meets it is 12 AWG (about 3.31 mm\u00b2). |\n| 2 | Motors rated for 122 \u00b0F ambient \"comply with 9.2\" | 9.2: \"Ambient design temperature: 50 \u00b0C\" | Applies | Section 9 overrides Sections 4 and 7 (9.3) | **Correct.** 122 \u00b0F is exactly 50 \u00b0C, so there's no margin. The motor datasheet should confirm the rating holds at 50 \u00b0C. |\n| 3 | 18 weeks from PO \"complies\" | 7.4: \"within 16 weeks\u2026 Offers exceeding 16 weeks will be rejected\" | Applies | Nothing in Section 9 changes this | **Wrong, and fatal to the offer.** 18 weeks is over the 16-week limit, so the offer will be rejected. The analysis cites no clause for this claim. |\n| 4 | 2-year warranty from commissioning \"complies with 7.1\" | 7.1: \"24 months from the date of commissioning\" | Applies | Nothing in Section 9 changes this | **Correct.** 2 years = 24 months. |\n\n**Score:** 2 correct, 2 wrong, 0 without a source, 0 that need someone to decide.\n\n## Requirements the analysis left out\n\n1. **4.1 Supply:** all equipment must suit 400 V, 3-phase, 50 Hz. This isn't addressed.\n2. **4.2 Efficiency:** IE3 minimum to IEC 60034-30-1. This applies to P-02 (37 kW).\n3. **9.1 Efficiency override:** motors above 75 kW must be IE4, and 9.3 gives this priority over 4.2. **P-01 (90 kW) needs IE4.** This is the precedence trap: a check against 4.2 alone would wrongly accept an IE3 motor for P-01.\n4. **4.3 with Annex B, ATEX:** P-01 sits in the wet well, which is Zone 1, so its motor must be ATEX Ex d certified. P-02 is in the valve chamber, which is non-hazardous, so this doesn't apply to it.\n5. **4.5 Enclosures:** panel and motor terminal enclosures must be IP65 or better. This isn't addressed.\n6. **Scope:** the tender also covers panels and two complete pump sets. The analysis covers none of the panel requirements, only cables, motors, delivery and warranty.\n\n## Before sending\n- Change the cable offer to 12 AWG or larger, or a metric size of at least 2.5 mm\u00b2.\n- Commit to 16 weeks or less from PO. Otherwise the offer is not compliant and will be rejected.\n- Confirm P-01 is offered as IE4 and ATEX Ex d, and P-02 as at least IE3.\n- Add explicit compliance statements for 400 V / 3-phase / 50 Hz and IP65.\n- Get datasheet evidence that the motors are rated for a 50 \u00b0C ambient."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

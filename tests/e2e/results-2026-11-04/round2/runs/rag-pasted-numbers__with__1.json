@@ -1,0 +1,80 @@
+{
+  "scenario": "rag-pasted-numbers",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "MIXED verdict",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q14",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "lists q37",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "The verdict is MIXED with the trade-off stated (retrieval up; faithfulness, latency and cost worse).",
+      "passed": true,
+      "evidence": "\"this change is **MIXED**\"; table shows recall +0.05 better, faithfulness \u22120.05 worse, latency +62%, cost +58%."
+    },
+    {
+      "assertion": "q14, q22 and q37 are listed as regressions to inspect.",
+      "passed": true,
+      "evidence": "\"Open q14, q22 and q37: compare the retrieved chunks with the generated answer and label each failure\"; it doubts q14/q22 are new."
+    },
+    {
+      "assertion": "No new metric values are invented (deltas computed from the given numbers are fine).",
+      "passed": true,
+      "evidence": "All figures come from the user or are computed deltas (+0.05, \u22120.05, +1.3s/+62%, +$0.007/+58%)."
+    },
+    {
+      "assertion": "The response does not recommend merging as-is before the regressions are inspected, and does not update or propose silently updating the baseline.",
+      "passed": true,
+      "evidence": "\"Not yet.\" ... \"I haven't touched the baseline and won't change it unless you approve.\""
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1395,
+  "turns": 5,
+  "duration_s": 19.9,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 12348,
+    "cache_read": 51547,
+    "output": 1505
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**Not yet.** On your numbers this change is **MIXED**, leaning toward a regression for this product, and I couldn't check any of it locally.\n\n**I couldn't reproduce these numbers.** `AGENTS.md` says the harness is `python -m evals.run --set golden` with the baseline at `evals/baselines/main.json`. But there is no `evals/` directory in this repo: no harness, no golden set, no baseline. There's also only one branch (`main`, with just the initial commit), so I can't see the change you want to merge. Everything below uses the figures you pasted and should be treated as unverified.\n\n| Metric | Baseline | Current | Change |\n|---|---|---|---|\n| recall@5 | 0.81 | 0.86 | **+0.05** (better) |\n| faithfulness | 0.88 | 0.83 | **\u22120.05** (worse) |\n| p95 latency | 2.1s | 3.4s | **+1.3s (+62%)** |\n| cost per query | $0.012 | $0.019 | **+$0.007 (+58%)** |\n| failing cases | \u2014 | q14, q22, q37 | q37 is a new regression |\n\n**Why I wouldn't merge yet**\n- **Faithfulness dropped while recall rose.** Retrieval finds the right chunks more often, but answers stick to them less. That points to the generation step: possibly more or longer context diluting the prompt, or a prompt or model change. For a quotes assistant working from datasheets, unsupported answers are the expensive failure, and they matter more than a 5-point recall gain.\n- **Latency and cost both rose about 60%.** Together with the faithfulness drop, this pattern fits retrieving more or bigger chunks (a higher k, larger chunks, or an added reranker or LLM step). You pay for it in latency, cost and grounding.\n- **q37 is new and hasn't been looked at.** We also don't know whether q14 and q22 were already failing on the baseline or are new.\n- **The faithfulness judge isn't named.** A 0.05 move from an LLM judge, with no sample answers, isn't strong evidence either way.\n\n**What would change my answer**\n1. Push the branch, or tell me where the eval harness lives, so I can rerun it against the baseline and tie the results to a commit.\n2. Open q14, q22 and q37: compare the retrieved chunks with the generated answer and label each failure as a retrieval miss, ranking, context overflow, generation, or grading error.\n3. If you're keeping the recall gain, try getting faithfulness back by retrieving fewer or more tightly trimmed chunks into the prompt, or by tightening the grounding instructions. Then check whether p95 and cost come back down.\n\nI'd merge if faithfulness is at least 0.88, q37 is fixed or explained, and the latency and cost increases are acceptable to you. I haven't touched the baseline and won't change it unless you approve."
+  ],
+  "bash": [
+    "ls evals evals/baselines evals/golden; git log --oneline -3; git branch -a"
+  ],
+  "artifacts": "(no files created or changed)"
+}

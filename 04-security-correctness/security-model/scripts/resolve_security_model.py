@@ -381,6 +381,11 @@ def main(argv: list[str] | None = None) -> int:
         if cmd == "check":
             p.add_argument("--scope", help="check only the chain for this path (default: every policy)")
     args = parser.parse_args(argv)
+    # Policies are UTF-8 and may hold characters the console code page cannot encode
+    # (Windows defaults to cp1252); writing them must not crash the resolver.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure") and (stream.encoding or "").lower() not in {"utf-8", "utf8"}:
+            stream.reconfigure(encoding="utf-8", errors="replace")
     if "/" in args.name or args.name in {"", ".", ".."}:
         parser.error("--name must be a bare filename")
     try:

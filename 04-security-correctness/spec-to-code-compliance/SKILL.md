@@ -31,7 +31,8 @@ Not for writing or improving documentation, though it produces the list of what 
 
 ## Do not check requirements in this context
 
-Run `/spec-to-code-compliance:spec-compliance <path>`. The slash command takes a path; to name the
+**If the Trail of Bits plugin is installed** (`/plugin install trailofbits/skills/plugins/spec-to-code-compliance`),
+run `/spec-to-code-compliance:spec-compliance <path>`. The slash command takes a path; to name the
 specification directly or widen the fan-out, ask for the run with those values — "run spec-compliance on
 ./contracts against SPEC.md, checking 20 requirements" — and they reach the script as `{path, spec, limit}`.
 Typing the object literally after the slash command does not work; it arrives as a string and becomes the path.
@@ -42,6 +43,28 @@ writes `spec-compliance/REPORT.md` plus one file per requirement under `spec-com
 compact records come back here.
 
 For a single requirement, dispatch the `spec-to-code-compliance:spec-compliance-checker` agent at it.
+
+**Standalone fallback (this library ships the skill without the plugin's workflow script).** When that slash
+command and agent are not available, reproduce the same shape with ordinary subagents rather than checking
+inline:
+
+1. Read the specification yourself and split it into individually checkable requirements, quoted verbatim.
+   A sentence that requires two things is two requirements.
+2. For each requirement, dispatch one `general-purpose` subagent whose prompt is the full text of
+   [agents/spec-compliance-checker.md](agents/spec-compliance-checker.md) followed by the requirement, the
+   document it came from, and the code path to search. Tell it to write its analysis to
+   `spec-compliance/requirements/<n>.md` in the format of [ANALYSIS_FORMAT.md](resources/ANALYSIS_FORMAT.md)
+   and return only the compact record. Run them in parallel.
+3. For every divergence (`partial`, `contradicted`, `absent`, `stronger-than-spec`), dispatch two fresh
+   subagents that did not produce it: one re-reads the code, one re-reads the document, each trying to refute
+   it. Drop what either knocks down; mark as `unverified` what both failed to settle.
+4. Dispatch one subagent to sweep the reverse direction: behaviour in the code that no document mentions.
+5. Write `spec-compliance/REPORT.md`: alignment matrix, surviving divergences worst first (severity from
+   [DIVERGENCE_RUBRIC.md](resources/DIVERGENCE_RUBRIC.md)), undocumented behaviour, documentation problems, and
+   the `notChecked` / `unverified` lists.
+
+The `audit-context-building` skill mentioned above is also part of the Trail of Bits plugin set and is not in
+this library; without it, build the system model by reading the entry points and the data model first.
 
 This is not a preference about where output lands. The check does not fit in one context window if it is done
 honestly: judging one requirement means reading the enforcement, its callees, and its callers, and doing that

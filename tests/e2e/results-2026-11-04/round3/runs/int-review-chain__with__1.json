@@ -1,0 +1,74 @@
+{
+  "scenario": "int-review-chain",
+  "skill": null,
+  "kind": "interop",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": null,
+  "skills_called": [],
+  "observe": {
+    "requesting-code-review": false,
+    "find-bugs": false
+  },
+  "checks": [
+    {
+      "type": "post_cmd",
+      "desc": "no tracked file modified (report-only request)",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The unescaped interpolation of customer / sku into HTML is reported as an injection issue.",
+      "passed": true,
+      "evidence": "\"HTML injection into the PDF renderer (high). `customer` and `sku` go into the HTML without escaping (`app/pdf.py:12-13`).\""
+    },
+    {
+      "assertion": "The missing font embedding is noted as a gap against ADR-0007 (or as pending work).",
+      "passed": true,
+      "evidence": "ADR table row: \"Fonts embedded, never from the system | \u274c Missing | `app/fonts/` doesn't exist, and there's no `@font-face`\""
+    },
+    {
+      "assertion": "The response separates the general review from the security pass, or clearly covers both.",
+      "passed": true,
+      "evidence": "Separate sections \"## ADR-0007 compliance\" and \"## Security pass\" cover both the general review and the security review."
+    },
+    {
+      "assertion": "No code was changed.",
+      "passed": true,
+      "evidence": "No files were created or changed; the agent states \"changed no code\" and only ran read and inspection tools."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [
+    {
+      "tool": "Bash",
+      "input": "{\"command\": \"python -m pytest -q\", \"description\": \"Run the test suite\"}"
+    }
+  ],
+  "cost_usd": 0.183,
+  "turns": 10,
+  "duration_s": 31.0,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 14473,
+    "cache_read": 86153,
+    "output": 2492
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I reviewed the branch and changed no code. I couldn't run the tests because the sandbox blocked `python -m pytest -q`, so nothing below has been run. It all comes from reading the diff (`app/pdf.py` and `tests/test_pdf.py`, +36 lines) against `main`.\n\n**Verdict: not ready to merge.** Only the RTL direction rule from ADR-0007 is actually met, and there is one serious security problem.\n\n## ADR-0007 compliance\n\n| ADR requirement | Status | Evidence |\n|---|---|---|\n| Use WeasyPrint | \u274c Missing | Nothing imports or depends on WeasyPrint. `route_quote_pdf` returns an HTML string, and the module docstring says \"rendering is stubbed\". |\n| HTML templates | \u274c Missing | The commit message says \"route and template\", but no template file was added. The HTML is built inline with f-strings in `app/pdf.py:12-14`. |\n| A4 page size | \u26a0\ufe0f In name only | `PAGE_SIZE = \"A4\"` is just a value in the response dict (`app/pdf.py:19`). It never reaches the HTML, which has no `@page { size: A4 }` rule, so WeasyPrint would ignore it. The A4 test only checks that dict value. |\n| `dir=\"rtl\"` for Arabic | \u2705 Met | `app/pdf.py:11`, tested for both `ar` and `en`. Adding `lang=\"ar\"` would also help the font fallback and text shaping. |\n| Fonts embedded, never from the system | \u274c Missing | `app/fonts/` doesn't exist, and there's no `@font-face` anywhere. As written, Arabic text would use whatever system fonts are installed, which the ADR rules out. Nothing tests for an embedded font. |\n| WeasyPrint as a system dependency in the image | \u274c Missing | The branch has no dependency or image change. |\n\n## Security pass\n\n1. **HTML injection into the PDF renderer (high).** `customer` and `sku` go into the HTML without escaping (`app/pdf.py:12-13`). Once WeasyPrint is connected, any quote field a user can edit can:\n   - inject markup that fetches resources with WeasyPrint's default URL fetcher. For example, `<img src=\"http://169.254.169.254/...\">` makes the server request internal addresses (SSRF), and `file://` URLs or `<link rel=\"attachment\" href=\"file:///...\">` could embed local server files in the PDF.\n   - change the layout or content of a document that customers receive.\n\n   Fix: escape every value with `html.escape` or a Jinja2 template with autoescaping on, and give WeasyPrint a restricted `url_fetcher` that only allows the bundled `app/fonts/` and assets.\n2. **No authorization on `GET /quotes/{id}/pdf` (medium\u2013high).** Anyone who can reach the route can download any quote by counting through IDs (IDOR). Customer names and prices leak this way. The route should check that the caller owns or may see the quote.\n3. **Unknown ID gives a 500 instead of a 404 (low).** `get_quote` does `QUOTES[quote_id]` and raises `KeyError`. Depending on the framework, this can also expose a stack trace. No test covers a missing ID.\n4. **No secrets were added.** `.env` stays gitignored.\n\n## Test gaps\n- No test escapes hostile input, for example a customer named `<img src=x>`.\n- No test checks for an unknown ID, the A4 CSS rule, or font embedding.\n- The tests only check the HTML string, so nothing confirms that a PDF actually renders.\n\n## Before merging\nEither finish the ADR items (WeasyPrint call, a template with autoescaping, `@page` A4, fonts bundled in `app/fonts/` with `@font-face`, the dependency in the image), or merge this explicitly as a stub with those items tracked. Either way, fix the escaping and authorization issues before this route is exposed."
+  ],
+  "bash": [
+    "git diff --stat main...HEAD"
+  ],
+  "artifacts": "(no files created or changed)"
+}

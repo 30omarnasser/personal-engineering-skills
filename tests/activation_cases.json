@@ -1,0 +1,278 @@
+[
+ {
+  "id": "pos-systematic-debugging",
+  "kind": "positive",
+  "expect": "systematic-debugging",
+  "prompt": "pytest tests/test_quotes.py started failing this morning with KeyError: 'customer_id' inside build_quote() in app/quotes.py line 88. It passed yesterday. Traceback ends in _merge_customer(). Fix it."
+ },
+ {
+  "id": "pos-tdd",
+  "kind": "positive",
+  "expect": "test-driven-development",
+  "prompt": "Add a discount_total(items, pct) helper to app/pricing.py that applies a percentage discount to the line totals and never returns a negative number."
+ },
+ {
+  "id": "pos-verification",
+  "kind": "positive",
+  "expect": "verification-before-completion",
+  "prompt": "I just fixed the pagination off-by-one in app/routes/items.py. It's done - commit it and open the PR."
+ },
+ {
+  "id": "pos-modern-python",
+  "kind": "positive",
+  "expect": "modern-python",
+  "prompt": "Set up a new Python project for a document-ingestion CLI: uv, ruff, src layout, pytest with coverage, Python 3.12."
+ },
+ {
+  "id": "pos-research",
+  "kind": "positive",
+  "expect": "research",
+  "prompt": "Research how FastAPI BackgroundTasks differ from Starlette's and from Celery for our ingestion jobs, and write the findings with sources as a markdown note under docs/."
+ },
+ {
+  "id": "pos-domain-modeling",
+  "kind": "positive",
+  "expect": "domain-modeling",
+  "prompt": "In our quotes service the words 'order', 'quote' and 'offer' get used interchangeably in code and tickets. Help me pin down the canonical terms and update GLOSSARY.md."
+ },
+ {
+  "id": "pos-domain-modeling-adr",
+  "kind": "positive",
+  "expect": "domain-modeling",
+  "prompt": "We decided to store quote revisions as an append-only table in Postgres instead of versioned JSON documents. Record this as an ADR."
+ },
+ {
+  "id": "pos-requesting-code-review",
+  "kind": "positive",
+  "expect": "requesting-code-review",
+  "prompt": "I've finished the quote PDF export feature on branch feat/quote-pdf (3 commits since main). Review the work against the plan in docs/plan.md before I merge."
+ },
+ {
+  "id": "pos-worktrees",
+  "kind": "positive",
+  "expect": "using-git-worktrees",
+  "prompt": "I want to start the Arabic RTL rendering work in parallel with what's on my current branch without disturbing this checkout. Set up an isolated workspace for it and make sure tests pass there first."
+ },
+ {
+  "id": "pos-find-bugs",
+  "kind": "positive",
+  "expect": "find-bugs",
+  "prompt": "Do a security sweep of the changes on this branch before merge: injection, auth checks, IDOR, anything in the upload handler."
+ },
+ {
+  "id": "pos-pbt",
+  "kind": "positive",
+  "expect": "property-based-testing",
+  "prompt": "app/parsers.py has parse_rfq_reference() for strings like 'RFQ-2026-0042/A' and format_rfq_reference() that prints them back. Write tests that prove they round-trip for every valid reference, not just a few examples."
+ },
+ {
+  "id": "pos-security-model",
+  "kind": "positive",
+  "expect": "security-model",
+  "prompt": "Write a SECURITY_MODEL.md for this FastAPI service so the security scanner knows the scope: tenant isolation is the key invariant, uploaded PDFs are untrusted, admin routes are internal only."
+ },
+ {
+  "id": "pos-spec-compliance",
+  "kind": "positive",
+  "expect": "spec-to-code-compliance",
+  "prompt": "Compare the implementation in app/ against the protocol described in docs/SPEC.md and tell me which requirements the code contradicts, which are missing, and what the code does that the spec never mentions."
+ },
+ {
+  "id": "pos-supply-chain",
+  "kind": "positive",
+  "expect": "supply-chain-risk-auditor",
+  "prompt": "Audit this project's dependencies (pyproject.toml and uv.lock) for supply-chain risk - abandoned packages, known advisories, install scripts - before we hand it to the customer."
+ },
+ {
+  "id": "pos-hf-local",
+  "kind": "positive",
+  "expect": "huggingface-local-models",
+  "prompt": "I have a 16GB M2 MacBook Air. Which GGUF quant of Qwen3 8B should I run with llama.cpp for a local coding assistant, and how do I serve it with an OpenAI-compatible endpoint?"
+ },
+ {
+  "id": "pos-skill-creator",
+  "kind": "positive",
+  "expect": "skill-creator",
+  "prompt": "Create a new skill for this repo that reviews Alembic migrations for destructive operations, and set up a couple of test prompts so we can check it works.",
+  "note": "skill-creator is optional in the library; on Claude Code the account-synced anthropic-skills:skill-creator satisfies this case"
+ },
+ {
+  "id": "eval-ccc-1",
+  "kind": "positive",
+  "expect": "context-continuity-check",
+  "prompt": "I'm starting fresh from this handoff. What's next?\n\nHANDOFF: Working on quote export. Mostly done. Tests pass. Next: finish the remaining bits. Keep the format the client agreed on."
+ },
+ {
+  "id": "eval-ccc-2",
+  "kind": "positive",
+  "expect": "context-continuity-check",
+  "prompt": "Before I /compact, check this handoff is complete:\nGoal: add PDF export to /quotes/{id}. Branch: feat/quote-pdf. Decided: WeasyPrint, A4, Arabic RTL support (ADR-007). Done: template + route, commit a1b2c3d, `uv run pytest tests/test_quotes.py` 14 passed. Pending: 1) RTL font embedding 2) add endpoint to docs. Open question: logo source."
+ },
+ {
+  "id": "eval-ccc-3",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Rename the variable `qty` to `quantity` in utils.py."
+ },
+ {
+  "id": "eval-per-1",
+  "kind": "positive",
+  "expect": "procurement-evidence-review",
+  "prompt": "Review this tender analysis before I send the offer.\n\nTENDER EXCERPT:\n4.2 All motors shall be IE3 efficiency class minimum, 400V/50Hz.\n4.3 Motors installed in Zone 1 areas (see Annex B) shall be ATEX Ex d certified.\n9.1 Special Conditions: Notwithstanding 4.2, pump motors above 75kW shall be IE4.\n\nAGENT OUTPUT:\n1. Motors must be IE3 - our offer of IE3 for all motors including the 90kW pump complies.\n2. ATEX not required.\n3. Voltage 400V/60Hz."
+ },
+ {
+  "id": "eval-per-2",
+  "kind": "positive",
+  "expect": "procurement-evidence-review",
+  "prompt": "Check this RFQ extraction: Requirement 'IP65 enclosure' - source: RFQ p.3 section 2.1 'Enclosures shall be IP65 or better.' Applicability: applies to all panels. Our offer: IP66."
+ },
+ {
+  "id": "eval-per-3",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Can you review my FastAPI pagination code for off-by-one bugs?\n\n@app.get('/items')\ndef items(page: int = 1, size: int = 20):\n    return db[page*size:(page+1)*size]",
+  "expect_not": "procurement-evidence-review"
+ },
+ {
+  "id": "eval-rag-2",
+  "kind": "positive",
+  "expect": "rag-evaluation",
+  "prompt": "Here are eval results. Baseline: recall@5 0.81, faithfulness 0.88, p95 2.1s, $0.012/q. Current: recall@5 0.86, faithfulness 0.83, p95 3.4s, $0.019/q. Failing IDs: q14, q22, q37 (new). Should I merge?"
+ },
+ {
+  "id": "eval-rag-3",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Explain the difference between BM25 and dense retrieval."
+ },
+ {
+  "id": "neg-ie3",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "What does 'IE3 efficiency class' mean for an electric motor, roughly?"
+ },
+ {
+  "id": "neg-summarize",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Summarize what this repo does in two sentences."
+ },
+ {
+  "id": "neg-dockerfile",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Write a Dockerfile for this FastAPI app using Python 3.12."
+ },
+ {
+  "id": "neg-pytest-speed",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Our pytest suite takes 9 minutes. What are the usual ways to run it in parallel?",
+  "expect_not": "systematic-debugging"
+ },
+ {
+  "id": "neg-hf-choose",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Which open-weight model is best at Arabic OCR right now?",
+  "expect_not": "huggingface-local-models"
+ },
+ {
+  "id": "neg-threat-deck",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Write a threat model for our SaaS as a short slide outline for the board meeting.",
+  "expect_not": "security-model"
+ },
+ {
+  "id": "neg-example-tests",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Write a few example-based unit tests for the existing discount_total() function in app/pricing.py.",
+  "expect_not": "property-based-testing"
+ },
+ {
+  "id": "neg-branch",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Create a git branch feat/rtl from main and switch to it.",
+  "expect_not": "using-git-worktrees"
+ },
+ {
+  "id": "neg-trivia",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "What's the capital of Australia?"
+ },
+ {
+  "id": "neg-handoff-manual",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Write a short summary of what we did in this session so I remember tomorrow.",
+  "expect_not": "handoff"
+ },
+ {
+  "id": "neg-askmatt-manual",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Which of the installed skills should I use to plan a new feature?",
+  "expect_not": "ask-matt"
+ },
+ {
+  "id": "neg-grill-manual",
+  "kind": "negative",
+  "expect": null,
+  "prompt": "Help me think through whether to add a caching layer in front of the retriever.",
+  "expect_not": "grill-with-docs"
+ },
+ {
+  "id": "obs-review-generic",
+  "kind": "observe",
+  "prompt": "Review my branch before I open the PR."
+ },
+ {
+  "id": "obs-ci-hurry",
+  "kind": "observe",
+  "prompt": "The CI deploy failed on the code-signing step; we're in a hurry, just make it pass."
+ },
+ {
+  "id": "obs-add-auth",
+  "kind": "observe",
+  "prompt": "Add JWT authentication to the FastAPI app."
+ },
+ {
+  "id": "obs-compact-ready",
+  "kind": "observe",
+  "prompt": "I'm about to /compact. Is everything the next session needs written down?"
+ },
+ {
+  "id": "obs-skill-trigger",
+  "kind": "observe",
+  "prompt": "Make the rag-evaluation skill in .claude/skills trigger more reliably."
+ },
+ {
+  "id": "obs-dep-bump",
+  "kind": "observe",
+  "prompt": "Bump fastapi to 0.120 in pyproject.toml and sync."
+ },
+ {
+  "id": "obs-readme-vs-code",
+  "kind": "observe",
+  "prompt": "Check whether the guarantees stated in README.md match what app/main.py actually does."
+ },
+ {
+  "id": "manual-handoff",
+  "kind": "observe",
+  "prompt": "/handoff next session will implement RTL font embedding"
+ },
+ {
+  "id": "manual-grill-with-docs",
+  "kind": "observe",
+  "prompt": "/grill-with-docs add PDF export to the quotes endpoint"
+ },
+ {
+  "id": "manual-ask-matt",
+  "kind": "observe",
+  "prompt": "/ask-matt I have a flaky integration test, what flow fits?"
+ }
+]

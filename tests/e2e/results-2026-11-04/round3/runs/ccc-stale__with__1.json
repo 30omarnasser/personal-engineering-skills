@@ -1,0 +1,76 @@
+{
+  "scenario": "ccc-stale",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "context-continuity-check"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the test command",
+      "passed": true,
+      "detail": "python -m pytest -q"
+    },
+    {
+      "type": "regex",
+      "desc": "reports the failing test",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The commit mismatch is detected (handoff says a1b2c3d; the repository HEAD differs / has an extra WIP commit).",
+      "passed": true,
+      "evidence": "\"handoff gives HEAD as a1b2c3d, but that commit isn't in the history. The real HEAD is e776211\" (WIP commit)"
+    },
+    {
+      "assertion": "The test mismatch is detected: one test fails (test_arabic_font_embedded) and the count is not 14 passed.",
+      "passed": true,
+      "evidence": "\"suite actually gives 1 failed, 9 passed\"; test_arabic_font_embedded fails"
+    },
+    {
+      "assertion": "The handoff is reported as stale / inaccurate, with corrected values or a proposed patch.",
+      "passed": true,
+      "evidence": "Table marks items stale; provides 'Proposed handoff patch' with HEAD e776211, 1 failed, 9 passed"
+    },
+    {
+      "assertion": "The test result is established by running the test command, not by trusting the handoff.",
+      "passed": true,
+      "evidence": "Tool calls include Bash: python -m pytest -q"
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.175,
+  "turns": 12,
+  "duration_s": 24.3,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 14886,
+    "cache_read": 75293,
+    "output": 2036
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "The handoff gets the plan right but its state is out of date. HEAD, the test results and the known failures don't match the repo, and the newest commit isn't mentioned.\n\n## Checklist (handoff vs. repo)\n\n| Item | Status | Evidence |\n|---|---|---|\n| Goal | present | \"add PDF export at GET /quotes/{id}/pdf\". This matches the docstring at `app/pdf.py:18`. |\n| Constraints / decisions | present | WeasyPrint, A4, RTL for Arabic, embedded fonts. All of these are in `docs/adr/0007-pdf-rendering-weasyprint.md` (status: accepted). |\n| File paths / sources | present | `app/pdf.py`, `tests/test_pdf.py` and the ADR path all exist. |\n| Done, with evidence | **stale** | It says `14 passed`, but the suite actually gives **1 failed, 9 passed** (10 tests, not 14). It also names no commit hash. |\n| Branch / HEAD | **stale** | The branch `feat/quote-pdf` is correct. The handoff gives HEAD as `a1b2c3d`, but that commit isn't in the history. The real HEAD is `e776211`. |\n| Pending, in order | mostly present | The order is right, but item 1 has already started (see below). |\n| Known failures | **stale** | It says \"none\", but `tests/test_rtl_font.py::test_arabic_font_embedded` fails: the HTML has no `@font-face`. |\n| Missing work | **missing** | Commit `e776211` (\"WIP: test for Arabic font embedding\") added `tests/test_rtl_font.py`, and the handoff doesn't mention it. |\n\nOther repo facts: the working tree is clean, `app/fonts/` doesn't exist yet, and the repo has no README, so pending item 2 means creating one. The handoff contains no secrets and no destructive commands.\n\n## Rebuilt next step\nMake `tests/test_rtl_font.py` pass:\n- Add an Arabic font file under `app/fonts/`.\n- In `render_html` (`app/pdf.py:9`), add an `@font-face` rule that embeds that font from `app/fonts/`. ADR-0007 says fonts are embedded and never taken from the system.\n- The `dir=\"rtl\"` logic is already in place.\n- Then run `python -m pytest -q`; all 10 tests should pass.\n\nOne open question: which Arabic font should it be? Neither the ADR nor the handoff says, so you need to pick one. Its license also needs to allow embedding.\n\n## Proposed handoff patch\n```\nBranch: feat/quote-pdf (HEAD e776211)\nDone: app/pdf.py + tests/test_pdf.py (cda58ff). WIP failing test tests/test_rtl_font.py (e776211).\n`python -m pytest -q` -> 1 failed, 9 passed (test_arabic_font_embedded: expected, no @font-face yet).\nPending, in order:\n1. Add Arabic font to app/fonts/ (font choice TBD) and embed via @font-face in render_html; make test_rtl_font pass.\n2. Create README.md and document GET /quotes/{id}/pdf (no README exists yet).\nKnown failures: test_arabic_font_embedded (expected until step 1).\nOpen question: which Arabic font, and is its license OK for embedding?\n```\n\nShould I apply this patch to `HANDOFF.md`? Once you choose a font, I can also start on step 1."
+  ],
+  "bash": [
+    "git log -5 --stat",
+    "git status",
+    "python -m pytest -q"
+  ],
+  "artifacts": "(no files created or changed)"
+}

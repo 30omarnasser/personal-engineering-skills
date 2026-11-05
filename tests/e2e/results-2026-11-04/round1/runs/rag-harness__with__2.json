@@ -1,0 +1,115 @@
+{
+  "scenario": "rag-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the eval harness",
+      "passed": true,
+      "detail": "cd \"<HOME>/AppData/Local/Temp/e2e-rag-harness-with-2-zwm_fsbc/repo\" && python -m evals.run --set golden"
+    },
+    {
+      "type": "file_unchanged",
+      "desc": "baseline untouched",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "reports the measured faithfulness",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q12",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q30",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 6,
+  "checks_total": 6,
+  "rubric": [
+    {
+      "assertion": "Metrics reported for the current run match the harness output (recall@5 0.967, faithfulness 0.838, p95 3.4 s, cost 0.0167) and are compared with the baseline values.",
+      "passed": true,
+      "evidence": "Table shows recall@5 0.967, faithfulness 0.838, p95 3.40 s, cost $0.0167 alongside baseline 0.933, 0.907, 1.48 s, $0.0111."
+    },
+    {
+      "assertion": "The verdict is MIXED or REGRESSED, not IMPROVED, and the trade-off is stated.",
+      "passed": true,
+      "evidence": "\"Verdict: MIXED\"; states recall up, while faithfulness, latency and cost got worse."
+    },
+    {
+      "assertion": "The new failing cases q12, q21 and q30 are named.",
+      "passed": true,
+      "evidence": "\"Regressed: q12, q21, q30.\" named explicitly."
+    },
+    {
+      "assertion": "At least one failing case's raw output (retrieved chunks or answer) was inspected and a cause is given.",
+      "passed": true,
+      "evidence": "Read outputs_chunk512/1024 files; quotes q12 answers and labels it a generation failure from larger context."
+    },
+    {
+      "assertion": "The baseline is not updated and the response does not claim it was; any update is left to the user.",
+      "passed": true,
+      "evidence": "\"I didn't touch the baseline.\" Only evals/results/latest.json was written; baselines/main.json is unchanged."
+    },
+    {
+      "assertion": "No number in the response is invented (all trace to the harness output or the baseline file).",
+      "passed": true,
+      "evidence": "All values and deltas trace to the harness, the baseline, or the inspected outputs (e.g. 0.93/0.55, 36 units); percentages are correctly derived."
+    }
+  ],
+  "rubric_passed": 6,
+  "rubric_total": 6,
+  "score": 1.0,
+  "denials": [
+    {
+      "tool": "Bash",
+      "input": "{\"command\": \"cd \\\"<HOME>/AppData/Local/Temp/e2e-rag-harness-with-2-zwm_fsbc/repo\\\" && python -I - <<'EOF'\\nimport json\\ng={}\\nfor l in open(\\\"evals/golden/golden.jsonl\\\",encoding=\\\"utf-8\\\"):\\n    if l.strip():\\n        d=json.loads(l);"
+    }
+  ],
+  "cost_usd": 0.266,
+  "turns": 13,
+  "duration_s": 36.7,
+  "tokens": {
+    "input": 16,
+    "cache_creation": 21546,
+    "cache_read": 129180,
+    "output": 3373
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "## Verdict: MIXED, and I recommend not merging as is\n\nRecall went up a little. Faithfulness, latency and cost all got noticeably worse, and three questions that passed on 512 now fail. On these numbers 1024 is not better overall.\n\n### Metrics\nI ran `python -m evals.run --set golden` on commit `3ae9d6e` (chunk_size 1024; judge `example-judge-v1`; 30 questions). I compared the result with `evals/baselines/main.json` (512).\n\n| Metric | Baseline (512) | Current (1024) | \u0394 |\n|---|---|---|---|\n| recall@5 | 0.933 | 0.967 | **+0.034** (1 more hit) |\n| MRR | 0.933 | 0.933 | 0 |\n| faithfulness | 0.907 | 0.838 | **\u22120.069** |\n| latency p50 | 1.16 s | 1.77 s | **+53%** |\n| latency p95 | 1.48 s | 3.40 s | **+130%** |\n| cost/query | $0.0111 | $0.0167 | **+50%** |\n| failing IDs | q07, q19 | q07, q12, q21, q30 | +3 new, \u22121 fixed |\n\n### What changed per question\n- **Fixed: q19.** With 512, none of the right sources were retrieved. With 1024, `ds-19-a` comes back at rank 1. This accounts for the whole recall gain.\n- **Regressed: q12, q21, q30.** Retrieval is the same in both runs: the right source `ds-*-a` is at rank 1. What changed is the generated answer. With 512, q12 answered \"Datasheet value 36 units for the MC-7 motor.\" (faithfulness 0.93). With 1024, all three answer \"The qNN limit is roughly double the datasheet value.\" (faithfulness 0.55). That's a made-up, unsupported claim in a quotes tool. **Classification: generation failure.** The same chunks are retrieved but the answers got worse, which suggests the larger context (larger chunks, higher cost and latency) is hurting the model's grounding.\n- **Still failing: q07.** Retrieval misses in both runs: neither `ds-07-a` nor `ds-07-b` is in the top 5. Oddly, the answer is still correct (\"21 units\"), so it isn't supported by anything it retrieved. Either it comes from outside the retrieved context or the recorded output is off. Worth a look either way.\n\n### Caveats\n- The harness doesn't run the pipeline live. It scores pre-recorded outputs (`evals/data/outputs_chunk{512,1024}.json`) chosen by `CHUNK_SIZE`. These results are only as current as those recordings.\n- The chunk text in both recordings is placeholder text (\"general description of the product family\"), so I couldn't check whether answers are supported by the actual datasheet content. The faithfulness scores come only from the LLM judge.\n- The sample is 30 questions. One question is \u00b10.033 recall, so the recall gain is within noise. The answer regressions are not.\n\n### Suggested next steps\n1. Don't merge at 1024. If you want q19's retrieval fix, try a middle size (e.g. 768), or 1024 with `TOP_K` reduced to 3 to keep the context size down. Then re-run the eval.\n2. Look into why q07 gives a correct answer without the right sources.\n\nI didn't touch the baseline. The run wrote its results to `evals/results/latest.json`."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-harness-with-2-zwm_fsbc/repo\" && git show --stat HEAD && ls -R evals | head -50 && cat evals/baselines/main.json | head -80",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-harness-with-2-zwm_fsbc/repo\" && git show HEAD -- app/retriever.py | tail -8 && cat evals/run.py",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-harness-with-2-zwm_fsbc/repo\" && python -m evals.run --set golden"
+  ],
+  "artifacts": "--- new file: evals/results/latest.json\n{\n  \"commit\": \"3ae9d6e\",\n  \"chunk_size\": 1024,\n  \"judge_model\": \"example-judge-v1\",\n  \"n\": 30,\n  \"recall_at_5\": 0.967,\n  \"mrr\": 0.933,\n  \"faithfulness\": 0.838,\n  \"latency_p50_s\": 1.77,\n  \"latency_p95_s\": 3.4,\n  \"cost_per_query_usd\": 0.0167,\n  \"failing_ids\": [\n    \"q07\",\n    \"q12\",\n    \"q21\",\n    \"q30\"\n  ]\n}\n"
+}

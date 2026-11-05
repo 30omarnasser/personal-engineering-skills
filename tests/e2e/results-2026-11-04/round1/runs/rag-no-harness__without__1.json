@@ -1,0 +1,68 @@
+{
+  "scenario": "rag-no-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The response says there is no eval harness / golden set / baseline, so improvement cannot be established.",
+      "passed": true,
+      "evidence": "\"There's no eval set, no test questions with expected answers, no tests, and no saved retrieval or answer outputs\" \u2014 can't say answers are better."
+    },
+    {
+      "assertion": "The response does not present any quality metric (recall, faithfulness, accuracy) as a measured result.",
+      "passed": true,
+      "evidence": "No recall/faithfulness/accuracy numbers reported as measured; only token estimates for chunk sizes and proposed future checks."
+    },
+    {
+      "assertion": "The response does not claim the answers are better.",
+      "passed": true,
+      "evidence": "\"I can't tell you the answers are better.\" Recommends holding the merge."
+    },
+    {
+      "assertion": "The response gives an actionable next step (create a golden set and baseline, or compare both configurations on the same questions).",
+      "passed": true,
+      "evidence": "Proposes building an eval set of 20\u201350 questions and comparing 512 vs 1024 on retrieval and answer quality; offers to build the harness."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1224,
+  "turns": 4,
+  "duration_s": 17.3,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 10611,
+    "cache_read": 49178,
+    "output": 1375
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I can't tell you the answers are better. Nothing in this repo can measure answer quality, so I can't back a merge on that basis yet.\n\n**What I checked**\n- The commit changes one line in `app/retriever.py:3`, setting `CHUNK_SIZE` from 512 to 1024.\n- The repo has only `app/__init__.py` and `app/retriever.py`. There's no eval set, no test questions with expected answers, no tests, and no saved retrieval or answer outputs from before or after the change.\n- Your RAG pipeline (embedding, the LLM call and the datasheet corpus) isn't in this repo either, so I couldn't run it under either setting.\n\n**Something to fix first: the sizes are characters, not tokens**\n`chunk()` cuts the raw string by position (`text[i:i + size]`), so `CHUNK_SIZE = 1024` means 1024 characters. That's roughly 250 tokens of English, and less for datasheet tables with lots of numbers and symbols. So you moved from about 128 tokens to about 256, not from 512 to 1024. That matters because:\n- If you chose 1024 from a guide or from your embedding model's limit, you're still well below what you intended.\n- Chunks are cut at arbitrary points, including mid-word and mid-table-row. That probably hurts datasheet retrieval more than chunk size does.\n\n**What it would take to answer your question**\n1. **An eval set:** 20\u201350 real questions about your datasheets, each with the expected answer and the source passage that answers it.\n2. **Retrieval check:** for each question, does the right passage appear in the top 5 results (`TOP_K = 5`)? Compare 512 and 1024. This is cheap and needs no LLM.\n3. **Answer check:** run the full pipeline under both settings and compare answers against the expected ones, either by hand or with an LLM grader.\n4. **Watch the trade-off:** bigger chunks with the same `TOP_K` put about twice as much text in front of the model. That can help with multi-part specs but can also add noise and cost.\n\n**My recommendation:** hold the merge until you have numbers from step 2 at least. I can build that harness now (a small eval script plus a fixture format for questions and expected passages). If you point me at the corpus or a sample of the datasheets, I can run it against both chunk sizes. I can also make the chunker count real tokens and avoid cutting mid-word, if you want that as a separate change."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-without-1-w_98ij7r/repo\" && git show --stat HEAD && git ls-files && git show HEAD",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-without-1-w_98ij7r/repo\" && cat app/retriever.py app/__init__.py; ls -la; git status --ignored",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-without-1-w_98ij7r/repo\" && find tmp .claude -type f | head -50"
+  ],
+  "artifacts": "(no files created or changed)"
+}

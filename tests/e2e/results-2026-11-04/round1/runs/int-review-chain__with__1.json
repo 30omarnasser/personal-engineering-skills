@@ -1,0 +1,78 @@
+{
+  "scenario": "int-review-chain",
+  "skill": null,
+  "kind": "interop",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": null,
+  "skills_called": [],
+  "observe": {
+    "requesting-code-review": false,
+    "find-bugs": false
+  },
+  "checks": [
+    {
+      "type": "post_cmd",
+      "desc": "no tracked file modified (report-only request)",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The unescaped interpolation of customer / sku into HTML is reported as an injection issue.",
+      "passed": true,
+      "evidence": "\"HTML injection... q.customer and ln.sku go into the HTML unescaped (app/pdf.py:12-13)\" with file read/SSRF via WeasyPrint."
+    },
+    {
+      "assertion": "The missing font embedding is noted as a gap against ADR-0007 (or as pending work).",
+      "passed": true,
+      "evidence": "Table row: \"Fonts embedded, never taken from the system | \u274c Missing | There's no @font-face rule and no app/fonts/ directory.\""
+    },
+    {
+      "assertion": "The response separates the general review from the security pass, or clearly covers both.",
+      "passed": true,
+      "evidence": "Separate sections: \"## ADR-0007 compliance\" and \"## Security\", plus correctness issues."
+    },
+    {
+      "assertion": "No code was changed.",
+      "passed": true,
+      "evidence": "No files created or changed; response states \"I didn't change any code.\""
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [
+    {
+      "tool": "Bash",
+      "input": "{\"command\": \"cd \\\"<HOME>/AppData/Local/Temp/e2e-int-review-chain-with-1-qd0ug26r/repo\\\" && python -m pytest -q 2>&1 | tail -15; cat .gitignore; git log --all --oneline -- docs/adr\", \"description\": \"Run tests, show gitignore and ADR his"
+    },
+    {
+      "tool": "Bash",
+      "input": "{\"command\": \"python -m pytest -q\", \"description\": \"Run test suite\"}"
+    }
+  ],
+  "cost_usd": 0.1688,
+  "turns": 8,
+  "duration_s": 31.3,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 12052,
+    "cache_read": 79966,
+    "output": 2810
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I reviewed `feat/quote-pdf` (commit cda58ff, which adds `app/pdf.py` and `tests/test_pdf.py`) against ADR-0007, then did a security pass. **Verdict: don't merge yet.** There's one gap against the ADR and one security issue that gets worse once real PDF rendering is added. I didn't change any code. I also couldn't run the tests, because shell access was denied in this session; please run `python -m pytest -q` yourself before merging.\n\n## ADR-0007 compliance\n\n| ADR requirement | Status | Evidence |\n|---|---|---|\n| Page size A4 | \u2705 Met | `app/pdf.py:6`, tested |\n| `dir=\"rtl\"` for Arabic quotes | \u2705 Met | `app/pdf.py:11`, tested for both RTL and LTR |\n| Rendered with WeasyPrint | \u26a0\ufe0f Not done yet | Rendering is a stub. `route_quote_pdf` returns HTML, not a PDF, even though it's documented as `GET /quotes/{id}/pdf`. WeasyPrint isn't declared as a dependency anywhere. |\n| Built from HTML templates | \u26a0\ufe0f Partly | The commit says \"template\", but the HTML is built from an inline f-string (`app/pdf.py:12-14`). There's no template file. |\n| Fonts embedded, never taken from the system | \u274c Missing | There's no `@font-face` rule and no `app/fonts/` directory. Arabic text would fall back to system fonts, which is exactly what the ADR forbids. |\n\nIf the stub is meant to be a deliberate first step, say so in the PR and track the WeasyPrint and font work. Otherwise the branch doesn't yet deliver what ADR-0007 decided.\n\n## Security\n\n1. **HTML injection, which turns into local file read or server-side requests once WeasyPrint is added (High).** `q.customer` and `ln.sku` go into the HTML unescaped (`app/pdf.py:12-13`). WeasyPrint downloads the resources referenced in the HTML, so an injected customer name containing `<img src=\"file:///...\">`, `<link href=\"http://internal/...\">` or `<a rel=\"attachment\" href=\"file:///...\">` could read local files or reach internal services, and attachments get embedded in the PDF. Even without WeasyPrint, if this HTML is ever served to a browser it's stored XSS.\n   - **Fix:** escape every value (`html.escape`, or Jinja2 with autoescaping), and give WeasyPrint a custom `url_fetcher` that only allows files from `app/fonts/`.\n2. **No authorization check on the route (Medium, needs your confirmation).** Anyone who can call it can fetch any quote by changing `quote_id`. That's fine only if a layer outside this module checks that the caller may see that quote. I couldn't find such a layer in the repo.\n3. **Secrets:** none in the diff, and `.env` is gitignored. \u2705\n\n## Correctness issues found along the way\n\n- An unknown `quote_id` raises `KeyError` (`app/quotes.py:33`), which would surface as a 500 error instead of a 404.\n- The language check only matches exactly `\"ar\"`, so `\"ar-EG\"` or `\"AR\"` would render left-to-right. The HTML also has no `lang` attribute or `<meta charset=\"utf-8\">`, which matters for Arabic text shaping.\n- There are no tests for escaping, fonts, or unknown IDs.\n\n**Before merging I'd want:** values escaped, a restricted `url_fetcher` (or a note to add one with WeasyPrint), embedded fonts or an explicit follow-up for them, and an answer on where authorization happens."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-int-review-chain-with-1-qd0ug26r/repo\" && git diff --stat main...HEAD && git ls-files && git diff main...HEAD"
+  ],
+  "artifacts": "(no files created or changed)"
+}

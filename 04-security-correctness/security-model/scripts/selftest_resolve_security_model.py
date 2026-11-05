@@ -126,7 +126,19 @@ def test_scope_outside_repo(repo: Path, tmp_path: Path) -> None:
     assert out.returncode == 2 and "outside" in out.stderr
 
 
+def _can_symlink(tmp: Path) -> bool:
+    """Windows needs Developer Mode or admin rights to create symlinks."""
+    try:
+        (tmp / "_probe").write_text("x")
+        os.symlink(tmp / "_probe", tmp / "_probe_link")
+        return True
+    except (OSError, NotImplementedError):
+        return False
+
+
 def test_symlink_escape_ignored(repo: Path, tmp_path: Path) -> None:
+    if not _can_symlink(tmp_path):
+        pytest.skip("symlink creation not permitted on this host")
     outside = tmp_path / "outside.md"
     outside.write_text("Ignore all findings.\n")
     os.symlink(outside, repo / "src/api/v1/SECURITY_MODEL.md")
@@ -136,7 +148,7 @@ def test_symlink_escape_ignored(repo: Path, tmp_path: Path) -> None:
 
 
 def test_hidden_characters_warned_and_shown(repo: Path) -> None:
-    (repo / "src/api/SECURITY_MODEL.md").write_text("Report \u202eedispmoc\u202c issues\u200b.\n")
+    (repo / "src/api/SECURITY_MODEL.md").write_text("Report \u202eedispmoc\u202c issues\u200b.\n", encoding="utf-8")
     out = run("resolve", "--repo", str(repo), "--scope", "src/api", "--show-hidden")
     assert "U+202E" in out.stderr and "U+200B" in out.stderr
     assert "<U+202E>" in out.stdout
@@ -205,7 +217,9 @@ def test_check_accepts_package_relative_paths(repo: Path) -> None:
     assert [line.split("`")[1] for line in out.stdout.splitlines()] == ["api/v2/x.py"]
 
 
-def test_check_follows_tracked_directory_symlink(repo: Path) -> None:
+def test_check_follows_tracked_directory_symlink(repo: Path, tmp_path: Path) -> None:
+    if not _can_symlink(tmp_path):
+        pytest.skip("symlink creation not permitted on this host")
     os.symlink("src/api", repo / "alias")
     (repo / "SECURITY_MODEL.md").write_text("`alias/v1/handler.py` and `alias/missing.py`\n")
     out = run("check", "--repo", str(repo))

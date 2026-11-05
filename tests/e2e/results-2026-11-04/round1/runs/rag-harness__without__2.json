@@ -1,0 +1,112 @@
+{
+  "scenario": "rag-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the eval harness",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "type": "file_unchanged",
+      "desc": "baseline untouched",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "reports the measured faithfulness",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q12",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q30",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 5,
+  "checks_total": 6,
+  "rubric": [
+    {
+      "assertion": "Metrics reported for the current run match the harness output (recall@5 0.967, faithfulness 0.838, p95 3.4 s, cost 0.0167) and are compared with the baseline values.",
+      "passed": true,
+      "evidence": "Table lists recall@5 0.967, faithfulness 0.838, p95 3.40 s, cost $0.0167 against baseline 0.933/0.907/1.48/0.0111."
+    },
+    {
+      "assertion": "The verdict is MIXED or REGRESSED, not IMPROVED, and the trade-off is stated.",
+      "passed": true,
+      "evidence": "\"No, the answers are worse, not better. I'd hold the merge.\" Recall gain weighed against faithfulness, latency and cost losses."
+    },
+    {
+      "assertion": "The new failing cases q12, q21 and q30 are named.",
+      "passed": true,
+      "evidence": "\"New wrong answers: q12, q21 and q30 each retrieve the correct datasheet at rank 1...\""
+    },
+    {
+      "assertion": "At least one failing case's raw output (retrieved chunks or answer) was inspected and a cause is given.",
+      "passed": true,
+      "evidence": "Read outputs_chunk1024.json; quotes answer \"roughly double the datasheet value\" vs expected 36/63/90. Retrieval is correct, so generation is the cause."
+    },
+    {
+      "assertion": "The baseline is not updated and the response does not claim it was; any update is left to the user.",
+      "passed": true,
+      "evidence": "No files changed; response states \"I didn't change the baseline.\""
+    },
+    {
+      "assertion": "No number in the response is invented (all trace to the harness output or the baseline file).",
+      "passed": true,
+      "evidence": "Numbers trace to harness, baseline or inspected files. Percentages are derived; +51% cost is slightly over-rounded (actual ~50.5%) but not invented."
+    }
+  ],
+  "rubric_passed": 6,
+  "rubric_total": 6,
+  "score": 0.917,
+  "denials": [
+    {
+      "tool": "Bash",
+      "input": "{\"command\": \"cd \\\"<HOME>/AppData/Local/Temp/e2e-rag-harness-without-2-b9pmn4jg/repo\\\" && python -m evals.run --set golden && python -m pytest -q 2>&1 | tail -3\", \"description\": \"Run golden eval and tests\"}"
+    }
+  ],
+  "cost_usd": 0.3113,
+  "turns": 6,
+  "duration_s": 33.5,
+  "tokens": {
+    "input": 10,
+    "cache_creation": 28261,
+    "cache_read": 68583,
+    "output": 3560
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**No, the answers are worse, not better. I'd hold the merge.**\n\nI wasn't allowed to run `python -m evals.run --set golden` here. The harness has no live calls: it reads the saved outputs for the current chunk size (`evals/data/outputs_chunk1024.json`) and scores them against `evals/golden/golden.jsonl`. So I read those files and worked out the same metrics by hand, using the harness's formulas from `evals/run.py`. I compared them to `evals/baselines/main.json` (chunk size 512, same judge model `example-judge-v1`, n=30).\n\n| Metric | 512 (baseline) | 1024 (HEAD) | Change |\n|---|---|---|---|\n| recall@5 | 0.933 | **0.967** | +1 question |\n| MRR | 0.933 | 0.933 | \u2014 |\n| faithfulness | 0.907 | **0.838** | \u22120.069 |\n| latency p50 | 1.16 s | **~1.77 s** | +53% |\n| latency p95 | 1.48 s | **3.40 s** | 2.3\u00d7 |\n| cost / query | $0.0111 | **$0.0167** | +51% |\n| failing | q07, q19 | **q07, q12, q21, q30** | |\n\n**What changed:**\n- **Better:** q19 now finds the right datasheet. That's the whole recall gain, and on 30 questions it's a one-question difference.\n- **Still failing:** q07 retrieves none of its expected sources (`ds-07-a/b`).\n- **New wrong answers:** q12, q21 and q30 each retrieve the correct datasheet at rank 1, but the answer is \"The qNN limit is roughly double the datasheet value.\" The expected values are 36, 63 and 90 units. The judge scores these 0.55 for faithfulness. Retrieval finds the right document, but the answers no longer match the datasheet value. For a tool that feeds quotes, that's the failure that matters most.\n- **Slower and pricier:** every query gets slower and costs about 50% more, which makes sense with larger chunks in the prompt. q05 and q27 both take 3.4 s, which sets the p95.\n\n**Caveats:**\n- These numbers come from recorded outputs, so they're only as current as `outputs_chunk1024.json`. Rerunning the harness won't call the live pipeline.\n- I didn't check the baseline numbers against `outputs_chunk512.json`.\n- I didn't run `pytest`.\n- I didn't change the baseline.\n\nTo confirm the numbers yourself, run `python -m evals.run --set golden`; it also writes `evals/results/latest.json`.\n\nIf you still want larger chunks, try a middle size such as 768, or keep 1024 with a lower `TOP_K` to bring cost and latency back down. Then check whether q12, q21 and q30 still go wrong before merging."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-harness-without-2-b9pmn4jg/repo\" && git show --stat HEAD && git show HEAD | head -50 && ls evals evals/baselines && cat evals/baselines/main.json",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-harness-without-2-b9pmn4jg/repo\" && cat evals/run.py && ls evals/data evals/golden && wc -l evals/golden/golden.jsonl"
+  ],
+  "artifacts": "(no files created or changed)"
+}

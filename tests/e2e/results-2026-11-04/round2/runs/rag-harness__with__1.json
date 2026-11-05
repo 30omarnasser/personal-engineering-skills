@@ -1,0 +1,109 @@
+{
+  "scenario": "rag-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the eval harness",
+      "passed": true,
+      "detail": "python -m evals.run --set golden"
+    },
+    {
+      "type": "file_unchanged",
+      "desc": "baseline untouched",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "reports the measured faithfulness",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q12",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "names new failure q30",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 6,
+  "checks_total": 6,
+  "rubric": [
+    {
+      "assertion": "Metrics reported for the current run match the harness output (recall@5 0.967, faithfulness 0.838, p95 3.4 s, cost 0.0167) and are compared with the baseline values.",
+      "passed": true,
+      "evidence": "Table lists recall@5 0.967, faithfulness 0.838, p95 3.40 s, cost $0.0167 beside baseline 0.933, 0.907, 1.48 s, $0.0111."
+    },
+    {
+      "assertion": "The verdict is MIXED or REGRESSED, not IMPROVED, and the trade-off is stated.",
+      "passed": true,
+      "evidence": "\"Verdict: REGRESSED.\" Trade-off stated: gains one question on retrieval, loses three on answers, with higher latency and cost."
+    },
+    {
+      "assertion": "The new failing cases q12, q21 and q30 are named.",
+      "passed": true,
+      "evidence": "\"q12, q21, q30 now fail because the answers are wrong\" \u2014 all three named."
+    },
+    {
+      "assertion": "At least one failing case's raw output (retrieved chunks or answer) was inspected and a cause is given.",
+      "passed": true,
+      "evidence": "Read outputs_chunk1024/512 files. Cites identical chunks and q12 answer change. Cause given: larger context leads to hallucination."
+    },
+    {
+      "assertion": "The baseline is not updated and the response does not claim it was; any update is left to the user.",
+      "passed": true,
+      "evidence": "Wrote only evals/results/latest.json. States \"I didn't change the baseline.\""
+    },
+    {
+      "assertion": "No number in the response is invented (all trace to the harness output or the baseline file).",
+      "passed": true,
+      "evidence": "Aggregates match the harness and baseline. Deltas and percentages compute correctly. Per-question details come from the outputs files the agent read."
+    }
+  ],
+  "rubric_passed": 6,
+  "rubric_total": 6,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.2303,
+  "turns": 12,
+  "duration_s": 26.9,
+  "tokens": {
+    "input": 12,
+    "cache_creation": 20291,
+    "cache_read": 92533,
+    "output": 2462
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**No, the answers aren't better, and I'd hold the merge.** Retrieval improved a little, but answer faithfulness dropped, three questions that used to pass now fail, and latency and cost both went up a lot.\n\nI ran `python -m evals.run --set golden` on commit `3ae9d6e` (chunk_size 1024, judge `example-judge-v1`, 30 questions) and compared it with `evals/baselines/main.json` (chunk_size 512).\n\n| Metric | Baseline (512) | Current (1024) | Change |\n|---|---|---|---|\n| recall@5 | 0.933 | 0.967 | **+0.034** |\n| MRR | 0.933 | 0.933 | 0 |\n| faithfulness | 0.907 | 0.838 | **\u22120.069** |\n| latency p50 | 1.16 s | 1.77 s | +0.61 s (+53%) |\n| latency p95 | 1.48 s | 3.40 s | +1.92 s (+130%) |\n| cost per query | $0.0111 | $0.0167 | +$0.0056 (+50%) |\n| failing questions | q07, q19 | q07, q12, q21, q30 | 1 fixed, 3 new |\n\n**What changed, question by question** (I read the full records for q12, q21 and q30 in both output files):\n- **q12, q21, q30 now fail because the answers are wrong, not because retrieval got worse.** The retrieved chunks are exactly the same as before and still include the right source (rank 1). But the answers changed from correct, e.g. \"Datasheet value 36 units for the MC-7 motor,\" to the unsupported \"The q12 limit is roughly double the datasheet value.\" Faithfulness fell from 0.93 to 0.55. Since the sources didn't change, the larger chunks are the likely cause: the model gets much more context and starts making things up.\n- **q19 is fixed:** at 1024 the right source `ds-19-a` is now the top result. This one fix is the whole recall gain.\n- **q07 still fails, the same way as before:** none of the top 5 retrieved chunks is from the expected sources (`ds-07-a`/`b`).\n\n**Verdict: REGRESSED.** You gain one question on retrieval and lose three on answer quality, and pay for it with p95 latency more than doubling and 50% higher cost per query.\n\n**Possible next steps:**\n- Try a size in between, like 768.\n- Keep 512 and add a reranker to fix q19.\n- Keep 1024 but trim the context or send fewer chunks to the model.\n\n**Caveats:**\n- The harness scores saved outputs (`evals/data/outputs_chunk1024.json`), not live calls. These numbers are only as good as that file is a true capture of the pipeline at 1024.\n- The baseline's commit field says `baseline-chunk512`, not a real commit hash.\n- This run's results are in `evals/results/latest.json`. I didn't change the baseline."
+  ],
+  "bash": [
+    "ls evals evals/baselines evals/golden; git show --stat HEAD",
+    "python -m evals.run --set golden"
+  ],
+  "artifacts": "--- new file: evals/results/latest.json\n{\n  \"commit\": \"3ae9d6e\",\n  \"chunk_size\": 1024,\n  \"judge_model\": \"example-judge-v1\",\n  \"n\": 30,\n  \"recall_at_5\": 0.967,\n  \"mrr\": 0.933,\n  \"faithfulness\": 0.838,\n  \"latency_p50_s\": 1.77,\n  \"latency_p95_s\": 3.4,\n  \"cost_per_query_usd\": 0.0167,\n  \"failing_ids\": [\n    \"q07\",\n    \"q12\",\n    \"q21\",\n    \"q30\"\n  ]\n}\n"
+}

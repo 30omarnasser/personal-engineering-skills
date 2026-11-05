@@ -1,0 +1,12 @@
+# Runtime dependencies declared by scripts in personal-engineering-skills (2026-11-04)
+PyYAML
+pytest
+# _optional/huggingface-community-evals PEP 723 headers
+inspect-ai
+inspect-evals
+openai
+vllm
+torch
+transformers
+accelerate
+lighteval

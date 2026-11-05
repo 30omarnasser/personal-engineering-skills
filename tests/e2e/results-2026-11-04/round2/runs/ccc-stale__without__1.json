@@ -1,0 +1,73 @@
+{
+  "scenario": "ccc-stale",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 1,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the test command",
+      "passed": true,
+      "detail": "python -m pytest -q"
+    },
+    {
+      "type": "regex",
+      "desc": "reports the failing test",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The commit mismatch is detected (handoff says a1b2c3d; the repository HEAD differs / has an extra WIP commit).",
+      "passed": true,
+      "evidence": "\"HEAD is `e776211`. No commit `a1b2c3d` appears\"; notes WIP commit e776211 not mentioned in handoff."
+    },
+    {
+      "assertion": "The test mismatch is detected: one test fails (test_arabic_font_embedded) and the count is not 14 passed.",
+      "passed": true,
+      "evidence": "\"The suite has only 10 tests: 1 failed, 9 passed\"; names test_arabic_font_embedded failing."
+    },
+    {
+      "assertion": "The handoff is reported as stale / inaccurate, with corrected values or a proposed patch.",
+      "passed": true,
+      "evidence": "\"out of date in four places\" with table of corrected values; suggests updating HANDOFF.md."
+    },
+    {
+      "assertion": "The test result is established by running the test command, not by trusting the handoff.",
+      "passed": true,
+      "evidence": "Agent ran Bash: python -m pytest -q before reporting results."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1257,
+  "turns": 7,
+  "duration_s": 16.7,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 11018,
+    "cache_read": 35397,
+    "output": 1515
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "The handoff is mostly right about the plan, but it's out of date in four places. I checked it against the git history and the current files, and ran the tests.\n\n**What's accurate**\n- Goal, branch and the decision all match. ADR-0007 is accepted: WeasyPrint, A4 pages, `dir=\"rtl\"` for Arabic quotes, and fonts embedded and shipped in `app/fonts/`.\n- `app/pdf.py` has the route stub and the HTML template, and `tests/test_pdf.py` exists. Both came in with commit `cda58ff`.\n- The two pending items, in that order, are still outstanding.\n\n**What's wrong or missing**\n| Handoff says | Repository actually has |\n|---|---|\n| HEAD `a1b2c3d` | HEAD is `e776211`. No commit `a1b2c3d` appears in the branch history. |\n| `pytest` gives 14 passed | The suite has only 10 tests: **1 failed, 9 passed** |\n| Known failures: none | `tests/test_rtl_font.py::test_arabic_font_embedded` fails |\n| *(not mentioned)* | Commit `e776211` \"WIP: test for Arabic font embedding\" added that failing test. The handoff doesn't mention this commit. |\n| Item 2: document the endpoint in the README | There's no README in the repo, so step 2 means creating one, not editing one |\n\nThe failure is expected. It's a test written ahead of pending item 1 to define what \"done\" means, and its own comment says embedding isn't implemented yet. It checks that the HTML from `route_quote_pdf(2)` contains `@font-face`. Right now the template in `app/pdf.py:13` has no `<style>` block, and `app/fonts/` doesn't exist.\n\n**Next step:** do pending item 1 and make `test_arabic_font_embedded` pass. Concretely:\n1. Add an Arabic font file under `app/fonts/` (ADR-0007 requires it to ship with the app, not come from the system). Check that its license allows bundling.\n2. In `render_html`, add a `<style>` block with an `@font-face` rule pointing at that bundled file. Apply it at least to Arabic quotes.\n3. Run `python -m pytest -q` and expect 10 passed.\n\nAfter that comes item 2: create the README and document `GET /quotes/{id}/pdf`. I'd also update HANDOFF.md with the correct HEAD, test count and known-failure line so the next session doesn't hit the same mismatches. Want me to start on the font embedding?"
+  ],
+  "bash": [
+    "git ls-files; git log --stat -3",
+    "python -m pytest -q"
+  ],
+  "artifacts": "(no files created or changed)"
+}

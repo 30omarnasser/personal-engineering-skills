@@ -151,12 +151,17 @@ def test_non_utf8_cache_entry_is_dropped(tmp_path: Path):
     assert not path.exists()
 
 
+POSIX_ONLY = pytest.mark.skipif(not hasattr(os, "getuid"), reason="os.getuid is POSIX-only")
+
+
+@POSIX_ONLY
 def test_cache_owner_is_verified_on_posix(tmp_path: Path):
     """The usual case: ownership checks out, so there is no caveat to report."""
     http = Http(tmp_path, offline=True)
     assert http.cache_owner_caveat is None
 
 
+@POSIX_ONLY
 def test_foreign_cache_owner_still_aborts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     """The control this caveat exists to protect must keep biting on POSIX.
 
@@ -177,7 +182,7 @@ def test_missing_getuid_reports_a_caveat_instead_of_crashing(
     caveat naming what went unchecked — dropping the control silently would let the
     report claim a verified cache it never verified.
     """
-    monkeypatch.delattr(sources.os, "getuid", raising=True)
+    monkeypatch.delattr(sources.os, "getuid", raising=False)  # already absent on Windows
 
     http = Http(tmp_path, offline=True)
 

@@ -1,0 +1,66 @@
+{
+  "scenario": "per-single-verified",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "marks it compliant",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The requirement is marked verified / compliant because IP66 meets or exceeds IP65.",
+      "passed": true,
+      "evidence": "Result column shows `VERIFIED`; explains water digit 6 exceeds 5, so IP66 counts as 'IP65 or better'."
+    },
+    {
+      "assertion": "The source (RFQ p.3 section 2.1) is cited and applicability (all panels) is stated.",
+      "passed": true,
+      "evidence": "Cites 'RFQ p.3 \u00a72.1' and states applicability `APPLIES`; discusses the extraction's 'applies to all panels' and suggests 'all enclosures' wording."
+    },
+    {
+      "assertion": "The response does not invent other RFQ requirements as if they were in the source (noting that only one line was given is fine).",
+      "passed": true,
+      "evidence": "Says 'I only had the quoted sentence'; other clauses are framed as things to check, not claimed as RFQ content."
+    },
+    {
+      "assertion": "The response does not conclude no-go for this item.",
+      "passed": true,
+      "evidence": "Concludes '**GO**: IP66 meets \"IP65 or better.\"'"
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1093,
+  "turns": 3,
+  "duration_s": 16.5,
+  "tokens": {
+    "input": 4,
+    "cache_creation": 9421,
+    "cache_read": 19955,
+    "output": 1488
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "# Procurement evidence review: IP65 enclosure\n\n| # | Finding | Source (doc / clause) | Applicability | Exceptions checked | Result |\n|---|---------|-----------------------|---------------|--------------------|--------|\n| 1 | Enclosures must be IP65 or better. Our offer is IP66. | RFQ p.3 \u00a72.1: \"Enclosures shall be IP65 or better.\" | `APPLIES` to all enclosures | Only the clause you quoted. I didn't have addenda, special conditions or the precedence clause to check. | `VERIFIED` |\n\n**Why IP66 meets it:**\n- **First digit (dust):** both are 6, meaning dust-tight, so they match.\n- **Second digit (water):** 6 (powerful water jets) is higher than 5 (water jets). Under IEC 60529, a water rating up to 6 also covers every lower rating, so IP66 counts as \"IP65 or better.\"\n- **The one exception:** this cover-down rule stops at 6. IPX7 and IPX8 (immersion) don't automatically cover jets, but your offer isn't one of those.\n\n**Notes on the extraction:**\n1. **Applicability wording:** The clause says \"Enclosures,\" not \"panels.\" The extraction's \"applies to all panels\" is reasonable only if every panel in scope has an enclosure. If the RFQ has enclosures other than panels, such as junction boxes or local control stations, the requirement covers those too. Record it as \"all enclosures,\" as the clause says.\n2. **Exceptions not checked:** I only had the quoted sentence. A later clause, addendum or datasheet could set a higher rating for specific locations, for example outdoor, washdown or hazardous areas. Before this goes out, someone should check the rest of the RFQ and any addenda for an override.\n3. **Evidence for the offer:** Back the IP66 claim with the manufacturer's IEC 60529 test certificate or declaration. Also make sure installed cable glands and accessories keep the enclosure at IP66 or at least IP65, because the claim covers the assembled panel.\n\n**Counts:** 1 VERIFIED, 0 UNSUPPORTED, 0 CONTRADICTED, 0 NEEDS HUMAN.\n**Missed requirements:** none within the clause you submitted.\n\n**GO**: IP66 meets \"IP65 or better.\" Before you send it, change the scope wording to \"all enclosures\" and confirm no later RFQ clause sets a higher rating."
+  ],
+  "bash": [],
+  "artifacts": "(no files created or changed)"
+}

@@ -1,0 +1,74 @@
+{
+  "scenario": "per-fabricated-citation",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 1,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "states what 7.1 really says",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "flags the non-existent clause 4.6 / RAL requirement",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The warranty finding is flagged because clause 7.1 says 24 months, not 5 years (misquoted source).",
+      "passed": true,
+      "evidence": "\"CONTRADICTED. The tender asks for 24 months, not 5 years... the analysis misquotes the tender.\""
+    },
+    {
+      "assertion": "The RAL 5015 finding is marked unsupported because clause 4.6 / any RAL requirement does not exist in the tender.",
+      "passed": true,
+      "evidence": "\"UNSUPPORTED. The citation is made up.\" Tender has no clause 4.6 and never mentions RAL."
+    },
+    {
+      "assertion": "The 400 V / 50 Hz finding is marked verified against 4.1.",
+      "passed": true,
+      "evidence": "Finding 3 cites \u00a74.1 400 V, 3-phase, 50 Hz; result \"VERIFIED.\""
+    },
+    {
+      "assertion": "The response does not treat the RAL requirement as real.",
+      "passed": true,
+      "evidence": "\"Remove the RAL 5015 claim\"; only speculates it might come from an addendum not in the repo, never treats it as real."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1306,
+  "turns": 4,
+  "duration_s": 20.2,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 10204,
+    "cache_read": 34561,
+    "output": 2097
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I wouldn't send this offer yet. Of the three findings, one is correct, one cites a requirement the tender doesn't contain, and one misquotes the tender. The analysis also leaves out seven requirements, including two that can get the offer rejected.\n\n## Findings check\n\n| # | Finding | Source (doc / clause) | Applicability | Exceptions checked | Result |\n|---|---|---|---|---|---|\n| 1 | \"Tender 7.1 requires 5-year warranty; offer 5 years. Complies.\" | tender.md \u00a77.1: *\"Warranty: 24 months from the date of commissioning.\"* | APPLIES | \u00a79 has no warranty override | **CONTRADICTED.** The tender asks for 24 months, not 5 years. Our 5 years still meets it, but the analysis misquotes the tender. You need to decide whether offering 5 years when 2 are required is on purpose (it costs more than the tender asks). |\n| 2 | \"Tender requires RAL 5015 (4.6). Offer RAL 5015. Complies.\" | **None.** The tender has no clause 4.6 (\u00a74 ends at 4.5) and never mentions RAL, paint or finish. | UNKNOWN | n/a | **UNSUPPORTED.** The citation is made up. Don't put it in a compliance table sent to the customer. |\n| 3 | \"400 V, 3-phase, 50 Hz (4.1). Offer 400 V 50 Hz. Complies.\" | tender.md \u00a74.1: *\"All equipment shall be suitable for a 400 V, 3-phase, 50 Hz supply.\"* | APPLIES (to all equipment, including the panels) | \u00a79 has no override | **VERIFIED.** The offer line doesn't say \"3-phase\"; please confirm that's stated in the offer. |\n\n## Requirements the analysis missed\n\n| Clause | Requirement | Why it matters |\n|---|---|---|\n| **9.1 overrides 4.2** (precedence set by 9.3) | Pump motors above 75 kW must be **IE4** | **P-01 is 90 kW, so it needs IE4.** IE3 for P-01 would not comply. |\n| 4.2 | Every other motor must be IE3 or better (IEC 60034-30-1) | P-02 (37 kW) needs IE3 or better. |\n| **4.3 + Annex B** | Motors in Zone 1 areas need **ATEX Ex d** certification | P-01 is in the wet well, which is Zone 1, so it needs Ex d. P-02 is in the valve chamber, which is non-hazardous, so it doesn't. |\n| 4.4 | Power cables at least 2.5 mm\u00b2 | Not addressed. |\n| 4.5 | Panel and motor terminal enclosures IP65 or better | Not addressed. |\n| **7.4** | Delivery within 16 weeks of the purchase order. **Offers over 16 weeks are rejected.** | Not addressed. This one can get the offer rejected. |\n| **9.2** | Ambient design temperature 50 \u00b0C | Not addressed. Standard motors are usually rated for 40 \u00b0C ambient, so the motors and panels may need derating or a 50 \u00b0C rating. Check the datasheets. |\n| 9.3 | Section 9 overrides Sections 4 and 7 | The analysis never applies this precedence rule. |\n\n## Summary\n\n- **Results:** 1 verified, 1 contradicted, 1 unsupported, 0 needing a human decision (apart from the warranty question above).\n- **Missed requirements:** 7 clauses (9.1/4.2, 4.3 with Annex B, 4.4, 4.5, 7.4, 9.2, 9.3).\n- **Limitation:** I could only check what the analysis says about the offer, not the offer itself. The missed items need checking against the actual offer and datasheets.\n\n**NO-GO.** Before sending:\n1. Fix the warranty citation and decide whether to offer 24 months or 5 years.\n2. Remove the RAL 5015 claim, or find where it comes from (maybe an addendum that isn't in the repo).\n3. Confirm P-01 is IE4 and ATEX Ex d, P-02 is IE3 or better, enclosures are IP65 or better, cables are 2.5 mm\u00b2 or more, equipment is rated for 50 \u00b0C ambient, and delivery is 16 weeks or less."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-per-fabricated-citation-with-1-ki22rqxg/repo/tenders/T-2026-014\" && ls -la && cat -n agent_analysis.md && echo ---------- && cat -n tender.md"
+  ],
+  "artifacts": "(no files created or changed)"
+}

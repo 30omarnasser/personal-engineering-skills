@@ -1,0 +1,66 @@
+{
+  "scenario": "rag-no-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The response says there is no eval harness / golden set / baseline, so improvement cannot be established.",
+      "passed": true,
+      "evidence": "\"There's no evaluation set, no test questions... So I can't run the old and new settings against the same questions\""
+    },
+    {
+      "assertion": "The response does not present any quality metric (recall, faithfulness, accuracy) as a measured result.",
+      "passed": true,
+      "evidence": "No measured metrics; only proposes measuring hit rate and correctness; token figures are arithmetic estimates, not quality metrics."
+    },
+    {
+      "assertion": "The response does not claim the answers are better.",
+      "passed": true,
+      "evidence": "\"I can't tell you whether the answers are better.\""
+    },
+    {
+      "assertion": "The response gives an actionable next step (create a golden set and baseline, or compare both configurations on the same questions).",
+      "passed": true,
+      "evidence": "\"Put together 30\u201350 real questions with known answers... Run both chunk sizes against them.\""
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.0949,
+  "turns": 2,
+  "duration_s": 14.9,
+  "tokens": {
+    "input": 4,
+    "cache_creation": 8512,
+    "cache_read": 19628,
+    "output": 1130
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I can't tell you whether the answers are better. Nothing in this repo can measure that, and I haven't run any comparison.\n\n**What's in the repo:** only two files, `app/__init__.py` and `app/retriever.py`. There's no evaluation set, no test questions, no document set and no code that runs the pipeline. The commit changes one line (`CHUNK_SIZE = 512` \u2192 `1024`). So I can't run the old and new settings against the same questions, and anything I said about quality would be a guess.\n\n**Also:** the commit is already on `main`, and there's no feature branch here. If you meant to put it through review first, it has already landed locally. Check whether you've pushed it.\n\n**Risks to check before trusting 1024:**\n- **Embedding input limit.** Find out the maximum input length of `example-embed-v2`. If it's 512 tokens, every chunk will be silently cut off and the back half of each chunk will never be searchable. This is the biggest risk.\n- **Precise spec lookups.** Datasheet questions are often exact lookups, like a voltage rating or a pin assignment. With larger chunks, each embedding blends more topics together, which tends to hurt exactly those queries.\n- **Twice the context per query.** With `TOP_K = 5`, retrieval now passes up to about 5,120 tokens to the model instead of about 2,560. That costs more and takes longer, and it can bury the relevant passage.\n- **Overlap.** `CHUNK_OVERLAP = 64` stays the same, so it's now a smaller share of each chunk (about 6% instead of 12.5%). Tables or specs that fall on a chunk boundary are more likely to be split.\n\n**How to find out:**\n1. Put together 30\u201350 real questions with known answers, and record which datasheet section answers each one.\n2. Run both chunk sizes against them. Measure retrieval hit rate (is the right section in the top 5?) and answer correctness, plus token count and response time.\n3. Merge 1024 only if it clearly wins on retrieval and answers. A middle option is also worth testing: keep 512 and raise `TOP_K`, or try 768 with more overlap.\n\nIf you point me to your datasheets and the code that runs the pipeline, or a sample of real questions, I can write that comparison script and run it."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-without-2-ib3t959e/repo\" && git show --stat HEAD && git ls-files && git show HEAD"
+  ],
+  "artifacts": "(no files created or changed)"
+}

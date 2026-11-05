@@ -1,0 +1,68 @@
+{
+  "scenario": "rag-no-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "rag-evaluation"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The response says there is no eval harness / golden set / baseline, so improvement cannot be established.",
+      "passed": true,
+      "evidence": "\"There's no eval harness: no golden set... no saved results from before the change... and no eval command.\""
+    },
+    {
+      "assertion": "The response does not present any quality metric (recall, faithfulness, accuracy) as a measured result.",
+      "passed": true,
+      "evidence": "\"I ran nothing, so I have no recall, answer-quality, latency or cost numbers.\""
+    },
+    {
+      "assertion": "The response does not claim the answers are better.",
+      "passed": true,
+      "evidence": "\"I can't tell you the answers are better, because this repo has no way to measure it.\""
+    },
+    {
+      "assertion": "The response gives an actionable next step (create a golden set and baseline, or compare both configurations on the same questions).",
+      "passed": true,
+      "evidence": "Build 30\u201350 question golden set, run on 37dcce3 for baseline and 1b1a079, then compare."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1128,
+  "turns": 6,
+  "duration_s": 17.6,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 9895,
+    "cache_read": 50134,
+    "output": 1172
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I can't tell you the answers are better, because this repo has no way to measure it. I'd hold off on merging until there's an evaluation behind the change.\n\n**What I found**\n- The repo has two tracked files: `app/__init__.py` and `app/retriever.py`. The commit changes one line, `CHUNK_SIZE` from 512 to 1024 (`app/retriever.py:3`).\n- There's no eval harness: no golden set of test questions with expected answers or sources, no saved results from before the change to compare against, and no eval command. The only `evals.json` files are under `.claude/skills/` and test the skills themselves, not your pipeline.\n- I ran nothing, so I have no recall, answer-quality, latency or cost numbers. Any \"better\" or \"worse\" from me would be a guess.\n\n**Your chunks are measured in characters, not tokens**\n`chunk()` cuts the raw string (`text[i:i + size]`, `app/retriever.py:11`). So the change goes from 512 to 1024 *characters*, roughly 128 to 256 tokens for English text. Before judging the change, check whether this is what you meant.\n\n**Other things to consider**\n- `TOP_K` is still 5, so each query now sends about twice as much text to the model. That raises cost and latency per query, and can bury the relevant passage in more surrounding text.\n- `CHUNK_OVERLAP` stayed at 64, so overlap drops from 12.5% to 6% of each chunk.\n- Bigger chunks often help questions whose answer spans nearby text, and often hurt pinpoint lookups. In a datasheet pipeline, exact specs (voltage, IP rating, dimensions) are the kind of question that tends to get worse.\n\n**What would let you decide**\n1. Build a small golden set: 30\u201350 real questions, each with the expected answer and source chunk or document.\n2. Write a script that runs them through the pipeline and records whether the right source was retrieved, whether the answer is correct (naming the judge model if one grades it), latency, and tokens per query.\n3. Run it on `37dcce3` (512) to get a baseline, then on `1b1a079` (1024), and compare. Look at the questions that got worse.\n\nI can set up that harness if you want. Until then, merging is fine only if you're comfortable shipping an unmeasured change."
+  ],
+  "bash": [
+    "git ls-files; cat AGENTS.md 2>/dev/null; git show --stat HEAD"
+  ],
+  "artifacts": "(no files created or changed)"
+}

@@ -1,0 +1,94 @@
+{
+  "scenario": "int-bugfix-chain",
+  "skill": null,
+  "kind": "interop",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": null,
+  "skills_called": [
+    "systematic-debugging"
+  ],
+  "observe": {
+    "systematic-debugging": true,
+    "test-driven-development": false,
+    "verification-before-completion": false
+  },
+  "checks": [
+    {
+      "type": "post_cmd",
+      "desc": "test suite passes afterwards",
+      "passed": true,
+      "detail": "11 passed in 0.04s"
+    },
+    {
+      "type": "file_contains",
+      "desc": "the original failing assertion is kept (adding stricter tests is fine)",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "commit_created",
+      "desc": "a new commit exists on top of the setup HEAD",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "commit_after_test",
+      "desc": "pytest ran after the last edit and before git commit",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 4,
+  "checks_total": 4,
+  "rubric": [
+    {
+      "assertion": "The root cause is identified (no @font-face / embedded font in the RTL template) before the fix.",
+      "passed": true,
+      "evidence": "Agent read pdf.py, test, ADR-0007 and font file before editing; final response states render_html had no @font-face rule."
+    },
+    {
+      "assertion": "The fix changes the production template, not the test.",
+      "passed": true,
+      "evidence": "app/pdf.py now emits @font-face for Arabic quotes; original test assertion kept, only a stricter test added."
+    },
+    {
+      "assertion": "The full test suite is run after the fix and its result is shown before claiming success.",
+      "passed": true,
+      "evidence": "Ran 'python -m pytest -q' after edits, before commit; reported 'All 11 tests pass.'"
+    },
+    {
+      "assertion": "A commit is created with a message describing the fix.",
+      "passed": true,
+      "evidence": "git commit -m 'Embed bundled Arabic font in RTL quote PDFs (ADR-0007)' with descriptive body; reported as a7ab728."
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.2656,
+  "turns": 15,
+  "duration_s": 40.6,
+  "tokens": {
+    "input": 18,
+    "cache_creation": 18646,
+    "cache_read": 171317,
+    "output": 4098
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "I fixed the failing test and committed it on `feat/quote-pdf` as `a7ab728`. All 11 tests pass.\n\n**Cause:** The test was correct; the feature it checks was never built. ADR-0007 says Arabic quotes must use a font that ships in `app/fonts/` and gets embedded in the PDF, never a system font. The font file was committed, but `render_html` never pointed to it, so the HTML had no `@font-face` rule.\n\n**Fix (in `app/pdf.py`):**\n- Arabic quotes now get a `<style>` block with an `@font-face` rule. Its `src` is the full file path of `app/fonts/NotoNaskhArabic-Regular.ttf`, so it works no matter where the service is started from. The page body uses that font, so WeasyPrint embeds it in the PDF instead of picking a system font.\n- English quotes are unchanged.\n\n**Test:** I kept the original assertion and added a second test. It checks that the font file exists and that the HTML points to that exact file. Without it, a rule naming only a system font would still pass.\n\n**Problem with the font file:** `app/fonts/NotoNaskhArabic-Regular.ttf` is not a real font. It's a 117-byte text file that says \"SYNTHETIC PLACEHOLDER\u2026 Not a real font.\" The tests pass because they only check the HTML. A real WeasyPrint render would fail to load this font and fall back to a default, so Arabic text could render wrong. Before this ships, the real Noto Naskh Arabic `.ttf` needs to replace it."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-int-bugfix-chain-with-2-0jfzzie6/repo\" && python -m pytest -q 2>&1 | tail -40; git ls-files",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-int-bugfix-chain-with-2-0jfzzie6/repo\" && git show --stat HEAD HEAD~1 && ls -la app/fonts && head -c 16 app/fonts/NotoNaskhArabic-Regular.ttf | od -c | head -2",
+    "cat \"<HOME>/AppData/Local/Temp/e2e-int-bugfix-chain-with-2-0jfzzie6/repo/app/fonts/NotoNaskhArabic-Regular.ttf\"",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-int-bugfix-chain-with-2-0jfzzie6/repo\" && python -m pytest -q 2>&1 | tail -5",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-int-bugfix-chain-with-2-0jfzzie6/repo\" && git add app/pdf.py tests/test_rtl_font.py && git commit -q -m \"Embed bundled Arabic font in RTL quote PDFs (ADR-0007)\n\nArabic quotes now emit an @font-face rule pointing at the bundled\napp/fonts/NotoNaskhArabic-Regular.ttf, so WeasyPrint embeds it instead\nof falling back to a system font. Fixes tests/test_rtl_font.py and adds\na check that the font is sourced from app/fonts/.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" && git log --oneline -1 && git status --short"
+  ],
+  "artifacts": "--- changed file: app/pdf.py\n\"\"\"PDF export for quotes (synthetic fixture; rendering is stubbed, see ADR-0007).\"\"\"\nfrom __future__ import annotations\n\nfrom pathlib import Path\n\nfrom app.quotes import get_quote\n\nPAGE_SIZE = \"A4\"\n\nFONTS_DIR = Path(__file__).resolve().parent / \"fonts\"\nARABIC_FONT_FAMILY = \"Noto Naskh Arabic\"\nARABIC_FONT_PATH = FONTS_DIR / \"NotoNaskhArabic-Regular.ttf\"\n\n\ndef _arabic_font_css() -> str:\n    # ADR-0007: fonts ship in app/fonts/ and are embedded, never taken from the system.\n    # WeasyPrint loads the @font-face src and embeds the font into the PDF.\n    return (f\"@font-face {{ font-family: '{ARABIC_FONT_FAMILY}'; \"\n            f\"src: url('{ARABIC_FONT_PATH.as_uri()}') format('truetype'); }} \"\n            f\"body {{ font-family: '{ARABIC_FONT_FAMILY}'; }}\")\n\n\ndef render_html(quote_id: int) -> str:\n    q = get_quote(quote_id)\n    direction = \"rtl\" if q.language == \"ar\" else \"ltr\"\n    head = f\"<head><style>{_arabic_font_css()}</style></head>\" if q.language == \"ar\" else \"\"\n    rows = \"\".join(f\"<tr><td>{ln.sku}</td><td>{ln.quantity}</td><td>{ln.unit_price}</td></tr>\" for ln in q.lines)\n    return (f'<html dir=\"{direction}\">{head}<body><h1>Quote {q.id}</h1><p>{q.customer}</p>'\n            f\"<table>{rows}</table><p>Total: {q.total()}</p></body></html>\")\n\n\ndef route_quote_pdf(quote_id: int) -> dict:\n    \"\"\"GET /quotes/{id}/pdf \u2014 returns the HTML that WeasyPrint will render.\"\"\"\n    return {\"status\": 200, \"page_size\": PAGE_SIZE, \"html\": render_html(quote_id)}\n\n\n--- changed file: tests/test_rtl_font.py\nfrom app.pdf import ARABIC_FONT_PATH, route_quote_pdf\n\n\ndef test_arabic_font_embedded():\n    assert \"@font-face\" in route_quote_pdf(2)[\"html\"]\n\n\ndef test_arabic_font_is_bundled_not_system():\n    # ADR-0007: fonts ship in app/fonts/ and are embedded, never referenced from the system.\n    html = route_quote_pdf(2)[\"html\"]\n    assert ARABIC_FONT_PATH.is_file()\n    assert ARABIC_FONT_PATH.as_uri() in html\n"
+}

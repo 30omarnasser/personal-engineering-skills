@@ -1,0 +1,95 @@
+{
+  "scenario": "per-precedence",
+  "skill": "procurement-evidence-review",
+  "kind": "e2e",
+  "arm": "with",
+  "rep": 2,
+  "skill_triggered": true,
+  "skills_called": [
+    "procurement-evidence-review"
+  ],
+  "observe": {},
+  "checks": [
+    {
+      "type": "regex",
+      "desc": "cites special condition 9.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "uses the Annex B hazardous-area schedule",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "type": "regex",
+      "desc": "overall no-go",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 3,
+  "checks_total": 3,
+  "rubric": [
+    {
+      "assertion": "Finding 1 (IE3 incl. 90 kW P-01) is marked contradicted / non-compliant because clause 9.1 requires IE4 above 75 kW.",
+      "passed": true,
+      "evidence": "Finding 1 CONTRADICTED: \"\u00a79.1 ... pump motors rated above 75 kW shall be IE4\"; P-01 needs IE4"
+    },
+    {
+      "assertion": "Finding 2 (ATEX not required) is marked contradicted or unsupported because P-01 sits in the wet well, Zone 1 per Annex B, so clause 4.3 applies.",
+      "passed": true,
+      "evidence": "CONTRADICTED: Annex B Wet well = Zone 1; P-01 in wet well; \u00a74.3 requires ATEX Ex d"
+    },
+    {
+      "assertion": "Finding 3 (60 Hz) is marked contradicted by clause 4.1 (50 Hz).",
+      "passed": true,
+      "evidence": "\u00a74.1 \"400 V, 3-phase, 50 Hz supply\" \u2014 CONTRADICTED: it's 50 Hz, not 60 Hz"
+    },
+    {
+      "assertion": "Finding 4 (IP66 vs IP65) is marked verified / compliant.",
+      "passed": true,
+      "evidence": "VERIFIED: IP66 meets \"IP65 or better\" per \u00a74.5"
+    },
+    {
+      "assertion": "Every finding cites a specific clause or annex of the tender.",
+      "passed": true,
+      "evidence": "Findings cite \u00a74.2/\u00a79.1/\u00a79.3, \u00a74.3/Annex B, \u00a74.1, \u00a74.5 respectively"
+    },
+    {
+      "assertion": "At least two requirements the analysis missed are flagged (any of 4.4, 7.1, 7.4, 9.2).",
+      "passed": true,
+      "evidence": "Flags \u00a74.4 cable, \u00a77.1 warranty, \u00a77.4 16-week delivery, \u00a79.2 50 \u00b0C ambient"
+    },
+    {
+      "assertion": "The overall conclusion is no-go / not ready to send.",
+      "passed": true,
+      "evidence": "\"Recommendation: don't send.\" and \"NO-GO\""
+    }
+  ],
+  "rubric_passed": 7,
+  "rubric_total": 7,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.13,
+  "turns": 4,
+  "duration_s": 21.4,
+  "tokens": {
+    "input": 6,
+    "cache_creation": 10107,
+    "cache_read": 34520,
+    "output": 2106
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**Recommendation: don't send.** Three of the analysis's four findings contradict the tender. The P-01 motor as offered doesn't comply, and several requirements are missing from the analysis entirely.\n\n## Finding-by-finding review\n\n| # | Finding (agent) | Source (tender.md) | Applicability | Exceptions checked | Result |\n|---|---|---|---|---|---|\n| 1 | Motors must be IE3; IE3 offered on all motors including 90 kW P-01 | \u00a74.2 \"IE3 efficiency class minimum\"; **\u00a79.1** \"Notwithstanding clause 4.2, pump motors rated above 75 kW shall be IE4\"; **\u00a79.3** Section 9 takes precedence over Sections 4 and 7 | P-01 (90 kW): **IE4 required**. P-02 (37 kW): IE3 minimum | Yes. \u00a79.1 overrides \u00a74.2 for any motor above 75 kW | **CONTRADICTED**: P-01 needs IE4; IE3 is OK for P-02 only |\n| 2 | ATEX not required | \u00a74.3 \"Motors installed in hazardous areas classified Zone 1 (see Annex B) shall be ATEX Ex d certified\"; Annex B: Wet well = Zone 1; schedule: P-01 is in the wet well | P-01: **APPLIES** (Ex d). P-02 (valve chamber, non-hazardous): DOES NOT APPLY | Section 9 has no ATEX exception | **CONTRADICTED**: P-01 motor must be ATEX Ex d |\n| 3 | Supply 400 V / 60 Hz | \u00a74.1 \"400 V, 3-phase, 50 Hz supply\" | APPLIES to all equipment | No override in Section 9 | **CONTRADICTED**: it's 50 Hz, not 60 Hz. A motor rated for 60 Hz only won't run at its rated speed on 50 Hz. |\n| 4 | IP65 required; IP66 offered, complies | \u00a74.5 \"Panel and motor terminal enclosures shall be IP65 or better\" | APPLIES to panels and motor terminal boxes | No override | **VERIFIED** for the requirement. IP66 meets \"IP65 or better\". The IP66 figure comes from our offer, which isn't in the repo, so check it against the datasheet. |\n\n## Requirements the analysis left out\n\n- **\u00a74.4:** Power cables need at least 2.5 mm\u00b2 conductor cross-section. Cabling is in scope.\n- **\u00a77.1:** Warranty is 24 months from commissioning, not from delivery.\n- **\u00a77.4:** Delivery within 16 weeks of the purchase order. **Any offer over 16 weeks is rejected.** An IE4 + Ex d 90 kW motor may have a long lead time, so confirm it before quoting.\n- **\u00a79.2:** The design ambient temperature is 50 \u00b0C. Standard motors are usually rated for 40 \u00b0C, so the P-01 and P-02 motors and the panels need to be rated or derated for 50 \u00b0C.\n- **\u00a74.1** also says 3-phase, which the analysis didn't mention.\n- **Clause numbering:** Section 7 goes from 7.1 straight to 7.4. Either 7.2 and 7.3 are missing from our copy or they were deliberately left out. Ask the customer to confirm. **NEEDS HUMAN**\n\n## Summary\n\n- **Counts:** 1 VERIFIED, 3 CONTRADICTED, 0 UNSUPPORTED, 1 NEEDS HUMAN (the missing 7.2/7.3)\n- **Root cause:** The analysis read only Section 4. It skipped the Section 9 special conditions and how they rank against Section 4, and it never matched the equipment schedule to Annex B.\n- **What P-01 actually needs:** a 90 kW, IE4, ATEX Ex d motor for 400 V / 3-phase / 50 Hz, rated for 50 \u00b0C ambient, with IP65 or better terminal box, delivered within 16 weeks.\n\n**NO-GO:** Before sending, fix P-01 to IE4 + Ex d, correct the supply to 50 Hz, and add the missing requirements: cable size, warranty, delivery limit and 50 \u00b0C ambient."
+  ],
+  "bash": [
+    "cd tenders/T-2026-014 && ls -la && cat -n tender.md && echo ---- && cat -n agent_analysis.md"
+  ],
+  "artifacts": "(no files created or changed)"
+}

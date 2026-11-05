@@ -1,0 +1,75 @@
+{
+  "scenario": "ccc-stale",
+  "skill": "context-continuity-check",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "bash_ran",
+      "desc": "ran the test command",
+      "passed": true,
+      "detail": "python -m pytest -q"
+    },
+    {
+      "type": "regex",
+      "desc": "reports the failing test",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2,
+  "rubric": [
+    {
+      "assertion": "The commit mismatch is detected (handoff says a1b2c3d; the repository HEAD differs / has an extra WIP commit).",
+      "passed": true,
+      "evidence": "\"HEAD is `e776211`, and no commit `a1b2c3d` exists\"; mentions extra 'WIP: test for Arabic font embedding' commit"
+    },
+    {
+      "assertion": "The test mismatch is detected: one test fails (test_arabic_font_embedded) and the count is not 14 passed.",
+      "passed": true,
+      "evidence": "\"1 failed, 9 passed (10 tests total)\"; test_arabic_font_embedded fails"
+    },
+    {
+      "assertion": "The handoff is reported as stale / inaccurate, with corrected values or a proposed patch.",
+      "passed": true,
+      "evidence": "\"The handoff is out of date\" with table of corrected values for HEAD, tests, known failures"
+    },
+    {
+      "assertion": "The test result is established by running the test command, not by trusting the handoff.",
+      "passed": true,
+      "evidence": "Agent ran Bash: python -m pytest -q"
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1434,
+  "turns": 10,
+  "duration_s": 18.6,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 12049,
+    "cache_read": 52974,
+    "output": 1813
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "The handoff is out of date. The plan in it still holds, but several of its facts don't match the repo.\n\n**Wrong in HANDOFF.md:**\n\n| Handoff says | Repository actually has |\n|---|---|\n| HEAD `a1b2c3d` | HEAD is `e776211`, and no commit `a1b2c3d` exists in the log |\n| `python -m pytest -q` \u2192 14 passed | **1 failed, 9 passed** (10 tests total) |\n| Known failures: none | `tests/test_rtl_font.py::test_arabic_font_embedded` fails because the HTML has no `@font-face` |\n| \u2014 | It doesn't mention the newest commit, `e776211 WIP: test for Arabic font embedding`, which added that failing test |\n\n**Correct in HANDOFF.md:**\n- The branch is `feat/quote-pdf`.\n- ADR-0007 exists and says WeasyPrint, A4, RTL for Arabic, fonts embedded and shipped in `app/fonts/`.\n- `app/pdf.py` has the `GET /quotes/{id}/pdf` route and the HTML template. It sets `dir=\"rtl\"`/`\"ltr\"` and A4, and the 4 tests in `tests/test_pdf.py` pass.\n- Both pending items are still open: `app/fonts/` doesn't exist and there's no README.\n\n**What this means:** whoever wrote the handoff had already started item 1. They committed a failing test for it (the TDD \"red\" step), and the test fails for the expected reason, not because something broke. The handoff was written before that commit.\n\n**Next step:** finish item 1 so `test_arabic_font_embedded` passes:\n1. Add an Arabic font file under `app/fonts/`. Check that its license allows you to bundle it in the app.\n2. Change `render_html` in `app/pdf.py:9` so Arabic quotes get a `<style>` block with an `@font-face` rule pointing at the bundled file, plus a `font-family` rule that uses it. ADR-0007 says fonts must not come from the system.\n3. Run `python -m pytest -q` and confirm all 10 pass.\n\nAfter that comes item 2: the README doesn't exist yet, so you'd be creating it, not editing it. I'd also update HANDOFF.md with the correct HEAD and test status so the next session doesn't hit the same problem. Do you want me to start on the font work?"
+  ],
+  "bash": [
+    "git log --stat -5; git ls-files",
+    "python -m pytest -q",
+    "cat .gitignore; ls -a; ls app",
+    "git status --short; ls -la tmp"
+  ],
+  "artifacts": "(no files created or changed)"
+}

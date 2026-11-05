@@ -1,0 +1,68 @@
+{
+  "scenario": "rag-no-harness",
+  "skill": "rag-evaluation",
+  "kind": "e2e",
+  "arm": "without",
+  "rep": 2,
+  "skill_triggered": false,
+  "skills_called": [],
+  "observe": {},
+  "checks": [
+    {
+      "type": "not_regex",
+      "desc": "verdict is not IMPROVED",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "checks_passed": 1,
+  "checks_total": 1,
+  "rubric": [
+    {
+      "assertion": "The response says there is no eval harness / golden set / baseline, so improvement cannot be established.",
+      "passed": true,
+      "evidence": "\"no eval set, no test questions, no corpus, no tests, and no saved before/after results\" so can't tell if better"
+    },
+    {
+      "assertion": "The response does not present any quality metric (recall, faithfulness, accuracy) as a measured result.",
+      "passed": true,
+      "evidence": "Mentions hit rate and correctness only as proposed comparisons; no measured values presented."
+    },
+    {
+      "assertion": "The response does not claim the answers are better.",
+      "passed": true,
+      "evidence": "\"I can't tell you whether the answers are better\"; recommends waiting to merge."
+    },
+    {
+      "assertion": "The response gives an actionable next step (create a golden set and baseline, or compare both configurations on the same questions).",
+      "passed": true,
+      "evidence": "\"Write 20\u201350 real questions... Build an index at 512 and at 1024... run the same questions against both.\""
+    }
+  ],
+  "rubric_passed": 4,
+  "rubric_total": 4,
+  "score": 1.0,
+  "denials": [],
+  "cost_usd": 0.1946,
+  "turns": 5,
+  "duration_s": 17.9,
+  "tokens": {
+    "input": 8,
+    "cache_creation": 19387,
+    "cache_read": 49427,
+    "output": 1468
+  },
+  "subtypes": [
+    "success"
+  ],
+  "timed_out": false,
+  "responses": [
+    "**I can't tell you whether the answers are better, because the repo has nothing to measure them with.** It contains only `app/__init__.py` and `app/retriever.py`. There's no eval set, no test questions, no corpus, no tests, and no saved before/after results. The commit changes one constant (`CHUNK_SIZE = 512` \u2192 `1024`) and doesn't include any evidence that answers improved. I'd wait to merge until you have a comparison.\n\nSome things I noticed while checking:\n\n1. **The chunks are measured in characters, not tokens.** `chunk()` in `app/retriever.py:9-11` slices the raw string (`text[i:i + size]`). So the change goes from 512 to 1024 *characters* (about 250 tokens), not 1024 tokens. That may still be fine, but the commit message and your expectations are off by roughly 4x.\n2. **Retrieval behaves differently now.** With `TOP_K = 5`, the model gets about twice as much context per query (about 5 KB instead of 2.5 KB). Bigger chunks often help questions that span several sentences. They can hurt precise lookups, like one value in a datasheet table, because the embedding gets diluted. Which effect wins depends on your questions, and only an eval will show that.\n3. **Overlap stayed at 64.** That's now 6% of a chunk instead of 12.5%. Probably harmless, but it's a second change you didn't intend.\n4. **The index has to be rebuilt.** Existing embeddings were built from 512-character chunks, so the change does nothing until you re-chunk and re-embed. If you've only been testing against an old index, you've been testing 512.\n\n**How to get a real answer before merging:**\n- Write 20\u201350 real questions with known answers, plus which datasheet passage holds each answer.\n- Build an index at 512 and at 1024 (each from scratch), and run the same questions against both.\n- Compare retrieval hit rate (is the passage with the answer in the top 5?) and answer correctness. Look at precise-value questions separately, since that's where larger chunks usually lose.\n- Merge if 1024 wins or ties and the cost of the extra context is acceptable.\n\nI can set up that eval harness if you point me to the datasheet corpus and some sample questions."
+  ],
+  "bash": [
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-without-2-_cahxhxu/repo\" && git show --stat HEAD && git ls-files",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-without-2-_cahxhxu/repo\" && git show HEAD -- app/retriever.py && ls -la",
+    "cd \"<HOME>/AppData/Local/Temp/e2e-rag-no-harness-without-2-_cahxhxu/repo\" && ls -laR .claude tmp"
+  ],
+  "artifacts": "(no files created or changed)"
+}
